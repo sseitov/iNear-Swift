@@ -25,20 +25,19 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
         userID.returnType = .next
         userID.placeholder = "Email"
         userID.delegate = self
+        if let user = UserDefaults.standard.value(forKey: "currentUser") as? String {
+            userID.setText(user)
+        }
         
         password.textType = .default
         password.secure = true
         password.returnType = .go
         password.placeholder = "Password"
         password.delegate = self
-
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if FIRAuth.auth()!.currentUser != nil && FIRAuth.auth()!.currentUser!.isEmailVerified {
-            dismiss(animated: true, completion: nil)
-        }
     }
     
     func textChange(_ sender:TextFieldContainer, text:String?) -> Bool {
@@ -76,52 +75,59 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
         
         SVProgressHUD.show(withStatus: "SignUp...")
         FIRAuth.auth()?.createUser(withEmail: self.userID.text(), password: self.password.text()) { (user, error) in
-            SVProgressHUD.dismiss()
             if error != nil {
+                SVProgressHUD.dismiss()
                 self.showMessage(error!.localizedDescription, messageType: .error)
             } else {
-                user?.sendEmailVerification(completion: { verifyError in
-                    self.showMessage("You must confirm your registration. Check your mail box.", messageType: .information)
+                Model.shared.setEmailUser(user!, email: self.userID.text(), result: { success in
+                    if success {
+                        UserDefaults.standard.set(self.userID.text(), forKey: "currentUser")
+                        UserDefaults.standard.synchronize()
+                        user?.sendEmailVerification(completion: { verifyError in
+                            SVProgressHUD.dismiss()
+                            if verifyError != nil {
+                                self.showMessage(verifyError!.localizedDescription, messageType: .error)
+                            } else {
+                                self.showMessage("You must confirm your registration. Check your mail box.", messageType: .information)
+                            }
+                        })
+                    } else {
+                        SVProgressHUD.dismiss()
+                        self.showMessage("Error setup user.", messageType: .error)
+                    }
                 })
             }
         }
     }
-
+    
     @IBAction func signIn() {
         TextFieldContainer.deactivateAll()
         if !checkFields() {
             return
         }
-        
         SVProgressHUD.show(withStatus: "SignIn...")
         FIRAuth.auth()?.signIn(withEmail: userID.text(), password: password.text()) { (user, error) in
             if error != nil {
                 SVProgressHUD.dismiss()
                 self.showMessage(error!.localizedDescription, messageType: .error)
             } else {
-                Model.shared.fetchUser(user!.uid, result: { fetchError, profile in
-                    if fetchError == nil {
-                        let newUser = Model.shared.createUser(user!.uid, email: self.userID.text())
-                        if let nickName = profile!["nickName"] as? String {
-                            newUser.nickName = nickName
-                        }
-                        if let imageURL = profile!["image"] as? String {
-                            let ref = Model.shared.storageRef.child(imageURL)
-                            ref.data(withMaxSize: INT64_MAX, completion: { data, error in
-                                SVProgressHUD.dismiss()
-                                newUser.image = data as NSData?
-                                self.dismiss(animated: true, completion: nil)
-                            })
-                        } else {
-                            SVProgressHUD.dismiss()
-                            self.dismiss(animated: true, completion: nil)
-                        }
-                        Model.shared.saveContext()
-                    } else {
+                if user!.isEmailVerified {
+                    let cashedUser = Model.shared.createUser(user!.uid)
+                    Model.shared.fetchUser(cashedUser, result: { success in
                         SVProgressHUD.dismiss()
-                        self.showMessage(fetchError!.localizedDescription, messageType: .error)
-                    }
-                })
+                        if success {
+                            UserDefaults.standard.set(self.userID.text(), forKey: "currentUser")
+                            UserDefaults.standard.synchronize()
+                            Model.shared.saveContext()
+                            self.dismiss(animated: true, completion: nil)
+                        } else {
+                            self.showMessage("Error get user profile.", messageType: .error)
+                        }
+                    })
+                } else {
+                    SVProgressHUD.dismiss()
+                    self.showMessage("You must confirm your registration. Check your mail box.", messageType: .information)
+                }
             }
         }
     }

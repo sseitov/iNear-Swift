@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2C17475C1DDB872A0018AEAB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C17475B1DDB872A0018AEAB /* AppDelegate.swift */; };
-		2C1747601DDB872A0018AEAB /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C17475F1DDB872A0018AEAB /* DetailViewController.swift */; };
 		2C1747631DDB872A0018AEAB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747611DDB872A0018AEAB /* Main.storyboard */; };
 		2C1747651DDB872A0018AEAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747641DDB872A0018AEAB /* Assets.xcassets */; };
 		2C1747681DDB872A0018AEAB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747661DDB872A0018AEAB /* LaunchScreen.storyboard */; };
@@ -37,6 +36,8 @@
 		2CC50C371DECC8D900D27456 /* CustomAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C341DECC8D900D27456 /* CustomAlerts.swift */; };
 		2CC50C381DECC8D900D27456 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CC50C351DECC8D900D27456 /* EmailInput.xib */; };
 		2CC50C3A1DECC93400D27456 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C391DECC93400D27456 /* StringExtensions.swift */; };
+		2CD714431DF0984C0077249E /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD714421DF0984C0077249E /* ContactCell.swift */; };
+		2CD714451DF0A3D10077249E /* ChatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD714441DF0A3D10077249E /* ChatController.swift */; };
 		F5904586F049C32CE5C9F26B /* Pods_iNear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4D918BFE1105623C478C208 /* Pods_iNear.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,7 +45,6 @@
 		288240803301CBF785FCC9B0 /* Pods-iNear.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iNear.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iNear/Pods-iNear.debug.xcconfig"; sourceTree = "<group>"; };
 		2C1747581DDB872A0018AEAB /* iNear.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iNear.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C17475B1DDB872A0018AEAB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2C17475F1DDB872A0018AEAB /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		2C1747621DDB872A0018AEAB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2C1747641DDB872A0018AEAB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = iNear/Assets.xcassets; sourceTree = "<group>"; };
 		2C1747671DDB872A0018AEAB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -79,6 +79,8 @@
 		2CC50C341DECC8D900D27456 /* CustomAlerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomAlerts.swift; path = CustomViews/CustomAlerts.swift; sourceTree = "<group>"; };
 		2CC50C351DECC8D900D27456 /* EmailInput.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EmailInput.xib; path = CustomViews/EmailInput.xib; sourceTree = "<group>"; };
 		2CC50C391DECC93400D27456 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StringExtensions.swift; path = Extensions/StringExtensions.swift; sourceTree = "<group>"; };
+		2CD714421DF0984C0077249E /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
+		2CD714441DF0A3D10077249E /* ChatController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatController.swift; sourceTree = "<group>"; };
 		4D20CBE7FFA3C4D46C8764D7 /* Pods-iNear.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iNear.release.xcconfig"; path = "Pods/Target Support Files/Pods-iNear/Pods-iNear.release.xcconfig"; sourceTree = "<group>"; };
 		D4D918BFE1105623C478C208 /* Pods_iNear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iNear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -131,9 +133,10 @@
 				2C87D3181DDEF36800F05528 /* CustomViews */,
 				2C87D3151DDEE4A800F05528 /* Extensions */,
 				2C1747701DDB94670018AEAB /* ContactsController.swift */,
+				2CD714441DF0A3D10077249E /* ChatController.swift */,
+				2CD714421DF0984C0077249E /* ContactCell.swift */,
 				2C1747721DDB95FA0018AEAB /* LoginController.swift */,
 				2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */,
-				2C17475F1DDB872A0018AEAB /* DetailViewController.swift */,
 				2C17475B1DDB872A0018AEAB /* AppDelegate.swift */,
 			);
 			path = iNear;
@@ -362,8 +365,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CD714431DF0984C0077249E /* ContactCell.swift in Sources */,
 				2CC50C2E1DECC55A00D27456 /* Model.swift in Sources */,
-				2C1747601DDB872A0018AEAB /* DetailViewController.swift in Sources */,
+				2CD714451DF0A3D10077249E /* ChatController.swift in Sources */,
 				2C87D31C1DDEF3C200F05528 /* UIColorExtensions.swift in Sources */,
 				2C87D31E1DDEF3F000F05528 /* UIViewExtensions.swift in Sources */,
 				2C87D3361DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.m in Sources */,

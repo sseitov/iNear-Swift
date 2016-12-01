@@ -45,7 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         // Use Firebase library to configure APIs
         FIRApp.configure()
-        try? FIRAuth.auth()?.signOut()
         
         // Add observer for InstanceID token refresh callback.
         NotificationCenter.default.addObserver(self,
@@ -58,13 +57,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
         splitViewController.delegate = self
         
-        UIApplication.shared.setStatusBarStyle(.lightContent, animated: false)
+        UIApplication.shared.statusBarStyle = .lightContent
         if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 17) {
             UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName : font], for: .normal)
         }
 
-        IQKeyboardManager.shared().disabledToolbarClasses.add(LoginController.self)
-        IQKeyboardManager.shared().disabledToolbarClasses.add(ProfileController.self)
+        IQKeyboardManager.shared().isEnableAutoToolbar = false
 
         return true
     }

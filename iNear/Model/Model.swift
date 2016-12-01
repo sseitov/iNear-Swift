@@ -60,19 +60,23 @@ class Model : NSObject {
     
     // MARK: - User table
     
-    func createUser(_ uid:String, email:String) -> User {
+    func setEmailUser(_ user:FIRUser, email:String, result:@escaping (Bool) -> ()) {
+        let cashedUser = createUser(user.uid)
+        cashedUser.email = email
+        updateUser(cashedUser, success: { success in
+            if success {
+                self.saveContext()
+            }
+            result(success)
+        })
+    }
+    
+    func createUser(_ uid:String) -> User {
         var user = getUser(uid)
         if user == nil {
             user = NSEntityDescription.insertNewObject(forEntityName: "User", into: managedObjectContext) as? User
             user!.uid = uid
         }
-        
-        let ref = FIRDatabase.database().reference()
-        let data = ["email" : email]
-        user!.email = email
-        ref.child("users").child(uid).setValue(data)
-
-        saveContext()
         return user!
     }
     
@@ -87,40 +91,47 @@ class Model : NSObject {
         }
     }
     
-    func fetchUser(_ uid:String, result:@escaping (NSError?, [String:Any]?) -> ()) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
-            result(nil, snapshot.value as? [String:Any])
-        }) { error in
-            result(error as NSError?, nil)
+    func allUsers() -> [User] {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "User")
+        if FIRAuth.auth()?.currentUser != nil {
+            let predicate = NSPredicate(format: "uid != %@", FIRAuth.auth()!.currentUser!.uid)
+            fetchRequest.predicate = predicate
+        }
+        let sortDescriptor = NSSortDescriptor(key: "nickName", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [User] {
+            return all
+        } else {
+            return []
         }
     }
-    
-    func updateUser(_ uid:String, nickName:String, imageData:NSData?, result:@escaping (NSError?) -> ()) {
-        let ref = FIRDatabase.database().reference()
-        fetchUser(uid, result: { error, data in
-            if error == nil {
-                var userData = data!
-                userData["nickName"] = nickName
-                if imageData != nil {
-                    let meta = FIRStorageMetadata()
-                    meta.contentType = "image/jpeg"
-                    self.storageRef.child(uid).put(imageData as! Data, metadata: meta, completion: { metadata, error in
-                        if error != nil {
-                            result(error as NSError?)
-                        } else {
-                            userData["image"] = metadata?.path
-                            ref.child("users").child(uid).setValue(userData)
-                            result(nil)
-                        }
-                    })
-                } else {
-                    ref.child("users").child(uid).setValue(userData)
-                    result(nil)
-                }
+
+    func updateUser(_ user:User, success:@escaping (Bool) -> ()) {
+        saveContext()
+        user.userData({ data in
+            if data != nil {
+                let ref = FIRDatabase.database().reference()
+                ref.child("users").child(user.uid!).setValue(data!)
+                success(true)
             } else {
-                result(error as NSError?)
+                success(false)
             }
         })
+    }
+
+    func fetchUser(_ user:User, result:@escaping (Bool) -> ()) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("users").child(user.uid!).observeSingleEvent(of: .value, with: { (snapshot) in
+            if let profile = snapshot.value as? [String:Any] {
+                user.setUserData(profile, completion: {
+                    result(true)
+                })
+            } else {
+                result(false)
+            }
+        }) { error in
+            result(false)
+        }
     }
 }

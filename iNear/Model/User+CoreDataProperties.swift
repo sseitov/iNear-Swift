@@ -2,7 +2,7 @@
 //  User+CoreDataProperties.swift
 //  iNear
 //
-//  Created by Сергей Сейтов on 29.11.16.
+//  Created by Сергей Сейтов on 01.12.16.
 //  Copyright © 2016 Сергей Сейтов. All rights reserved.
 //
 
@@ -17,8 +17,9 @@ extension User {
     }
 
     @NSManaged public var email: String?
-    @NSManaged public var image: NSData?
+    @NSManaged public var imageData: NSData?
     @NSManaged public var nickName: String?
     @NSManaged public var uid: String?
+    @NSManaged public var imageURL: String?
 
 }

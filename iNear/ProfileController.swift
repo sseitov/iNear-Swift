@@ -12,6 +12,7 @@ import SVProgressHUD
 
 class ProfileController: UIViewController, TextFieldContainerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
 
+    @IBOutlet weak var email: UILabel!
     @IBOutlet weak var logo: UIImageView!
     @IBOutlet weak var nickName: TextFieldContainer!
     @IBOutlet weak var updateButton: UIButton!
@@ -41,12 +42,13 @@ class ProfileController: UIViewController, TextFieldContainerDelegate, UINavigat
         
         owner = Model.shared.getUser(FIRAuth.auth()!.currentUser!.uid)
         if owner != nil {
+            email.text = owner!.email
             if owner!.nickName != nil {
                 nickName.setText(owner!.nickName!)
             }
-            if owner!.image != nil {
-                avatar = owner!.image
-                logo.image = UIImage(data: owner!.image as! Data)
+            if owner!.imageData != nil {
+                avatar = owner!.imageData
+                logo.image = UIImage(data: avatar as! Data)
             }
         }
     }
@@ -73,6 +75,7 @@ class ProfileController: UIViewController, TextFieldContainerDelegate, UINavigat
     @IBAction func doSignOut(_ sender: Any) {
         do {
             try FIRAuth.auth()?.signOut()
+            UserDefaults.standard.set(nil, forKey: "currentUser")
             _ = navigationController?.popViewController(animated: true)
         } catch {
             showMessage((error as NSError?)!.localizedDescription, messageType: .error)
@@ -80,13 +83,13 @@ class ProfileController: UIViewController, TextFieldContainerDelegate, UINavigat
     }
 
     fileprivate func updatePhoto(_ sender:UIButton) {
-        let removeCover:CompletionBlock? = owner!.image != nil ? {
-            self.owner!.image = nil
+        let removeCover:CompletionBlock? = avatar != nil ? {
+            self.avatar = nil
             Model.shared.saveContext()
             self.logo.image = UIImage(named:"logo")
         } : nil
         var actions = ["From Camera Roll", "Use Camera"]
-        if owner!.image != nil {
+        if avatar != nil {
             actions.append("Remove Cover")
         }
         let actionView = ActionSheet.create(
@@ -136,13 +139,13 @@ class ProfileController: UIViewController, TextFieldContainerDelegate, UINavigat
     @IBAction func updateProfile(_ sender: Any) {
         if owner != nil {
             SVProgressHUD.show(withStatus: "Update...")
-            Model.shared.updateUser(owner!.uid!, nickName: nickName.text(), imageData: avatar, result: { error in
+            owner?.nickName = nickName.text().isEmpty ? nil : nickName.text()
+            owner?.imageData = avatar
+            Model.shared.updateUser(owner!, success: { success in
                 SVProgressHUD.dismiss()
-                if error != nil {
-                    self.showMessage(error!.localizedDescription, messageType: .error)
+                if !success {
+                    self.showMessage("Error update profile data.", messageType: .error)
                 } else {
-                    self.owner!.nickName = self.nickName.text()
-                    self.owner!.image = self.avatar
                     Model.shared.saveContext()
                     self.goBack()
                 }
