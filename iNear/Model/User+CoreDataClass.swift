@@ -2,64 +2,77 @@
 //  User+CoreDataClass.swift
 //  iNear
 //
-//  Created by Сергей Сейтов on 28.11.16.
+//  Created by Сергей Сейтов on 09.12.16.
 //  Copyright © 2016 Сергей Сейтов. All rights reserved.
 //
 
 import Foundation
 import CoreData
-import Firebase
+
 
 public class User: NSManagedObject {
-    
-    func userData(_ userData:@escaping ([String:Any]?) -> ()) {
-        var profile:[String : Any] = ["email" : email!]
-        if nickName != nil {
-            profile["nickName"] = nickName!
-        }
-        
-        if imageData != nil {
-            let meta = FIRStorageMetadata()
-            meta.contentType = "image/jpeg"
-            Model.shared.storageRef.child(uid!).put(imageData! as Data, metadata: meta, completion: { metadata, error in
-                if error != nil {
-                    userData(nil)
-                } else {
-                    self.imageURL = metadata?.path!
-                    Model.shared.saveContext()
-                    profile["imageURL"] = self.imageURL!
-                    userData(profile)
-                }
-            })
+    lazy var socialType: SocialType = {
+        if let val = SocialType(rawValue: Int(self.type)) {
+            return val
         } else {
-            if imageURL != nil {
-                let ref = Model.shared.storageRef.child(imageURL!)
-                ref.delete(completion: { error in
-                    self.imageURL = nil
-                    Model.shared.saveContext()
-                    userData(profile)
-                })
-            } else {
-                userData(profile)
-            }
+            return .unknown
         }
+    }()
+    
+    lazy var imageURL: URL? = {
+        if self.image != nil {
+            return URL(string: self.image!)
+        } else {
+            return nil
+        }
+    }()
+    
+    lazy var shortName:String = {
+        if self.givenName != nil {
+            return self.givenName!
+        } else if self.name != nil {
+            return self.name!
+        } else {
+            return "anonym"
+        }
+    }()
+    
+    func userData() -> [String:Any] {
+        var profile:[String : Any] = ["socialType" : Int(type)]
+        if email != nil {
+            profile["email"] = email!
+        }
+        if name != nil {
+            profile["name"] = name!
+        }
+        if givenName != nil {
+            profile["givenName"] = givenName!
+        }
+        if familyName != nil {
+            profile["familyName"] = familyName!
+        }
+        if image != nil {
+            profile["imageURL"] = image!
+        }
+        if token != nil {
+            profile["token"] = token!
+        }
+        return profile
     }
     
-    func setUserData(_ profile:[String : Any], completion:@escaping () -> ()) {
-        email = profile["email"] as? String
-        nickName = profile["nickName"] as? String
-        imageURL = profile["imageURL"] as? String
-        if imageURL != nil {
-            let ref = Model.shared.storageRef.child(imageURL!)
-            ref.data(withMaxSize: INT64_MAX, completion: { data, error in
-                self.imageData = data as NSData?
-                Model.shared.saveContext()
-                completion()
-            })
+    func setUserData(_ profile:[String : Any]) {
+        if let typeVal = profile["socialType"] as? Int {
+            type = Int16(typeVal)
         } else {
-            Model.shared.saveContext()
-            completion()
+            type = 0
         }
+        email = profile["email"] as? String
+        name = profile["name"] as? String
+        givenName = profile["givenName"] as? String
+        familyName = profile["familyName"] as? String
+        image = profile["imageURL"] as? String
+        token = profile["token"] as? String
+        Model.shared.saveContext()
     }
 
 }

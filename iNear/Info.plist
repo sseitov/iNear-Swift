@@ -16,6 +16,35 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1027279802021-j65vtq40vuqvhknel6j72iqqiethlqau</string>
+			</array>
+		</dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>fb823694161012947</string>
+            </array>
+        </dict>
+	</array>
+    <key>FacebookAppID</key>
+    <string>823694161012947</string>
+    <key>FacebookDisplayName</key>
+    <string>iNear</string>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <false/>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>fbauth2</string>
+    </array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>

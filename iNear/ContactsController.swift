@@ -20,13 +20,18 @@ class ContactsController: UITableViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if FIRAuth.auth()?.currentUser == nil || !FIRAuth.auth()!.currentUser!.isEmailVerified {
-            performSegue(withIdentifier: "Login", sender: self)
+        if FIRAuth.auth()?.currentUser == nil {
+            performSegue(withIdentifier: "showProfile", sender: self)
         } else {
             refresh()
-            if IS_PAD() && contacts.count > 0 {
-                let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
-                performSegue(withIdentifier: "showDetail", sender: cell)
+            if IS_PAD() {
+                if contacts.count > 0 {
+                    let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
+                    performSegue(withIdentifier: "showDetail", sender: cell)
+                }
+                //else {
+                //    performSegue(withIdentifier: "showProfile", sender: self)
+                //}
             }
         }
     }
@@ -59,21 +64,20 @@ class ContactsController: UITableViewController {
             let ref = FIRDatabase.database().reference()
             ref.child("users").queryOrdered(byChild: "email").queryEqual(toValue: email).observeSingleEvent(of: .value, with: { snapshot in
                 if let values = snapshot.value as? [String:Any] {
-                    if let uid = values.keys.first {
+                    for uid in values.keys {
+                        if uid == Model.shared.currentUser()!.uid! {
+                            continue
+                        }
                         if let profile = values[uid] as? [String:Any] {
                             let user = Model.shared.createUser(uid)
-                            user.setUserData(profile, completion: {
-                                SVProgressHUD.dismiss()
-                                self.refresh()
-                            })
-                        } else {
+                            user.setUserData(profile)
                             SVProgressHUD.dismiss()
-                            self.showMessage("User not found.", messageType: .error)
+                            self.refresh()
+                            return
                         }
-                    } else {
-                        SVProgressHUD.dismiss()
-                        self.showMessage("User not found.", messageType: .error)
                     }
+                    SVProgressHUD.dismiss()
+                    self.showMessage("User not found.", messageType: .error)
                 } else {
                     SVProgressHUD.dismiss()
                     self.showMessage("User not found.", messageType: .error)

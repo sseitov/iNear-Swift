@@ -12,7 +12,6 @@
 		2C1747651DDB872A0018AEAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747641DDB872A0018AEAB /* Assets.xcassets */; };
 		2C1747681DDB872A0018AEAB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747661DDB872A0018AEAB /* LaunchScreen.storyboard */; };
 		2C1747711DDB94670018AEAB /* ContactsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1747701DDB94670018AEAB /* ContactsController.swift */; };
-		2C1747731DDB95FA0018AEAB /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1747721DDB95FA0018AEAB /* LoginController.swift */; };
 		2C5B6B001DE2FE4E00F992C5 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */; };
 		2C7DF6B11DE038CD0046FF94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2C7DF6AF1DE030E50046FF94 /* GoogleService-Info.plist */; };
 		2C87D3171DDEE4D200F05528 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D3161DDEE4D200F05528 /* Utilities.swift */; };
@@ -28,10 +27,14 @@
 		2C87D3341DDF1A5C00F05528 /* LGTextFieldAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C87D32B1DDF1A5C00F05528 /* LGTextFieldAlertView.xib */; };
 		2C87D3351DDF1A5C00F05528 /* LGVAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C87D32C1DDF1A5C00F05528 /* LGVAlertView.xib */; };
 		2C87D3361DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D32E1DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.m */; };
-		2CC50C2C1DECC4D900D27456 /* iNear.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C2A1DECC4D900D27456 /* iNear.xcdatamodeld */; };
-		2CC50C2E1DECC55A00D27456 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C2D1DECC55A00D27456 /* Model.swift */; };
-		2CC50C311DECC5EE00D27456 /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C2F1DECC5EE00D27456 /* User+CoreDataClass.swift */; };
-		2CC50C321DECC5EE00D27456 /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C301DECC5EE00D27456 /* User+CoreDataProperties.swift */; };
+		2C8B189E1DFAFB0E00769A12 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8B189A1DFAFB0E00769A12 /* Bolts.framework */; };
+		2C8B189F1DFAFB0E00769A12 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8B189B1DFAFB0E00769A12 /* FBSDKCoreKit.framework */; };
+		2C8B18A01DFAFB0E00769A12 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8B189C1DFAFB0E00769A12 /* FBSDKLoginKit.framework */; };
+		2C8B18A11DFAFB0E00769A12 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8B189D1DFAFB0E00769A12 /* FBSDKShareKit.framework */; };
+		2C8B18A91DFB1EC600769A12 /* iNear.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18A71DFB1EC600769A12 /* iNear.xcdatamodeld */; };
+		2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */; };
+		2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */; };
+		2C8B18AF1DFB1FBC00769A12 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18AE1DFB1FBC00769A12 /* Model.swift */; };
 		2CC50C361DECC8D900D27456 /* ActionSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CC50C331DECC8D900D27456 /* ActionSheet.xib */; };
 		2CC50C371DECC8D900D27456 /* CustomAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C341DECC8D900D27456 /* CustomAlerts.swift */; };
 		2CC50C381DECC8D900D27456 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CC50C351DECC8D900D27456 /* EmailInput.xib */; };
@@ -50,7 +53,6 @@
 		2C1747671DDB872A0018AEAB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C1747691DDB872A0018AEAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = iNear/Info.plist; sourceTree = "<group>"; };
 		2C1747701DDB94670018AEAB /* ContactsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsController.swift; sourceTree = "<group>"; };
-		2C1747721DDB95FA0018AEAB /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileController.swift; sourceTree = "<group>"; };
 		2C7DF6AF1DE030E50046FF94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "iNear/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2C87D3131DDEE1E500F05528 /* iNear.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = iNear.entitlements; path = iNear/iNear.entitlements; sourceTree = "<group>"; };
@@ -71,10 +73,14 @@
 		2C87D32C1DDF1A5C00F05528 /* LGVAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LGVAlertView.xib; path = iNear/Vendor/LGAlertSheet/LGVAlertView.xib; sourceTree = "<group>"; };
 		2C87D32D1DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSPointerArray+AbstractionHelpers.h"; path = "iNear/Vendor/LGAlertSheet/NSPointerArray+AbstractionHelpers.h"; sourceTree = "<group>"; };
 		2C87D32E1DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSPointerArray+AbstractionHelpers.m"; path = "iNear/Vendor/LGAlertSheet/NSPointerArray+AbstractionHelpers.m"; sourceTree = "<group>"; };
-		2CC50C2B1DECC4D900D27456 /* iNear.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = iNear.xcdatamodel; sourceTree = "<group>"; };
-		2CC50C2D1DECC55A00D27456 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Model.swift; path = Model/Model.swift; sourceTree = "<group>"; };
-		2CC50C2F1DECC5EE00D27456 /* User+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataClass.swift"; path = "Model/User+CoreDataClass.swift"; sourceTree = "<group>"; };
-		2CC50C301DECC5EE00D27456 /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataProperties.swift"; path = "Model/User+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		2C8B189A1DFAFB0E00769A12 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
+		2C8B189B1DFAFB0E00769A12 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
+		2C8B189C1DFAFB0E00769A12 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
+		2C8B189D1DFAFB0E00769A12 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
+		2C8B18A81DFB1EC600769A12 /* iNear.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = iNear.xcdatamodel; sourceTree = "<group>"; };
+		2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataClass.swift"; path = "Model/User+CoreDataClass.swift"; sourceTree = "<group>"; };
+		2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataProperties.swift"; path = "Model/User+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		2C8B18AE1DFB1FBC00769A12 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Model.swift; path = Model/Model.swift; sourceTree = "<group>"; };
 		2CC50C331DECC8D900D27456 /* ActionSheet.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ActionSheet.xib; path = CustomViews/ActionSheet.xib; sourceTree = "<group>"; };
 		2CC50C341DECC8D900D27456 /* CustomAlerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomAlerts.swift; path = CustomViews/CustomAlerts.swift; sourceTree = "<group>"; };
 		2CC50C351DECC8D900D27456 /* EmailInput.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EmailInput.xib; path = CustomViews/EmailInput.xib; sourceTree = "<group>"; };
@@ -90,6 +96,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C8B189E1DFAFB0E00769A12 /* Bolts.framework in Frameworks */,
+				2C8B189F1DFAFB0E00769A12 /* FBSDKCoreKit.framework in Frameworks */,
+				2C8B18A01DFAFB0E00769A12 /* FBSDKLoginKit.framework in Frameworks */,
+				2C8B18A11DFAFB0E00769A12 /* FBSDKShareKit.framework in Frameworks */,
 				F5904586F049C32CE5C9F26B /* Pods_iNear.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -100,6 +110,10 @@
 		12915D74E6089C1BDDF892C9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2C8B189A1DFAFB0E00769A12 /* Bolts.framework */,
+				2C8B189B1DFAFB0E00769A12 /* FBSDKCoreKit.framework */,
+				2C8B189C1DFAFB0E00769A12 /* FBSDKLoginKit.framework */,
+				2C8B189D1DFAFB0E00769A12 /* FBSDKShareKit.framework */,
 				D4D918BFE1105623C478C208 /* Pods_iNear.framework */,
 			);
 			name = Frameworks;
@@ -129,13 +143,12 @@
 		2C17475A1DDB872A0018AEAB /* iNear */ = {
 			isa = PBXGroup;
 			children = (
-				2CC50C291DECC48800D27456 /* Model */,
+				2C8B18A61DFB1E8A00769A12 /* Model */,
 				2C87D3181DDEF36800F05528 /* CustomViews */,
 				2C87D3151DDEE4A800F05528 /* Extensions */,
 				2C1747701DDB94670018AEAB /* ContactsController.swift */,
 				2CD714441DF0A3D10077249E /* ChatController.swift */,
 				2CD714421DF0984C0077249E /* ContactCell.swift */,
-				2C1747721DDB95FA0018AEAB /* LoginController.swift */,
 				2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */,
 				2C17475B1DDB872A0018AEAB /* AppDelegate.swift */,
 			);
@@ -204,13 +217,13 @@
 			name = LGAlertSheet;
 			sourceTree = "<group>";
 		};
-		2CC50C291DECC48800D27456 /* Model */ = {
+		2C8B18A61DFB1E8A00769A12 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				2CC50C2A1DECC4D900D27456 /* iNear.xcdatamodeld */,
-				2CC50C2F1DECC5EE00D27456 /* User+CoreDataClass.swift */,
-				2CC50C301DECC5EE00D27456 /* User+CoreDataProperties.swift */,
-				2CC50C2D1DECC55A00D27456 /* Model.swift */,
+				2C8B18A71DFB1EC600769A12 /* iNear.xcdatamodeld */,
+				2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */,
+				2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */,
+				2C8B18AE1DFB1FBC00769A12 /* Model.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -366,23 +379,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CD714431DF0984C0077249E /* ContactCell.swift in Sources */,
-				2CC50C2E1DECC55A00D27456 /* Model.swift in Sources */,
 				2CD714451DF0A3D10077249E /* ChatController.swift in Sources */,
 				2C87D31C1DDEF3C200F05528 /* UIColorExtensions.swift in Sources */,
 				2C87D31E1DDEF3F000F05528 /* UIViewExtensions.swift in Sources */,
 				2C87D3361DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.m in Sources */,
 				2C87D31A1DDEF37900F05528 /* TextFieldContainer.swift in Sources */,
-				2CC50C311DECC5EE00D27456 /* User+CoreDataClass.swift in Sources */,
-				2CC50C2C1DECC4D900D27456 /* iNear.xcdatamodeld in Sources */,
 				2C5B6B001DE2FE4E00F992C5 /* ProfileController.swift in Sources */,
 				2C87D3201DDF026300F05528 /* UIViewControllerExtensions.swift in Sources */,
+				2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */,
+				2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */,
 				2C87D3331DDF1A5C00F05528 /* LGProgressView.m in Sources */,
-				2C1747731DDB95FA0018AEAB /* LoginController.swift in Sources */,
+				2C8B18A91DFB1EC600769A12 /* iNear.xcdatamodeld in Sources */,
 				2C87D32F1DDF1A5C00F05528 /* LGAlertView.m in Sources */,
-				2CC50C321DECC5EE00D27456 /* User+CoreDataProperties.swift in Sources */,
 				2C1747711DDB94670018AEAB /* ContactsController.swift in Sources */,
 				2C87D3171DDEE4D200F05528 /* Utilities.swift in Sources */,
 				2C17475C1DDB872A0018AEAB /* AppDelegate.swift in Sources */,
+				2C8B18AF1DFB1FBC00769A12 /* Model.swift in Sources */,
 				2CC50C371DECC8D900D27456 /* CustomAlerts.swift in Sources */,
 				2CC50C3A1DECC93400D27456 /* StringExtensions.swift in Sources */,
 			);
@@ -516,6 +528,10 @@
 				CODE_SIGN_ENTITLEMENTS = iNear/iNear.entitlements;
 				DEVELOPMENT_TEAM = 7TSVKXZ79P;
 				ENABLE_BITCODE = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = iNear/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.vchannel.iNearby;
@@ -538,6 +554,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = 7TSVKXZ79P;
 				ENABLE_BITCODE = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = iNear/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.vchannel.iNearby;
@@ -573,12 +593,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		2CC50C2A1DECC4D900D27456 /* iNear.xcdatamodeld */ = {
+		2C8B18A71DFB1EC600769A12 /* iNear.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				2CC50C2B1DECC4D900D27456 /* iNear.xcdatamodel */,
+				2C8B18A81DFB1EC600769A12 /* iNear.xcdatamodel */,
 			);
-			currentVersion = 2CC50C2B1DECC4D900D27456 /* iNear.xcdatamodel */;
+			currentVersion = 2C8B18A81DFB1EC600769A12 /* iNear.xcdatamodel */;
 			name = iNear.xcdatamodeld;
 			path = Model/iNear.xcdatamodeld;
 			sourceTree = "<group>";

@@ -11,26 +11,24 @@ import UserNotifications
 
 import IQKeyboardManager
 import Firebase
-import FirebaseInstanceID
-import FirebaseMessaging
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
     
+    let FACEBOOK_SCHEME = "fb823694161012947"
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        // [START register_for_notifications]
+        // Register_for_notifications
         if #available(iOS 10.0, *) {
             let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
             UNUserNotificationCenter.current().requestAuthorization(
                 options: authOptions,
                 completionHandler: {_, _ in })
             
-            // For iOS 10 display notification (sent via APNS)
             UNUserNotificationCenter.current().delegate = self
-            // For iOS 10 data message (sent via FCM)
             FIRMessaging.messaging().remoteMessageDelegate = self
             
         } else {
@@ -41,17 +39,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         application.registerForRemoteNotifications()
         
-        // [END register_for_notifications]
-        
         // Use Firebase library to configure APIs
         FIRApp.configure()
         
-        // Add observer for InstanceID token refresh callback.
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(self.tokenRefreshNotification),
                                                name: .firInstanceIDTokenRefresh,
                                                object: nil)
         
+        FIRAuth.auth()?.addStateDidChangeListener({ auth, user in
+            if let owner = Model.shared.currentUser(), let token = FIRInstanceID.instanceID().token() {
+                owner.token = token
+                Model.shared.updateUser(owner)
+            }
+        })
+        
+        // Facebook SDK init
+        
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+
+        // UI settings
+
         let splitViewController = self.window!.rootViewController as! UISplitViewController
         let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
@@ -67,39 +75,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         return true
     }
     
-    // [START receive_message]
+    // MARK: - Receive_message
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
-        // If you are receiving a notification message while your app is in the background,
-        // this callback will not be fired till the user taps on the notification launching the application.
-        // TODO: Handle data of notification
-        // Print message ID.
-        print("Message ID: \(userInfo["gcm.message_id"]!)")
-        // Print full message.
+        print("didReceiveRemoteNotification: Message ID: \(userInfo["gcm.message_id"]!)")
         print(userInfo)
     }
+    
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        // If you are receiving a notification message while your app is in the background,
-        // this callback will not be fired till the user taps on the notification launching the application.
-        // TODO: Handle data of notification
-        // Print message ID.
         print("Message ID: \(userInfo["gcm.message_id"]!)")
-        // Print full message.
         print(userInfo)
     }
-    // [END receive_message]
     
-    // [START refresh_token]
+    // MARK: - Refresh_token
+    
     func tokenRefreshNotification(_ notification: Notification) {
         if let refreshedToken = FIRInstanceID.instanceID().token() {
             print("InstanceID token: \(refreshedToken)")
+            // Connect to FCM since connection may have failed when attempted before having a token.
+            connectToFcm()
         }
-        // Connect to FCM since connection may have failed when attempted before having a token.
-        connectToFcm()
     }
-    // [END refresh_token]
     
-    // [START connect_to_fcm]
     func connectToFcm() {
         FIRMessaging.messaging().connect { (error) in
             if error != nil {
@@ -109,19 +106,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             }
         }
     }
-    // [END connect_to_fcm]
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Unable to register for remote notifications: \(error.localizedDescription)")
     }
     
-    // This function is added here only for debugging purposes, and can be removed if swizzling is enabled.
-    // If swizzling is disabled then this function must be implemented so that the APNs token can be paired to
-    // the InstanceID token.
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("APNs token retrieved: \(deviceToken)")
-        // With swizzling disabled you must set the APNs token here.
-        // FIRInstanceID.instanceID().setAPNSToken(deviceToken, type: FIRInstanceIDAPNSTokenType.sandbox)
+        #if DEBUG
+            FIRInstanceID.instanceID().setAPNSToken(deviceToken, type: FIRInstanceIDAPNSTokenType.sandbox)
+        #else
+            FIRInstanceID.instanceID().setAPNSToken(deviceToken, type: FIRInstanceIDAPNSTokenType.prod)
+        #endif
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        if url.scheme! == FACEBOOK_SCHEME {
+            return FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        } else {
+            return GIDSignIn.sharedInstance().handle(url,
+                                                     sourceApplication: options[.sourceApplication] as! String!,
+                                                     annotation: options[.annotation])
+        }
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -136,6 +141,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         connectToFcm()
+        FBSDKAppEvents.activateApp()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

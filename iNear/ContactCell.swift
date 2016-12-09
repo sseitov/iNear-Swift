@@ -7,21 +7,23 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ContactCell: UITableViewCell {
 
     @IBOutlet weak var contactView: UIImageView!
+    @IBOutlet weak var background: UIView!
     @IBOutlet weak var nameLabel: UILabel!
 
     var user:User? {
         didSet {
-            if user!.nickName != nil {
-                nameLabel.text = user!.nickName!
+            if user!.name != nil {
+                nameLabel.text = user!.name
             } else {
-                nameLabel.text = user!.email!
+                nameLabel.text = user!.email
             }
-            if user!.imageData != nil {
-                contactView.image = UIImage(data: user!.imageData as! Data)
+            if user!.imageURL != nil {
+                contactView.sd_setImage(with: user!.imageURL, placeholderImage: UIImage(named: "logo"))
             } else {
                 contactView.image = UIImage(named: "logo")
             }
@@ -31,7 +33,12 @@ class ContactCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         contactView.setupCircle()
-        nameLabel.setupBorder(UIColor.white, radius: 20)
+        background.setupBorder(UIColor.clear, radius: 35)
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        nameLabel.textColor = selected ? UIColor.black : UIColor.white
     }
 
 }

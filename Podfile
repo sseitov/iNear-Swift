@@ -14,8 +14,11 @@ target 'iNear' do
     pod 'Firebase/Auth'
     pod 'Firebase/Database'
     pod 'Firebase/Messaging'
+    pod 'Google/SignIn'
     
+    pod 'AFNetworking'
     pod 'JSQMessagesViewController'
+    pod 'SDWebImage'
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'
 end

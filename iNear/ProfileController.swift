@@ -9,148 +9,146 @@
 import UIKit
 import Firebase
 import SVProgressHUD
+import SDWebImage
 
-class ProfileController: UIViewController, TextFieldContainerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-
-    @IBOutlet weak var email: UILabel!
-    @IBOutlet weak var logo: UIImageView!
-    @IBOutlet weak var nickName: TextFieldContainer!
-    @IBOutlet weak var updateButton: UIButton!
+class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
+    
+    @IBOutlet weak var photoView: UIImageView!
+    
+    @IBOutlet weak var userView: UIView!
+    @IBOutlet weak var userName: UILabel!
+    @IBOutlet weak var userEmail: UILabel!
+    @IBOutlet weak var socialType: UILabel!
+    
+    @IBOutlet weak var authView: UIView!
     
     var owner:User?
-    var avatar:NSData?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTitle("My Account")
-        setupBackButton()
+        photoView.setupCircle()
         
-        logo.layer.masksToBounds = true
-        logo.clipsToBounds = false
-        logo.layer.cornerRadius = logo.frame.width / 2.0        
-        logo.layer.shadowColor = UIColor.black.cgColor
-        logo.layer.shadowOffset = CGSize(width: 5, height: 5)
-        logo.layer.shadowOpacity = 0.3
-        
-        nickName.textType = .default
-        nickName.returnType = .done
-        nickName.autocapitalizationType = .words
-        nickName.placeholder = "Nick Name"
-        nickName.delegate = self
+        GIDSignIn.sharedInstance().clientID = FIRApp.defaultApp()?.options.clientID
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance().uiDelegate = self
 
-        updateButton.setupBorder(UIColor.white, radius: 20)
-        
-        owner = Model.shared.getUser(FIRAuth.auth()!.currentUser!.uid)
-        if owner != nil {
-            email.text = owner!.email
-            if owner!.nickName != nil {
-                nickName.setText(owner!.nickName!)
-            }
-            if owner!.imageData != nil {
-                avatar = owner!.imageData
-                logo.image = UIImage(data: avatar as! Data)
-            }
-        }
-    }
-    
-    func textChange(_ sender:TextFieldContainer, text:String?) -> Bool {
-        return true
-    }
-    
-    func textDone(_ sender:TextFieldContainer, text:String?) {
-        sender.activate(false)
-    }
-    
-    @IBAction func touchDown(_ sender: Any) {
-        self.logo.layer.shadowOffset = CGSize()
-        self.logo.layer.shadowColor = UIColor.clear.cgColor
-    }
-    
-    @IBAction func touchUp(_ sender: UIButton) {
-        self.logo.layer.shadowOffset = CGSize(width: 5, height: 5)
-        self.logo.layer.shadowColor = UIColor.black.cgColor
-        updatePhoto(sender)
-    }
-
-    @IBAction func doSignOut(_ sender: Any) {
-        do {
-            try FIRAuth.auth()?.signOut()
-            UserDefaults.standard.set(nil, forKey: "currentUser")
-            _ = navigationController?.popViewController(animated: true)
-        } catch {
-            showMessage((error as NSError?)!.localizedDescription, messageType: .error)
-        }
-    }
-
-    fileprivate func updatePhoto(_ sender:UIButton) {
-        let removeCover:CompletionBlock? = avatar != nil ? {
-            self.avatar = nil
-            Model.shared.saveContext()
-            self.logo.image = UIImage(named:"logo")
-        } : nil
-        var actions = ["From Camera Roll", "Use Camera"]
-        if avatar != nil {
-            actions.append("Remove Cover")
-        }
-        let actionView = ActionSheet.create(
-            title: "Select Cover",
-            actions: actions,
-            handler1: {
-                let imagePicker = UIImagePickerController()
-                imagePicker.allowsEditing = false
-                imagePicker.sourceType = .photoLibrary
-                imagePicker.delegate = self
-                imagePicker.modalPresentationStyle = .formSheet
-                if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 15) {
-                    imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : UIColor.mainColor(), NSFontAttributeName : font]
-                }
-                imagePicker.navigationBar.tintColor = UIColor.mainColor()
-                self.present(imagePicker, animated: true, completion: nil)
-        }, handler2: {
-            let imagePicker = UIImagePickerController()
-            imagePicker.allowsEditing = false
-            imagePicker.sourceType = .camera
-            imagePicker.delegate = self
-            self.present(imagePicker, animated: true, completion: nil)
-        }, handler3: removeCover)
-        if(IS_PAD()) {
-            actionView?.showInPopover(host: self, target: sender)
+        owner = Model.shared.currentUser()
+        if owner == nil {
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.hidesBackButton = true
         } else {
-            actionView?.show()
+            setupBackButton()
+        }
+        
+        if owner != nil {
+            authView.alpha = 0
+            userView.alpha = 1
+            setupTitle("My Account")
+            userEmail.text = owner!.email
+            userName.text = owner!.name
+            switch owner!.socialType {
+            case .facebook:
+                socialType.text = "Login over Facebook"
+            case .google:
+                socialType.text = "Signed over Google+"
+            default:
+                socialType.text = ""
+            }
+            if owner!.imageURL != nil {
+                photoView.sd_setImage(with: owner!.imageURL, placeholderImage: UIImage(named: "logo"))
+            } else {
+                photoView.image = UIImage(named: "logo")
+            }
+        } else {
+            authView.alpha = 1
+            userView.alpha = 0
+            setupTitle("Authentication")
         }
     }
+
+    override func goBack() {
+        dismiss(animated: true, completion: nil)
+    }
     
-    // MARK: - UIImagePickerController delegate
+    @IBAction func signOut(_ sender: Any) {
+        Model.shared.signOut()
+        UIView.animate(withDuration: 0.3, animations: {
+            self.userView.alpha = 0
+        }, completion: { _ in
+            self.setupTitle("Authentication")
+            self.navigationItem.leftBarButtonItem = nil
+            self.navigationItem.hidesBackButton = true
+            UIView.animate(withDuration: 0.3, animations: {
+                self.authView.alpha = 1
+            })
+        })
+    }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        picker.dismiss(animated: true, completion: {
-            if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-                self.avatar = UIImageJPEGRepresentation(pickedImage, 0.5) as NSData?
-                self.logo.image = UIImage(data: self.avatar as! Data)
-                Model.shared.saveContext()
+    // MARK: - Google+ Auth
+    
+    @IBAction func facebookSignIn(_ sender: Any) {
+        FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email"], from: self, handler: { result, error in
+            if error != nil {
+                self.showMessage("Facebook authorization error.", messageType: .error)
+                return
+            }
+            
+            SVProgressHUD.show(withStatus: "Login...")
+            let params = ["fields" : "name,email,first_name,last_name,birthday,picture.width(480).height(480)"]
+            let request = FBSDKGraphRequest(graphPath: "me", parameters: params)
+            request!.start(completionHandler: { _, result, fbError in
+                if fbError != nil {
+                    SVProgressHUD.dismiss()
+                    self.showMessage(fbError!.localizedDescription, messageType: .error)
+                } else {
+                    let credential = FIRFacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
+                    FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
+                        SVProgressHUD.dismiss()
+                        if error != nil {
+                            self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
+                        } else {
+                            if let profile = result as? [String:Any] {
+                                Model.shared.setFacebookUser(firUser!, profile: profile)
+                                self.goBack()
+                            } else {
+                                self.showMessage("Can not read user profile.", messageType: .error)
+                                try? FIRAuth.auth()?.signOut()
+                            }
+                        }
+                    })
+                }
+            })
+        })
+    }
+    
+    // MARK: - Google+ Auth
+    
+    @IBAction func googleSitnIn(_ sender: Any) {
+        GIDSignIn.sharedInstance().signIn()
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if error != nil {
+            showMessage(error.localizedDescription, messageType: .error)
+            return
+        }
+        let authentication = user.authentication
+        let credential = FIRGoogleAuthProvider.credential(withIDToken: (authentication?.idToken)!,
+                                                          accessToken: (authentication?.accessToken)!)
+        SVProgressHUD.show(withStatus: "Login...")
+        FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
+            SVProgressHUD.dismiss()
+            if error != nil {
+                self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
+            } else {
+                Model.shared.setGoogleUser(firUser!, googleProfile: user.profile)
+                self.goBack()
             }
         })
     }
     
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-
-    @IBAction func updateProfile(_ sender: Any) {
-        if owner != nil {
-            SVProgressHUD.show(withStatus: "Update...")
-            owner?.nickName = nickName.text().isEmpty ? nil : nickName.text()
-            owner?.imageData = avatar
-            Model.shared.updateUser(owner!, success: { success in
-                SVProgressHUD.dismiss()
-                if !success {
-                    self.showMessage("Error update profile data.", messageType: .error)
-                } else {
-                    Model.shared.saveContext()
-                    self.goBack()
-                }
-            })
-        }
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        try? FIRAuth.auth()?.signOut()
     }
     
     /*
