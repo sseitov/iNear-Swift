@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreData
-
+import SDWebImage
 
 public class User: NSManagedObject {
     lazy var socialType: SocialType = {
@@ -73,6 +73,27 @@ public class User: NSManagedObject {
         image = profile["imageURL"] as? String
         token = profile["token"] as? String
         Model.shared.saveContext()
+    }
+    
+    func getImage(_ result: @escaping(UIImage) -> ()) {
+        if self.image != nil {
+            SDImageCache.shared().queryDiskCache(forKey: self.image!, done: { webImage, cacheType in
+                if webImage == nil {
+                    SDWebImageManager.shared().downloadImage(with: self.imageURL!, options: SDWebImageOptions(rawValue:0), progress: {_, _ in
+                    }, completed: { newImage, error, _, _, _ in
+                        if newImage != nil {
+                            result(newImage!)
+                        } else {
+                            result(UIImage(named:"unknown_user")!)
+                        }
+                    })
+                } else {
+                    result(webImage!)
+                }
+            })
+        } else {
+            result(UIImage(named:"unknown_user")!)
+        }
     }
 
 }

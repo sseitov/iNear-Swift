@@ -20,18 +20,16 @@ class ContactsController: UITableViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if FIRAuth.auth()?.currentUser == nil {
+        if Model.shared.currentUser() == nil {
             performSegue(withIdentifier: "showProfile", sender: self)
         } else {
+            Model.shared.startObservers()
             refresh()
             if IS_PAD() {
                 if contacts.count > 0 {
                     let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
                     performSegue(withIdentifier: "showDetail", sender: cell)
                 }
-                //else {
-                //    performSegue(withIdentifier: "showProfile", sender: self)
-                //}
             }
         }
     }

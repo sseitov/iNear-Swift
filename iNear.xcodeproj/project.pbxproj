@@ -35,6 +35,10 @@
 		2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */; };
 		2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */; };
 		2C8B18AF1DFB1FBC00769A12 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B18AE1DFB1FBC00769A12 /* Model.swift */; };
+		2C9423B01DFC6456003C4075 /* Message+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9423AE1DFC6456003C4075 /* Message+CoreDataClass.swift */; };
+		2C9423B11DFC6456003C4075 /* Message+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9423AF1DFC6456003C4075 /* Message+CoreDataProperties.swift */; };
+		2C9423B31DFC6708003C4075 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9423B21DFC6708003C4075 /* UIImageExtensions.swift */; };
+		2C9423B51DFC67A1003C4075 /* PhotoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9423B41DFC67A1003C4075 /* PhotoController.swift */; };
 		2CC50C361DECC8D900D27456 /* ActionSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CC50C331DECC8D900D27456 /* ActionSheet.xib */; };
 		2CC50C371DECC8D900D27456 /* CustomAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C341DECC8D900D27456 /* CustomAlerts.swift */; };
 		2CC50C381DECC8D900D27456 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CC50C351DECC8D900D27456 /* EmailInput.xib */; };
@@ -81,6 +85,10 @@
 		2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataClass.swift"; path = "Model/User+CoreDataClass.swift"; sourceTree = "<group>"; };
 		2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataProperties.swift"; path = "Model/User+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		2C8B18AE1DFB1FBC00769A12 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Model.swift; path = Model/Model.swift; sourceTree = "<group>"; };
+		2C9423AE1DFC6456003C4075 /* Message+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Message+CoreDataClass.swift"; path = "Model/Message+CoreDataClass.swift"; sourceTree = "<group>"; };
+		2C9423AF1DFC6456003C4075 /* Message+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Message+CoreDataProperties.swift"; path = "Model/Message+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		2C9423B21DFC6708003C4075 /* UIImageExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIImageExtensions.swift; path = Extensions/UIImageExtensions.swift; sourceTree = "<group>"; };
+		2C9423B41DFC67A1003C4075 /* PhotoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoController.swift; sourceTree = "<group>"; };
 		2CC50C331DECC8D900D27456 /* ActionSheet.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ActionSheet.xib; path = CustomViews/ActionSheet.xib; sourceTree = "<group>"; };
 		2CC50C341DECC8D900D27456 /* CustomAlerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomAlerts.swift; path = CustomViews/CustomAlerts.swift; sourceTree = "<group>"; };
 		2CC50C351DECC8D900D27456 /* EmailInput.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EmailInput.xib; path = CustomViews/EmailInput.xib; sourceTree = "<group>"; };
@@ -148,6 +156,7 @@
 				2C87D3151DDEE4A800F05528 /* Extensions */,
 				2C1747701DDB94670018AEAB /* ContactsController.swift */,
 				2CD714441DF0A3D10077249E /* ChatController.swift */,
+				2C9423B41DFC67A1003C4075 /* PhotoController.swift */,
 				2CD714421DF0984C0077249E /* ContactCell.swift */,
 				2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */,
 				2C17475B1DDB872A0018AEAB /* AppDelegate.swift */,
@@ -175,6 +184,7 @@
 				2CC50C391DECC93400D27456 /* StringExtensions.swift */,
 				2C87D31D1DDEF3F000F05528 /* UIViewExtensions.swift */,
 				2C87D31B1DDEF3C200F05528 /* UIColorExtensions.swift */,
+				2C9423B21DFC6708003C4075 /* UIImageExtensions.swift */,
 				2C87D3161DDEE4D200F05528 /* Utilities.swift */,
 			);
 			name = Extensions;
@@ -220,6 +230,8 @@
 		2C8B18A61DFB1E8A00769A12 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				2C9423AE1DFC6456003C4075 /* Message+CoreDataClass.swift */,
+				2C9423AF1DFC6456003C4075 /* Message+CoreDataProperties.swift */,
 				2C8B18A71DFB1EC600769A12 /* iNear.xcdatamodeld */,
 				2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */,
 				2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */,
@@ -379,6 +391,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CD714431DF0984C0077249E /* ContactCell.swift in Sources */,
+				2C9423B51DFC67A1003C4075 /* PhotoController.swift in Sources */,
+				2C9423B31DFC6708003C4075 /* UIImageExtensions.swift in Sources */,
 				2CD714451DF0A3D10077249E /* ChatController.swift in Sources */,
 				2C87D31C1DDEF3C200F05528 /* UIColorExtensions.swift in Sources */,
 				2C87D31E1DDEF3F000F05528 /* UIViewExtensions.swift in Sources */,
@@ -389,6 +403,7 @@
 				2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */,
 				2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */,
 				2C87D3331DDF1A5C00F05528 /* LGProgressView.m in Sources */,
+				2C9423B11DFC6456003C4075 /* Message+CoreDataProperties.swift in Sources */,
 				2C8B18A91DFB1EC600769A12 /* iNear.xcdatamodeld in Sources */,
 				2C87D32F1DDF1A5C00F05528 /* LGAlertView.m in Sources */,
 				2C1747711DDB94670018AEAB /* ContactsController.swift in Sources */,
@@ -397,6 +412,7 @@
 				2C8B18AF1DFB1FBC00769A12 /* Model.swift in Sources */,
 				2CC50C371DECC8D900D27456 /* CustomAlerts.swift in Sources */,
 				2CC50C3A1DECC93400D27456 /* StringExtensions.swift in Sources */,
+				2C9423B01DFC6456003C4075 /* Message+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

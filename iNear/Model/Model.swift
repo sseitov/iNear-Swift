@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import Firebase
+import AFNetworking
 
 enum SocialType:Int {
     case unknown = 0
@@ -18,10 +19,42 @@ enum SocialType:Int {
     case phone = 4
 }
 
+enum PushType:Int {
+    case none = 0
+    case newCoordinate = 1
+    case newMessage = 2
+}
+
+let newMessageNotification = Notification.Name("NEW_MESSAGE")
+let readMessageNotification = Notification.Name("READ_MESSAGE")
+
 class Model : NSObject {
     
     static let shared = Model()
     
+    // MARK: - Date formatter
+    
+    lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter
+    }()
+    
+    lazy var textDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        formatter.doesRelativeDateFormatting = true
+        return formatter
+    }()
+    
+    lazy var textYearFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
+
     // MARK: - SignOut from cloud
     
     func signOut() {
@@ -36,6 +69,49 @@ class Model : NSObject {
             }
         }
         try? FIRAuth.auth()?.signOut()
+        newMessageRefHandle = nil
+    }
+    
+    // MARK: - Cloud observers
+    
+    func startObservers() {
+        if newMessageRefHandle == nil {
+            observeMessages()
+        }
+    }
+    
+    lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: "gs://v-channel-a693c.appspot.com")
+    
+    static let serverKey = "AAAA7y6lzqU:APA91bF0ISTVkscUz81T0fYnLvEQzqGPOIerVudF7_CIj4eJsSs1P1FIw4KYzx8MNo11kF7WgZ6SGT3DZuyCNtuIQMi7JxInttd6vf3JmAkxvqPrVzd_6PyXWxW9IoRYQP5aRkZvzwrelpkVa4xUCkGFOkxDdKNVlQ"
+    
+    private var newMessageRefHandle: FIRDatabaseHandle?
+    
+    // MARK: - Push notifications
+    
+    fileprivate lazy var httpManager:AFHTTPSessionManager = {
+        let manager = AFHTTPSessionManager(baseURL: URL(string: "https://fcm.googleapis.com/fcm/"))
+        manager.requestSerializer = AFJSONRequestSerializer()
+        manager.requestSerializer.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        manager.requestSerializer.setValue("key=\(serverKey)", forHTTPHeaderField: "Authorization")
+        manager.responseSerializer = AFHTTPResponseSerializer()
+        return manager
+    }()
+    
+    fileprivate func messagePush(_ text:String?, to:User, from:User) {
+        if to.token != nil {
+            let data:[String:Int] = ["pushType" : PushType.newMessage.rawValue]
+            let notification:[String:Any] = ["title" : "New message from \(from.shortName):",
+                "body": text != nil ? text! : "It is photo",
+                "sound":"default",
+                "content_available": true]
+            let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
+            httpManager.post("send", parameters: message, progress: nil, success: { task, response in
+            }, failure: { task, error in
+                print("SEND PUSH ERROR: \(error)")
+            })
+        } else {
+            print("USER HAVE NO TOKEN")
+        }
     }
 
     // MARK: - CoreData stack
@@ -145,7 +221,7 @@ class Model : NSObject {
     }
 
     func allUsers() -> [User] {
-        if FIRAuth.auth()?.currentUser == nil {
+        if currentUser() == nil {
             return[]
         }
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "User")
@@ -159,6 +235,183 @@ class Model : NSObject {
         } else {
             return []
         }
+    }
+    
+    // MARK: - Message table
+    
+    func createMessage(_ uid:String) -> Message {
+        var message = getMessage(uid)
+        if message == nil {
+            message = NSEntityDescription.insertNewObject(forEntityName: "Message", into: managedObjectContext) as? Message
+            message!.uid = uid
+        }
+        return message!
+    }
+    
+    func getMessage(_ uid:String) -> Message? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        let predicate = NSPredicate(format: "uid = %@", uid)
+        fetchRequest.predicate = predicate
+        if let message = try? managedObjectContext.fetch(fetchRequest).first as? Message {
+            return message
+        } else {
+            return nil
+        }
+    }
+    
+    private func chatPredicate(with:String) -> NSPredicate {
+        let predicate1  = NSPredicate(format: "from == %@", with)
+        let predicate2 = NSPredicate(format: "to == %@", currentUser()!.uid!)
+        let toPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
+        let predicate3  = NSPredicate(format: "from == %@", currentUser()!.uid!)
+        let predicate4 = NSPredicate(format: "to == %@", with)
+        let fromPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate3, predicate4])
+        return NSCompoundPredicate(orPredicateWithSubpredicates: [toPredicate, fromPredicate])
+    }
+    
+    func chatMessages(with:String) -> [Message] {
+        if currentUser() == nil {
+            return []
+        }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        fetchRequest.predicate = chatPredicate(with: with)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Message] {
+            return all
+        } else {
+            return []
+        }
+    }
+    
+    func unreadCountInChat(_ uid:String) -> Int {
+        if currentUser() == nil {
+            return 0
+        }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        let predicate = NSPredicate(format: "isNew == YES")
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [chatPredicate(with: uid), predicate])
+        
+        do {
+            return try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            return 0
+        }
+    }
+    
+    func lastMessageInChat(_ uid:String) -> Message? {
+        if currentUser() == nil {
+            return nil
+        }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        fetchRequest.predicate = chatPredicate(with: uid)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.fetchLimit = 1
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Message] {
+            return all.first
+        } else {
+            return nil
+        }
+    }
+    
+    func allUnreadCount() -> Int {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        fetchRequest.predicate = NSPredicate(format: "isNew == YES")
+        do {
+            return try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            return 0
+        }
+    }
+    
+    func readMessage(_ message:Message) {
+        message.isNew = false
+        saveContext()
+        NotificationCenter.default.post(name: readMessageNotification, object: message)
+    }
+    
+    func sendTextMessage(_ text:String, from:String, to:String) {
+        let ref = FIRDatabase.database().reference()
+        let dateStr = dateFormatter.string(from: Date())
+        let messageItem = ["from" : from, "to" : to, "text" : text, "date" : dateStr]
+        ref.child("messages").childByAutoId().setValue(messageItem)
+        
+        if let fromUser = getUser(from), let toUser = getUser(to) {
+            self.messagePush(text, to: toUser, from: fromUser)
+        }
+    }
+    
+    func sendImageMessage(_ image:UIImage, from:String, to:String, result:@escaping (NSError?) -> ()) {
+        if let imageData = UIImageJPEGRepresentation(image, 0.5) {
+            let meta = FIRStorageMetadata()
+            meta.contentType = "image/jpeg"
+            self.storageRef.child(generateUDID()).put(imageData, metadata: meta, completion: { metadata, error in
+                if error != nil {
+                    result(error as NSError?)
+                } else {
+                    let ref = FIRDatabase.database().reference()
+                    let dateStr = self.dateFormatter.string(from: Date())
+                    let messageItem = ["from" : from, "to" : to, "image" : metadata?.path!, "date" : dateStr]
+                    ref.child("messages").childByAutoId().setValue(messageItem)
+                    
+                    if let fromUser = self.getUser(from), let toUser = self.getUser(to) {
+                        self.messagePush(nil, to: toUser, from: fromUser)
+                    }
+                    
+                    result(nil)
+                }
+            })
+        }
+    }
+    
+    private func observeMessages() {
+        let ref = FIRDatabase.database().reference()
+        let messageQuery = ref.child("messages").queryLimited(toLast:25)
+        
+        newMessageRefHandle = messageQuery.observe(.childAdded, with: { (snapshot) -> Void in
+            let messageData = snapshot.value as! [String:Any]
+            if let from = messageData["from"] as? String, let to = messageData["to"] as? String {
+                if self.currentUser() != nil && self.getMessage(snapshot.key) == nil {
+                    let received = (to == self.currentUser()!.uid!)
+                    let sended = (from == self.currentUser()!.uid!)
+                    if received || sended {
+                        let message = self.createMessage(snapshot.key)
+                        message.setData(messageData, new: received, completion: {
+                            NotificationCenter.default.post(name: newMessageNotification, object: message)
+                        })
+                    }
+                }
+            } else {
+                print("Error! Could not decode message data")
+            }
+        })
+    }
+    
+    func refreshMessages() {
+        let ref = FIRDatabase.database().reference()
+        ref.child("messages").queryOrdered(byChild: "date").observeSingleEvent(of: .value, with: { snapshot in
+            if let values = snapshot.value as? [String:Any] {
+                for (key, value) in values {
+                    let messageData = value as! [String:Any]
+                    if let from = messageData["from"] as? String, let to = messageData["to"] as? String {
+                        if self.currentUser() != nil && self.getMessage(snapshot.key) == nil {
+                            let received = (to == self.currentUser()!.uid!)
+                            let sended = (from == self.currentUser()!.uid!)
+                            if received || sended {
+                                let message = self.createMessage(key)
+                                message.setData(messageData, new: false, completion: {
+                                    NotificationCenter.default.post(name: newMessageNotification, object: message)
+                                })
+                            }
+                        }
+                    } else {
+                        print("Error! Could not decode message data")
+                    }
+                }
+            }
+        })
     }
 
 }

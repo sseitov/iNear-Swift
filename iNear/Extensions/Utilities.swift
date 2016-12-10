@@ -8,6 +8,10 @@
 
 import Foundation
 
+func generateUDID() -> String {
+    return UUID().uuidString
+}
+
 func iNearError(_ text:String) -> NSError {
     return NSError(domain: "iNear", code: -1, userInfo: [NSLocalizedDescriptionKey:text])
 }
