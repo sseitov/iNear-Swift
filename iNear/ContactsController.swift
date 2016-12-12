@@ -9,14 +9,21 @@
 import UIKit
 import Firebase
 import SVProgressHUD
+import WatchConnectivity
 
-class ContactsController: UITableViewController {
+class ContactsController: UITableViewController, WCSessionDelegate {
     
     var contacts:[User] = []
+    var watchSession:WCSession?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitle("Contacts")
+        if WCSession.isSupported() {
+            watchSession = WCSession.default()
+            watchSession!.delegate = self
+            watchSession!.activate()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -33,7 +40,7 @@ class ContactsController: UITableViewController {
             }
         }
     }
-    
+
     func refresh() {
         contacts = Model.shared.allUsers()
         tableView.reloadData()
@@ -95,4 +102,40 @@ class ContactsController: UITableViewController {
             }
         }
     }
+}
+
+extension ContactsController {
+    
+    func sessionDidDeactivate(_ session: WCSession) {
+        
+    }
+    func sessionDidBecomeInactive(_ session: WCSession) {
+        
+    }
+    
+    @available(iOS 9.3, *)
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print("activationDidCompleteWith \(activationState)")
+    }
+
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        print("didReceiveMessage")
+    }
+    
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if session.isReachable {
+            for contact in self.contacts {
+                contact.getImage({ image in
+                    let data = UIImagePNGRepresentation(image.inCircle())
+                    let friend:[String:Any] = ["uid" : contact.uid!, "name" : contact.name!, "image" : data!]
+                    session.sendMessage(friend, replyHandler: { reply in
+                        print(reply)
+                    }, errorHandler: { error in
+                        print(error)
+                    })
+                })
+            }
+        }
+    }
+
 }

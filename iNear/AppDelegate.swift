@@ -12,6 +12,10 @@ import UserNotifications
 import IQKeyboardManager
 import Firebase
 
+func IS_PAD() -> Bool {
+    return UIDevice.current.userInterfaceIdiom == .pad
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 

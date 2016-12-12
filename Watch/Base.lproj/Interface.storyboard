@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+    <device id="watch38" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="watchOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="11508"/>
+    </dependencies>
+    <scenes>
+        <!--Interface Controller-->
+        <scene sceneID="aou-V4-d1y">
+            <objects>
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="Watch" customModuleProvider="target">
+                    <items>
+                        <group width="1" alignment="left" id="HHv-1x-VX7">
+                            <items>
+                                <imageView width="30" height="30" alignment="left" image="logo" id="nlG-XK-EmS"/>
+                                <label width="1" height="30" alignment="left" text="iNear" textAlignment="center" id="vXG-ud-8Mr">
+                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
+                                </label>
+                            </items>
+                        </group>
+                        <table alignment="left" id="Fda-sw-EDj">
+                            <items>
+                                <tableRow identifier="contact" id="TNC-Gc-KSa" customClass="ContactController" customModule="Watch_Extension">
+                                    <group key="rootItem" width="1" alignment="left" id="Ayd-hN-tLh">
+                                        <items>
+                                            <imageView width="30" height="30" alignment="left" image="logo" id="3Yg-0l-FDa"/>
+                                            <label width="1" height="30" alignment="left" text="Name" id="p53-fh-D23">
+                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                            </label>
+                                        </items>
+                                    </group>
+                                    <connections>
+                                        <outlet property="imageView" destination="3Yg-0l-FDa" id="9Vc-5e-R2z"/>
+                                        <outlet property="nameLabel" destination="p53-fh-D23" id="bnq-u2-Ju3"/>
+                                    </connections>
+                                </tableRow>
+                            </items>
+                        </table>
+                    </items>
+                    <connections>
+                        <outlet property="contactsTable" destination="Fda-sw-EDj" id="OtW-b3-fRC"/>
+                    </connections>
+                </controller>
+            </objects>
+        </scene>
+    </scenes>
+</document>
