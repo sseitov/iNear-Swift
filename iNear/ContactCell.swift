@@ -22,11 +22,7 @@ class ContactCell: UITableViewCell {
             } else {
                 nameLabel.text = user!.email
             }
-            if user!.imageURL != nil {
-                contactView.sd_setImage(with: user!.imageURL, placeholderImage: UIImage(named: "logo"))
-            } else {
-                contactView.image = UIImage(named: "logo")
-            }
+            contactView.image = user!.getImage()
         }
     }
     

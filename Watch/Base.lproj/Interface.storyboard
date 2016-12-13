@@ -16,10 +16,7 @@
                     <items>
                         <group width="1" alignment="left" id="HHv-1x-VX7">
                             <items>
-                                <imageView width="30" height="30" alignment="left" image="logo" id="nlG-XK-EmS"/>
-                                <label width="1" height="30" alignment="left" text="iNear" textAlignment="center" id="vXG-ud-8Mr">
-                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
-                                </label>
+                                <imageView width="1" height="30" alignment="center" image="logoTitle" id="nlG-XK-EmS"/>
                             </items>
                         </group>
                         <table alignment="left" id="Fda-sw-EDj">
@@ -46,6 +43,30 @@
                     </connections>
                 </controller>
             </objects>
+        </scene>
+        <!--Map-->
+        <scene sceneID="zLE-hx-MkX">
+            <objects>
+                <controller identifier="Map" id="jCr-qW-fJv" customClass="MapController" customModule="Watch_Extension">
+                    <items>
+                        <group width="1" alignment="left" id="HOU-UT-s8o">
+                            <items>
+                                <map height="100" alignment="left" id="ptI-3L-O7s"/>
+                            </items>
+                        </group>
+                        <slider width="1" alignment="left" continuous="YES" value="1" minimum="1" maximum="10" steps="1" id="6ta-ne-adb">
+                            <connections>
+                                <action selector="zoom:" destination="jCr-qW-fJv" id="qnF-qL-tnj"/>
+                            </connections>
+                        </slider>
+                    </items>
+                    <connections>
+                        <outlet property="map" destination="ptI-3L-O7s" id="7gG-h9-fcH"/>
+                        <outlet property="zoomSlider" destination="6ta-ne-adb" id="Utp-2N-8QC"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="352" y="93"/>
         </scene>
     </scenes>
 </document>

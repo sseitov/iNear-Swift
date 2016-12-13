@@ -44,6 +44,12 @@
                         <barButtonItem key="leftBarButtonItem" image="backButton" id="FRE-94-SHx">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" image="button-Map" id="pch-op-Mmg">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <segue destination="7yV-40-yWv" kind="show" identifier="showMap" id="ULh-Tb-K33"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <segue destination="Azb-cL-7ug" kind="show" identifier="showPhoto" id="nJS-yb-X5M"/>
@@ -179,14 +185,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="p5j-F7-21A">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="p5j-F7-21A">
                                 <rect key="frame" x="30" y="100" width="260" height="260"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="260" id="0mu-zk-YoB"/>
                                     <constraint firstAttribute="width" constant="260" id="M7J-c5-FDC"/>
                                 </constraints>
                             </imageView>
-                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wYY-8O-D4L">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wYY-8O-D4L">
                                 <rect key="frame" x="30" y="380" width="260" height="140"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kta-Ht-hTw">
@@ -225,7 +231,7 @@
                                     <constraint firstAttribute="height" constant="140" id="teD-ac-sss"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PIN-jL-erS">
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PIN-jL-erS">
                                 <rect key="frame" x="30" y="400" width="260" height="90"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5Gn-t4-RJM">
@@ -279,6 +285,29 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vfl-AC-NaZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2342" y="-631"/>
+        </scene>
+        <!--Route Controller-->
+        <scene sceneID="sP6-cq-iW9">
+            <objects>
+                <viewController id="7yV-40-yWv" customClass="RouteController" customModule="iNear" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="YRm-fG-mo9"/>
+                        <viewControllerLayoutGuide type="bottom" id="DKQ-aD-RJf"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="qWF-A4-QKk">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="cnp-dw-WcE">
+                        <barButtonItem key="leftBarButtonItem" image="backButton" id="v2A-kd-GdB">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </barButtonItem>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1SG-Bh-uaI" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1564" y="70"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="r7l-gg-dq7">
@@ -352,7 +381,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="n1Y-VR-nJD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1543" y="129"/>
+            <point key="canvasLocation" x="1564" y="689"/>
         </scene>
     </scenes>
     <resources>
@@ -360,6 +389,7 @@
         <image name="backButton" width="22" height="22"/>
         <image name="button-Facebook" width="260" height="40"/>
         <image name="button-Google" width="260" height="40"/>
+        <image name="button-Map" width="26" height="26"/>
         <image name="button-SignOut" width="260" height="40"/>
         <image name="logo" width="340" height="340"/>
     </resources>

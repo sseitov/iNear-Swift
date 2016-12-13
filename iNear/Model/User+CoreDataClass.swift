@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import SDWebImage
+import CoreLocation
 
 public class User: NSManagedObject {
     lazy var socialType: SocialType = {
@@ -37,8 +38,12 @@ public class User: NSManagedObject {
         }
     }()
     
+    func location() -> CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+    
     func userData() -> [String:Any] {
-        var profile:[String : Any] = ["socialType" : Int(type)]
+        var profile:[String : Any] = ["socialType" : Int(type), "latitude" : latitude, "longitude" : longitude]
         if email != nil {
             profile["email"] = email!
         }
@@ -57,10 +62,14 @@ public class User: NSManagedObject {
         if token != nil {
             profile["token"] = token!
         }
+        if lastDate != nil {
+            profile["lastDate"] = Model.shared.dateFormatter.string(from: lastDate as! Date)
+        }
+
         return profile
     }
     
-    func setUserData(_ profile:[String : Any]) {
+    func setUserData(_ profile:[String : Any], completion: @escaping() -> ()) {
         if let typeVal = profile["socialType"] as? Int {
             type = Int16(typeVal)
         } else {
@@ -70,29 +79,44 @@ public class User: NSManagedObject {
         name = profile["name"] as? String
         givenName = profile["givenName"] as? String
         familyName = profile["familyName"] as? String
-        image = profile["imageURL"] as? String
         token = profile["token"] as? String
-        Model.shared.saveContext()
-    }
-    
-    func getImage(_ result: @escaping(UIImage) -> ()) {
-        if self.image != nil {
-            SDImageCache.shared().queryDiskCache(forKey: self.image!, done: { webImage, cacheType in
-                if webImage == nil {
-                    SDWebImageManager.shared().downloadImage(with: self.imageURL!, options: SDWebImageOptions(rawValue:0), progress: {_, _ in
-                    }, completed: { newImage, error, _, _, _ in
-                        if newImage != nil {
-                            result(newImage!)
-                        } else {
-                            result(UIImage(named:"unknown_user")!)
-                        }
-                    })
-                } else {
-                    result(webImage!)
-                }
+        if let lat = profile["latitude"] as? Double {
+            latitude = lat
+        } else {
+            latitude = 0
+        }
+        if let lon = profile["longitude"] as? Double {
+            longitude = lon
+        } else {
+            longitude = 0
+        }
+        if let dateVal = profile["lastDate"] as? String {
+            lastDate = Model.shared.dateFormatter.date(from: dateVal) as NSDate?
+        }
+
+        image = profile["imageURL"] as? String
+        if image != nil, let url = URL(string: image!) {
+            SDWebImageManager.shared().downloadImage(with: url,
+                                                     options: [],
+                                                     progress: { _ in },
+                                                     completed: { image, error, _, _, _ in
+                                                        if image != nil {
+                                                            self.imageData = UIImagePNGRepresentation(image!) as NSData?
+                                                        }
+                                                        Model.shared.saveContext()
+                                                        completion()
             })
         } else {
-            result(UIImage(named:"unknown_user")!)
+            imageData = nil
+            completion()
+        }
+    }
+
+    func getImage() -> UIImage {
+        if imageData != nil {
+            return UIImage(data: imageData! as Data)!
+        } else {
+            return UIImage(named:"logo")!
         }
     }
 

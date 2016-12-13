@@ -21,4 +21,5 @@ target 'iNear' do
     pod 'SDWebImage'
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'
+    pod 'GoogleMaps'
 end

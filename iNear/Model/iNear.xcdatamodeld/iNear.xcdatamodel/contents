@@ -15,13 +15,18 @@
         <attribute name="familyName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="givenName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="lastDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="token" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uploadedOnWatch" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <elements>
-        <element name="User" positionX="-3060" positionY="-1188" width="128" height="163"/>
-        <element name="Message" positionX="-2864" positionY="-1182" width="128" height="163"/>
+        <element name="Message" positionX="-2882" positionY="-1152" width="128" height="163"/>
+        <element name="User" positionX="-3105" positionY="-1171" width="128" height="240"/>
     </elements>
 </model>

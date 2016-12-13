@@ -54,11 +54,7 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
             default:
                 socialType.text = ""
             }
-            if owner!.imageURL != nil {
-                photoView.sd_setImage(with: owner!.imageURL, placeholderImage: UIImage(named: "logo"))
-            } else {
-                photoView.image = UIImage(named: "logo")
-            }
+            photoView.image = owner!.getImage()
         } else {
             authView.alpha = 1
             userView.alpha = 0
@@ -103,13 +99,15 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
                 } else {
                     let credential = FIRFacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                     FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
-                        SVProgressHUD.dismiss()
                         if error != nil {
+                            SVProgressHUD.dismiss()
                             self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
                         } else {
                             if let profile = result as? [String:Any] {
-                                Model.shared.setFacebookUser(firUser!, profile: profile)
-                                self.goBack()
+                                Model.shared.setFacebookUser(firUser!, profile: profile, completion: {
+                                    SVProgressHUD.dismiss()
+                                    self.goBack()
+                                })
                             } else {
                                 self.showMessage("Can not read user profile.", messageType: .error)
                                 try? FIRAuth.auth()?.signOut()
@@ -137,12 +135,14 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
                                                           accessToken: (authentication?.accessToken)!)
         SVProgressHUD.show(withStatus: "Login...")
         FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
-            SVProgressHUD.dismiss()
             if error != nil {
+                SVProgressHUD.dismiss()
                 self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
             } else {
-                Model.shared.setGoogleUser(firUser!, googleProfile: user.profile)
-                self.goBack()
+                Model.shared.setGoogleUser(firUser!, googleProfile: user.profile, completion: {
+                    SVProgressHUD.dismiss()
+                    self.goBack()
+                })
             }
         })
     }

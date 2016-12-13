@@ -10,6 +10,7 @@ import Foundation
 import CoreData
 import Firebase
 import AFNetworking
+import SDWebImage
 
 enum SocialType:Int {
     case unknown = 0
@@ -31,6 +32,10 @@ let readMessageNotification = Notification.Name("READ_MESSAGE")
 class Model : NSObject {
     
     static let shared = Model()
+    
+    private override init() {
+        super.init()
+    }
     
     // MARK: - Date formatter
     
@@ -70,6 +75,7 @@ class Model : NSObject {
         }
         try? FIRAuth.auth()?.signOut()
         newMessageRefHandle = nil
+        updateUserRefHandle = nil
     }
     
     // MARK: - Cloud observers
@@ -78,6 +84,9 @@ class Model : NSObject {
         if newMessageRefHandle == nil {
             observeMessages()
         }
+        if updateUserRefHandle == nil {
+            observeUsers()
+        }
     }
     
     lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: "gs://v-channel-a693c.appspot.com")
@@ -85,7 +94,8 @@ class Model : NSObject {
     static let serverKey = "AAAA7y6lzqU:APA91bF0ISTVkscUz81T0fYnLvEQzqGPOIerVudF7_CIj4eJsSs1P1FIw4KYzx8MNo11kF7WgZ6SGT3DZuyCNtuIQMi7JxInttd6vf3JmAkxvqPrVzd_6PyXWxW9IoRYQP5aRkZvzwrelpkVa4xUCkGFOkxDdKNVlQ"
     
     private var newMessageRefHandle: FIRDatabaseHandle?
-    
+    private var updateUserRefHandle: FIRDatabaseHandle?
+
     // MARK: - Push notifications
     
     fileprivate lazy var httpManager:AFHTTPSessionManager = {
@@ -181,8 +191,27 @@ class Model : NSObject {
         let ref = FIRDatabase.database().reference()
         ref.child("users").child(user.uid!).setValue(user.userData())
     }
+    
+    fileprivate func observeUsers() {
+        
+        let ref = FIRDatabase.database().reference()
+        let userQuery = ref.child("users").queryLimited(toLast:25)
+        
+        updateUserRefHandle = userQuery.observe(.childChanged, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let profile = snapshot.value as? [String:Any] {
+                    if let lat = profile["latitude"] as? Double, let lon = profile["longitude"] as? Double, let date = profile["lastDate"] as? String {
+                        user.latitude = lat
+                        user.longitude = lon
+                        user.lastDate = self.dateFormatter.date(from: date) as NSDate?
+                        self.saveContext()
+                    }
+                }
+            }
+        })
+    }
 
-    func setFacebookUser(_ user:FIRUser, profile:[String:Any]) {
+    func setFacebookUser(_ user:FIRUser, profile:[String:Any], completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.facebook.rawValue)
         cashedUser.email = profile["email"] as? String
@@ -194,10 +223,25 @@ class Model : NSObject {
                 cashedUser.image = data["url"] as? String
             }
         }
-        updateUser(cashedUser)
+        if cashedUser.image != nil, let url = URL(string: cashedUser.image!) {
+            SDWebImageManager.shared().downloadImage(with: url,
+                                                     options: [],
+                                                     progress: { _ in },
+                                                     completed: { image, error, _, _, _ in
+                                                        if image != nil {
+                                                            cashedUser.imageData = UIImagePNGRepresentation(image!) as NSData?
+                                                        }
+                                                        self.updateUser(cashedUser)
+                                                        completion()
+            })
+        } else {
+            cashedUser.imageData = nil
+            updateUser(cashedUser)
+            completion()
+        }
     }
     
-    func setGoogleUser(_ user:FIRUser, googleProfile: GIDProfileData!) {
+    func setGoogleUser(_ user:FIRUser, googleProfile: GIDProfileData!, completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.google.rawValue)
         cashedUser.email = googleProfile.email
@@ -209,7 +253,22 @@ class Model : NSObject {
                 cashedUser.image = url.absoluteString
             }
         }
-        updateUser(cashedUser)
+        if cashedUser.image != nil, let url = URL(string: cashedUser.image!) {
+            SDWebImageManager.shared().downloadImage(with: url,
+                                                     options: [],
+                                                     progress: { _ in },
+                                                     completed: { image, error, _, _, _ in
+                                                        if image != nil {
+                                                            cashedUser.imageData = UIImagePNGRepresentation(image!) as NSData?
+                                                        }
+                                                        self.updateUser(cashedUser)
+                                                        completion()
+            })
+        } else {
+            cashedUser.imageData = nil
+            updateUser(cashedUser)
+            completion()
+        }
     }
     
     func currentUser() -> User? {

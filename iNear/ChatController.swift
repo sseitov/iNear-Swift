@@ -17,10 +17,7 @@ class Avatar : NSObject, JSQMessageAvatarImageDataSource {
     
     init(_ user:User) {
         super.init()
-        self.userImage = UIImage(named: "unknown_user")
-        user.getImage({ image in
-            self.userImage = image.inCircle()
-        })
+        self.userImage = user.getImage().inCircle()
     }
     
     func avatarImage() -> UIImage! {
@@ -32,7 +29,7 @@ class Avatar : NSObject, JSQMessageAvatarImageDataSource {
     }
     
     func avatarPlaceholderImage() -> UIImage! {
-        return UIImage(named: "unknown_user")
+        return UIImage(named: "logo")?.inCircle()
     }
 }
 
@@ -250,6 +247,10 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             controller.date = message.date
             let photo = message.media as! JSQPhotoMediaItem
             controller.image = photo.image
+        } else if segue.identifier == "showMap" {
+            let controller = segue.destination as! RouteController
+            controller.user = self.user
         }
+
     }
 }

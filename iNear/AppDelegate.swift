@@ -11,6 +11,8 @@ import UserNotifications
 
 import IQKeyboardManager
 import Firebase
+import CoreLocation
+import GoogleMaps
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -22,6 +24,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     var window: UIWindow?
     
     let FACEBOOK_SCHEME = "fb823694161012947"
+    let GoolgleMapAPIKey = "AIzaSyASkBVjFprQb3Mhalnl_rnGe14ewUlrrGA"
+
+    let locationManager = CLLocationManager()
+    var bgIdentifier: UIBackgroundTaskIdentifier?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
@@ -61,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Facebook SDK init
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-
+        
         // UI settings
 
         let splitViewController = self.window!.rootViewController as! UISplitViewController
@@ -75,7 +81,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
 
         IQKeyboardManager.shared().isEnableAutoToolbar = false
+        
+        // connect iWatch
+        _ = WatchManager.shared.activate()
 
+        // Initialize Google Maps
+        GMSServices.provideAPIKey(GoolgleMapAPIKey)
+        
+        // Location manager
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            if CLLocationManager.authorizationStatus() != .authorizedAlways {
+                locationManager.requestAlwaysAuthorization()
+            } else {
+                locationManager.startUpdatingLocation()
+            }
+        }
+        
         return true
     }
     
@@ -179,9 +202,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
     }
     
+    func application(_ application: UIApplication, handleWatchKitExtensionRequest userInfo: [AnyHashable : Any]?, reply: @escaping ([AnyHashable : Any]?) -> Void) {
+        
+    }
 }
 
-// [START ios_10_message_handling]
 @available(iOS 10, *)
 extension AppDelegate : UNUserNotificationCenterDelegate {
     // Receive displayed notifications for iOS 10 devices.
@@ -204,14 +229,29 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         print(userInfo)
     }
 }
-// [END ios_10_message_handling]
 
-// [START ios_10_data_message_handling]
 extension AppDelegate : FIRMessagingDelegate {
     // Receive data message on iOS 10 devices while app is in the foreground.
     func applicationReceivedRemoteMessage(_ remoteMessage: FIRMessagingRemoteMessage) {
         print(remoteMessage.appData)
     }
 }
-// [END ios_10_data_message_handling]
 
+extension AppDelegate : CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if CLLocationManager.authorizationStatus() == .authorizedAlways {
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last, let user = Model.shared.currentUser() {
+            print("update location")
+            user.latitude = location.coordinate.latitude
+            user.longitude = location.coordinate.longitude
+            user.lastDate = NSDate()
+            Model.shared.updateUser(user)
+        }
+    }
+}

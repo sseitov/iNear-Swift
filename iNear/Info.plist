@@ -26,35 +26,43 @@
 				<string>com.googleusercontent.apps.1027279802021-j65vtq40vuqvhknel6j72iqqiethlqau</string>
 			</array>
 		</dict>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>fb823694161012947</string>
-            </array>
-        </dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb823694161012947</string>
+			</array>
+		</dict>
 	</array>
-    <key>FacebookAppID</key>
-    <string>823694161012947</string>
-    <key>FacebookDisplayName</key>
-    <string>iNear</string>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>fbauth2</string>
-    </array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>FacebookAppID</key>
+	<string>823694161012947</string>
+	<key>FacebookDisplayName</key>
+	<string>iNear</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbauth2</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>iNear needs your camera for take pictures and share it</string>
+	<string>iNear needs your camera for take pictures and share it.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>iNear needs your photo library for share photos</string>
+	<string>iNear needs your photo library for share photos.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>iNear wants to track your location.</string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>location</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -65,11 +73,6 @@
 	<array>
 		<string>armv7</string>
 	</array>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
 	<key>UIStatusBarTintParameters</key>
 	<dict>
 		<key>UINavigationBar</key>
