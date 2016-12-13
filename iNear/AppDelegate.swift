@@ -61,6 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             if let owner = Model.shared.currentUser(), let token = FIRInstanceID.instanceID().token() {
                 owner.token = token
                 Model.shared.updateUser(owner)
+                self.connectToFcm()
             }
         })
         

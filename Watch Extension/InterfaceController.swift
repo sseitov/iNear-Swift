@@ -156,6 +156,15 @@ extension InterfaceController {
     // Receiver
     func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
         print("didReceiveApplicationContext")
+        if let list = applicationContext["contactList"] as? [Any] {
+            DispatchQueue.main.async {
+                UserDefaults.standard.removeObject(forKey: "contacts")
+                for contact in list {
+                    self.addContact(contact as? [String:Any])
+                }
+                self.refreshTable()
+            }
+        }
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {

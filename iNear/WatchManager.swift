@@ -32,27 +32,16 @@ class WatchManager: NSObject, WCSessionDelegate {
     }
     
     func updateContacts() {
-/*
-        let contacts = Model.shared.allUsers()
-        for contact in contacts {
-            if !contact.uploadedOnWatch {
-                contact.getImage({ image in
-                    let data = UIImagePNGRepresentation(image.inCircle())
-                    let friend:[String:Any] = ["uid" : contact.uid!, "name" : contact.name!, "image" : data!]
-                    self.watchSession!.sendMessage(friend, replyHandler: { reply in
-                        DispatchQueue.main.async {
-                            if let uid = reply["uid"] as? String, uid == contact.uid! {
-                                contact.uploadedOnWatch = true
-                                Model.shared.saveContext()
-                            }
-                        }
-                    }, errorHandler: { error in
-                        print(error)
-                    })
-                })
+        if watchSession != nil {
+            let contacts = Model.shared.allUsers()
+            var friends:[Any] = []
+            for contact in contacts {
+                let data = UIImagePNGRepresentation(contact.getImage().withSize(CGSize(width: 30, height: 30)).inCircle())
+                let friend:[String:Any] = ["uid" : contact.uid!, "name" : contact.name!, "image" : data!]
+                friends.append(friend)
             }
+            try? watchSession!.updateApplicationContext(["contactList" : friends])
         }
- */
     }
 }
 
@@ -83,7 +72,7 @@ extension WatchManager {
                     let users = Model.shared.allUsers()
                     for user in users {
                         let imageData = UIImagePNGRepresentation(user.getImage().inCircle())
-                        let contact:[String:Any] = ["uid" : user.uid!, "name" : user.name!, "image" : imageData!]
+                        let contact:[String:Any] = ["uid" : user.uid!, "name" : user.shortName, "image" : imageData!]
                         contacts.append(contact)
                     }
                     replyHandler(["contacts" : contacts])

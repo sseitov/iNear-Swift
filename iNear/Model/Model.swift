@@ -197,6 +197,7 @@ class Model : NSObject {
         let userQuery = ref.child("users").child(user.uid!)
         userQuery.observeSingleEvent(of: .value, with: { snapshot in
             if let profile = snapshot.value as? [String:Any] {
+                user.token = profile["token"] as? String
                 if let lat = profile["latitude"] as? Double, let lon = profile["longitude"] as? Double, let date = profile["lastDate"] as? String {
                     user.latitude = lat
                     user.longitude = lon
