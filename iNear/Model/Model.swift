@@ -75,7 +75,6 @@ class Model : NSObject {
         }
         try? FIRAuth.auth()?.signOut()
         newMessageRefHandle = nil
-        updateUserRefHandle = nil
     }
     
     // MARK: - Cloud observers
@@ -84,9 +83,6 @@ class Model : NSObject {
         if newMessageRefHandle == nil {
             observeMessages()
         }
-        if updateUserRefHandle == nil {
-            observeUsers()
-        }
     }
     
     lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: "gs://v-channel-a693c.appspot.com")
@@ -94,7 +90,6 @@ class Model : NSObject {
     static let serverKey = "AAAA7y6lzqU:APA91bF0ISTVkscUz81T0fYnLvEQzqGPOIerVudF7_CIj4eJsSs1P1FIw4KYzx8MNo11kF7WgZ6SGT3DZuyCNtuIQMi7JxInttd6vf3JmAkxvqPrVzd_6PyXWxW9IoRYQP5aRkZvzwrelpkVa4xUCkGFOkxDdKNVlQ"
     
     private var newMessageRefHandle: FIRDatabaseHandle?
-    private var updateUserRefHandle: FIRDatabaseHandle?
 
     // MARK: - Push notifications
     
@@ -186,31 +181,33 @@ class Model : NSObject {
         }
     }
     
+    func deleteUser(_ user:User) {
+        managedObjectContext.delete(user)
+        saveContext()
+    }
+    
     func updateUser(_ user:User) {
         saveContext()
         let ref = FIRDatabase.database().reference()
         ref.child("users").child(user.uid!).setValue(user.userData())
     }
     
-    fileprivate func observeUsers() {
-        
+    func refreshUser(_ user:User, completion: @escaping() -> ()) {
         let ref = FIRDatabase.database().reference()
-        let userQuery = ref.child("users").queryLimited(toLast:25)
-        
-        updateUserRefHandle = userQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let profile = snapshot.value as? [String:Any] {
-                    if let lat = profile["latitude"] as? Double, let lon = profile["longitude"] as? Double, let date = profile["lastDate"] as? String {
-                        user.latitude = lat
-                        user.longitude = lon
-                        user.lastDate = self.dateFormatter.date(from: date) as NSDate?
-                        self.saveContext()
-                    }
+        let userQuery = ref.child("users").child(user.uid!)
+        userQuery.observeSingleEvent(of: .value, with: { snapshot in
+            if let profile = snapshot.value as? [String:Any] {
+                if let lat = profile["latitude"] as? Double, let lon = profile["longitude"] as? Double, let date = profile["lastDate"] as? String {
+                    user.latitude = lat
+                    user.longitude = lon
+                    user.lastDate = self.dateFormatter.date(from: date) as NSDate?
+                    self.saveContext()
                 }
             }
+            completion()
         })
     }
-
+    
     func setFacebookUser(_ user:FIRUser, profile:[String:Any], completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.facebook.rawValue)

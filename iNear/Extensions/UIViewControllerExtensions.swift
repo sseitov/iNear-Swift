@@ -14,12 +14,21 @@ enum MessageType {
 
 extension UIViewController {
     
-    func setupTitle(_ text:String) {
+    func setupTitle(_ text:String, prompt:String? = nil) {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
         label.textAlignment = .center
         label.font = UIFont(name: "HelveticaNeue-CondensedBold", size: 15)
         label.text = text
         label.textColor = UIColor.white
+        if prompt != nil {
+            let promptLabel = UILabel(frame: CGRect(x: 0, y: -31, width: 200, height: 44))
+            promptLabel.textAlignment = .center
+            promptLabel.font = UIFont(name: "HelveticaNeue-CondensedBold", size: 15)
+            promptLabel.text = prompt!
+            promptLabel.textColor = UIColor.white
+            label.addSubview(promptLabel)
+            label.clipsToBounds = false
+        }
         navigationItem.titleView = label
     }
     

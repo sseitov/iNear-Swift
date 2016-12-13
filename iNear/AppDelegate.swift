@@ -79,7 +79,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 17) {
             UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName : font], for: .normal)
         }
-
         IQKeyboardManager.shared().isEnableAutoToolbar = false
         
         // connect iWatch
@@ -91,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Location manager
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
             } else {
@@ -119,7 +118,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func tokenRefreshNotification(_ notification: Notification) {
         if let refreshedToken = FIRInstanceID.instanceID().token() {
             print("InstanceID token: \(refreshedToken)")
-            // Connect to FCM since connection may have failed when attempted before having a token.
+            if let owner = Model.shared.currentUser() {
+                owner.token = FIRInstanceID.instanceID().token()
+                Model.shared.updateUser(owner)
+            }
             connectToFcm()
         }
     }
@@ -128,8 +130,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         FIRMessaging.messaging().connect { (error) in
             if error != nil {
                 print("Unable to connect with FCM. \(error)")
-            } else {
-                print("Connected to FCM with token \(FIRInstanceID.instanceID().token()).")
             }
         }
     }
@@ -167,7 +167,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        connectToFcm()
         FBSDKAppEvents.activateApp()
     }
 

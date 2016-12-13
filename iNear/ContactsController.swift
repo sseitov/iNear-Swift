@@ -17,6 +17,7 @@ class ContactsController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitle("Contacts")
+        tableView.allowsSelectionDuringEditing = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -33,7 +34,7 @@ class ContactsController: UITableViewController {
             }
         }
     }
-
+    
     func refresh() {
         contacts = Model.shared.allUsers()
         tableView.reloadData()
@@ -53,6 +54,32 @@ class ContactsController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Contact", for: indexPath) as! ContactCell
         cell.user = contacts[indexPath.row]
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let user = contacts[indexPath.row]
+            if let index = contacts.index(of: user) {
+                tableView.beginUpdates()
+                contacts.remove(at: index)
+                Model.shared.deleteUser(user)
+                tableView.deleteRows(at: [indexPath], with: .top)
+                tableView.endUpdates()
+            }
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let user = contacts[indexPath.row]
+        SVProgressHUD.show(withStatus: "Refresh..")
+        Model.shared.refreshUser(user, completion: {
+            SVProgressHUD.dismiss()
+            self.performSegue(withIdentifier: "showDetail", sender: user)
+        })
     }
     
     @IBAction func addContact(_ sender: Any) {
@@ -91,8 +118,7 @@ class ContactsController: UITableViewController {
         if segue.identifier == "showDetail" {
             let nav = segue.destination as! UINavigationController
             if let controller = nav.topViewController as? ChatController {
-                let cell = sender as! ContactCell
-                controller.user = cell.user
+                controller.user = sender as? User
             }
         }
     }

@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>2.0</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -56,10 +56,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>iNear needs your camera for take pictures and share it.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>iNear wants to track your location.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>iNear needs your photo library for share photos.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>iNear wants to track your location.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

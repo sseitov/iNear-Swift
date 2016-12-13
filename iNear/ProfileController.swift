@@ -82,14 +82,14 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
     
     // MARK: - Google+ Auth
     
-    @IBAction func facebookSignIn(_ sender: Any) {
+    @IBAction func facebookSignIn(_ sender: Any) { // read_custom_friendlists
         FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email"], from: self, handler: { result, error in
             if error != nil {
                 self.showMessage("Facebook authorization error.", messageType: .error)
                 return
             }
             
-            SVProgressHUD.show(withStatus: "Login...")
+            SVProgressHUD.show(withStatus: "Login...") // interested_in
             let params = ["fields" : "name,email,first_name,last_name,birthday,picture.width(480).height(480)"]
             let request = FBSDKGraphRequest(graphPath: "me", parameters: params)
             request!.start(completionHandler: { _, result, fbError in
