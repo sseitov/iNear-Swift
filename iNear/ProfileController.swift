@@ -32,7 +32,7 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance().uiDelegate = self
 
-        owner = Model.shared.currentUser()
+        owner = currentUser()
         if owner == nil {
             navigationItem.leftBarButtonItem = nil
             navigationItem.hidesBackButton = true

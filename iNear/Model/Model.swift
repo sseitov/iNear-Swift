@@ -11,14 +11,7 @@ import CoreData
 import Firebase
 import AFNetworking
 import SDWebImage
-
-enum SocialType:Int {
-    case unknown = 0
-    case facebook = 1
-    case twitter = 2
-    case google = 3
-    case phone = 4
-}
+import CoreLocation
 
 enum PushType:Int {
     case none = 0
@@ -28,6 +21,15 @@ enum PushType:Int {
 
 let newMessageNotification = Notification.Name("NEW_MESSAGE")
 let readMessageNotification = Notification.Name("READ_MESSAGE")
+let contactNotification = Notification.Name("CONTACT")
+
+func currentUser() -> User? {
+    if FIRAuth.auth()?.currentUser != nil {
+        return Model.shared.getUser(FIRAuth.auth()!.currentUser!.uid)
+    } else {
+        return nil
+    }
+}
 
 class Model : NSObject {
     
@@ -75,6 +77,13 @@ class Model : NSObject {
         }
         try? FIRAuth.auth()?.signOut()
         newMessageRefHandle = nil
+        updateCoordinateRefHandle = nil
+        newCoordinateRefHandle = nil
+        updateTokenRefHandle = nil
+        newTokenRefHandle = nil
+        updateContactRefHandle = nil
+        newContactRefHandle = nil
+        deleteContactRefHandle = nil
     }
     
     // MARK: - Cloud observers
@@ -83,6 +92,15 @@ class Model : NSObject {
         if newMessageRefHandle == nil {
             observeMessages()
         }
+        if updateCoordinateRefHandle == nil {
+            observeCoordinate()
+        }
+        if updateTokenRefHandle == nil {
+            observeTokens()
+        }
+        if updateContactRefHandle == nil {
+            observeContacts()
+        }
     }
     
     lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: "gs://v-channel-a693c.appspot.com")
@@ -90,7 +108,17 @@ class Model : NSObject {
     static let serverKey = "AAAA7y6lzqU:APA91bF0ISTVkscUz81T0fYnLvEQzqGPOIerVudF7_CIj4eJsSs1P1FIw4KYzx8MNo11kF7WgZ6SGT3DZuyCNtuIQMi7JxInttd6vf3JmAkxvqPrVzd_6PyXWxW9IoRYQP5aRkZvzwrelpkVa4xUCkGFOkxDdKNVlQ"
     
     private var newMessageRefHandle: FIRDatabaseHandle?
-
+    
+    private var updateCoordinateRefHandle: FIRDatabaseHandle?
+    private var newCoordinateRefHandle: FIRDatabaseHandle?
+    
+    private var updateTokenRefHandle: FIRDatabaseHandle?
+    private var newTokenRefHandle: FIRDatabaseHandle?
+    
+    private var updateContactRefHandle: FIRDatabaseHandle?
+    private var newContactRefHandle: FIRDatabaseHandle?
+    private var deleteContactRefHandle: FIRDatabaseHandle?
+    
     // MARK: - Push notifications
     
     fileprivate lazy var httpManager:AFHTTPSessionManager = {
@@ -186,26 +214,103 @@ class Model : NSObject {
         saveContext()
     }
     
+    func uploadUser(_ uid:String, result: @escaping(User?) -> ()) {
+        if let existUser = getUser(uid) {
+            result(existUser)
+        } else {
+            let ref = FIRDatabase.database().reference()
+            ref.child("users").child(uid).observeSingleEvent(of: .value, with: { snapshot in
+                if let userData = snapshot.value as? [String:Any] {
+                    let user = self.createUser(uid)
+                    user.setUserData(userData, completion: {
+                        result(user)
+                    })
+                } else {
+                    result(nil)
+                }
+            })
+        }
+    }
+    
     func updateUser(_ user:User) {
         saveContext()
         let ref = FIRDatabase.database().reference()
         ref.child("users").child(user.uid!).setValue(user.userData())
     }
     
-    func refreshUser(_ user:User, completion: @escaping() -> ()) {
+    func publishCoordinate(_ pos:CLLocationCoordinate2D) -> Bool {
+        if let user = currentUser() {
+            user.latitude = pos.latitude
+            user.longitude = pos.longitude
+            user.lastDate = NSDate()
+            saveContext()
+            let ref = FIRDatabase.database().reference()
+            let data:[String:Any] = ["latitude" : pos.latitude,
+                                     "longitude" : pos.longitude,
+                                     "lastDate" : Model.shared.dateFormatter.string(from: Date())]
+            ref.child("positions").child(currentUser()!.uid!).setValue(data)
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func publishToken(_ user:FIRUser,  token:String) {
         let ref = FIRDatabase.database().reference()
-        let userQuery = ref.child("users").child(user.uid!)
-        userQuery.observeSingleEvent(of: .value, with: { snapshot in
-            if let profile = snapshot.value as? [String:Any] {
-                user.token = profile["token"] as? String
-                if let lat = profile["latitude"] as? Double, let lon = profile["longitude"] as? Double, let date = profile["lastDate"] as? String {
-                    user.latitude = lat
-                    user.longitude = lon
-                    user.lastDate = self.dateFormatter.date(from: date) as NSDate?
+        ref.child("tokens").child(user.uid).setValue(token)
+    }
+    
+    fileprivate func observeCoordinate() {
+        let ref = FIRDatabase.database().reference()
+        let coordQuery = ref.child("positions").queryLimited(toLast:25)
+
+        newCoordinateRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let position = snapshot.value as? [String:Any] {
+                    if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double, let date = position["lastDate"] as? String {
+                        user.latitude = lat
+                        user.longitude = lon
+                        user.lastDate = self.dateFormatter.date(from: date) as NSDate?
+                        self.saveContext()
+                    }
+                }
+            }
+        })
+        
+        updateCoordinateRefHandle = coordQuery.observe(.childChanged, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let position = snapshot.value as? [String:Any] {
+                    if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double, let date = position["lastDate"] as? String {
+                        user.latitude = lat
+                        user.longitude = lon
+                        user.lastDate = self.dateFormatter.date(from: date) as NSDate?
+                        self.saveContext()
+                    }
+                }
+            }
+        })
+    }
+    
+    fileprivate func observeTokens() {
+        let ref = FIRDatabase.database().reference()
+        let coordQuery = ref.child("tokens").queryLimited(toLast:25)
+        
+        newTokenRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let token = snapshot.value as? String {
+                    user.token = token
                     self.saveContext()
                 }
             }
-            completion()
+        })
+        
+        updateTokenRefHandle = coordQuery.observe(.childChanged, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let token = snapshot.value as? String {
+                    user.token = token
+                    self.saveContext()
+                }
+            }
         })
     }
     
@@ -268,29 +373,137 @@ class Model : NSObject {
             completion()
         }
     }
+
+    func allContacts() -> [User] {
+        if currentUser() == nil {
+            return[]
+        }
+        var users:[User] = []
+        if let contacts = currentUser()!.contacts?.allObjects as? [Contact] {
+            for contact in contacts {
+                if contact.initiator! != currentUser()!.uid!, let peer = getUser(contact.initiator!) {
+                    users.append(peer)
+                } else if let peer = getUser(contact.requester!){
+                    users.append(peer)
+                }
+            }
+        }
+        return users
+    }
     
-    func currentUser() -> User? {
-        if FIRAuth.auth()?.currentUser != nil {
-            return getUser(FIRAuth.auth()!.currentUser!.uid)
+    // MARK: - Contacts table
+    
+    func createContact(_ uid:String) -> Contact {
+        var contact = getContact(uid)
+        if contact == nil {
+            contact = NSEntityDescription.insertNewObject(forEntityName: "Contact", into: managedObjectContext) as? Contact
+            contact!.uid = uid
+        }
+        return contact!
+    }
+    
+    func getContact(_ uid:String) -> Contact? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
+        let predicate = NSPredicate(format: "uid = %@", uid)
+        fetchRequest.predicate = predicate
+        if let contact = try? managedObjectContext.fetch(fetchRequest).first as? Contact {
+            return contact
         } else {
             return nil
         }
     }
 
-    func allUsers() -> [User] {
-        if currentUser() == nil {
-            return[]
-        }
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "User")
-        let predicate = NSPredicate(format: "uid != %@", currentUser()!.uid!)
-        fetchRequest.predicate = predicate
-        let sortDescriptor = NSSortDescriptor(key: "familyName", ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
+    func addContact(with:String) {
+        let contact = createContact(generateUDID())
+        contact.initiator = currentUser()!.uid
+        contact.requester = with
+        contact.status = ContactStatus.requested.rawValue
+        contact.owner = currentUser()
+        currentUser()?.addToContacts(contact)
         
-        if let all = try? managedObjectContext.fetch(fetchRequest) as! [User] {
-            return all
+        let ref = FIRDatabase.database().reference()
+        ref.child("contacts").child(contact.uid!).setValue(contact.getData())
+        NotificationCenter.default.post(name: contactNotification, object: nil)
+    }
+    
+    func approveContact(_ contact:Contact) {
+        let ref = FIRDatabase.database().reference()
+        contact.status = ContactStatus.approved.rawValue
+        ref.child("contacts").child(contact.uid!).setValue(contact.getData())
+    }
+    
+    func rejectContact(_ contact:Contact) {
+        let ref = FIRDatabase.database().reference()
+        contact.status = ContactStatus.rejected.rawValue
+        ref.child("contacts").child(contact.uid!).setValue(contact.getData())
+    }
+    
+    func deleteContact(_ contact:Contact) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("contacts").child(contact.uid!).removeValue()
+        currentUser()?.removeFromContacts(contact)
+        managedObjectContext.delete(contact)
+        saveContext()
+    }
+    
+    fileprivate func observeContacts() {
+        let ref = FIRDatabase.database().reference()
+        let contactQuery = ref.child("contacts").queryLimited(toLast:25)
+        
+        newContactRefHandle = contactQuery.observe(.childAdded, with: { (snapshot) -> Void in
+            if self.getContact(snapshot.key) == nil {
+                if let contactData = snapshot.value as? [String:Any] {
+                    if let from = contactData["initiator"] as? String, let to = contactData["requester"] as? String {
+                        if from == currentUser()!.uid! || to == currentUser()!.uid! {
+                            self.uploadUser(from, result: { fromUser in
+                                if fromUser != nil {
+                                    self.uploadUser(to, result: { toUser in
+                                        if toUser != nil {
+                                            let contact = self.createContact(snapshot.key)
+                                            contact.owner = currentUser()
+                                            currentUser()?.addToContacts(contact)
+                                            contact.setData(contactData)
+                                            NotificationCenter.default.post(name: contactNotification, object: nil)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        })
+        
+        updateContactRefHandle = contactQuery.observe(.childChanged, with: { (snapshot) -> Void in
+            if let contact = self.getContact(snapshot.key) {
+                if let data = snapshot.value as? [String:Any] {
+                    contact.setData(data)
+                    NotificationCenter.default.post(name: contactNotification, object: contact)
+                }
+            }
+        })
+        
+        deleteContactRefHandle = contactQuery.observe(.childRemoved, with: { (snapshot) -> Void in
+            if let contact = self.getContact(snapshot.key) {
+                currentUser()!.removeFromContacts(contact)
+                self.managedObjectContext.delete(contact)
+                self.saveContext()
+                NotificationCenter.default.post(name: contactNotification, object: nil)
+            }
+        })
+
+    }
+    
+    func contactWithUser(_ uid:String) -> Contact? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
+        let predicate1  = NSPredicate(format: "initiator == %@", uid)
+        let predicate2 = NSPredicate(format: "requester == %@", uid)
+        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [predicate1, predicate2])
+        
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Contact] {
+            return all.first
         } else {
-            return []
+            return nil
         }
     }
     
@@ -430,9 +643,9 @@ class Model : NSObject {
         newMessageRefHandle = messageQuery.observe(.childAdded, with: { (snapshot) -> Void in
             let messageData = snapshot.value as! [String:Any]
             if let from = messageData["from"] as? String, let to = messageData["to"] as? String {
-                if self.currentUser() != nil && self.getMessage(snapshot.key) == nil {
-                    let received = (to == self.currentUser()!.uid!)
-                    let sended = (from == self.currentUser()!.uid!)
+                if currentUser() != nil && self.getMessage(snapshot.key) == nil {
+                    let received = (to == currentUser()!.uid!)
+                    let sended = (from == currentUser()!.uid!)
                     if received || sended {
                         let message = self.createMessage(snapshot.key)
                         message.setData(messageData, new: received, completion: {
@@ -441,7 +654,7 @@ class Model : NSObject {
                     }
                 }
             } else {
-                print("Error! Could not decode message data")
+                print("Error! Could not decode message data \(messageData)")
             }
         })
     }
@@ -453,9 +666,9 @@ class Model : NSObject {
                 for (key, value) in values {
                     let messageData = value as! [String:Any]
                     if let from = messageData["from"] as? String, let to = messageData["to"] as? String {
-                        if self.currentUser() != nil && self.getMessage(snapshot.key) == nil {
-                            let received = (to == self.currentUser()!.uid!)
-                            let sended = (from == self.currentUser()!.uid!)
+                        if currentUser() != nil && self.getMessage(snapshot.key) == nil {
+                            let received = (to == currentUser()!.uid!)
+                            let sended = (from == currentUser()!.uid!)
                             if received || sended {
                                 let message = self.createMessage(key)
                                 message.setData(messageData, new: false, completion: {
@@ -464,7 +677,7 @@ class Model : NSObject {
                             }
                         }
                     } else {
-                        print("Error! Could not decode message data")
+                        print("Error! Could not decode message data \(messageData)")
                     }
                 }
             }

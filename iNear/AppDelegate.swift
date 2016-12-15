@@ -27,7 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     let GoolgleMapAPIKey = "AIzaSyASkBVjFprQb3Mhalnl_rnGe14ewUlrrGA"
 
     let locationManager = CLLocationManager()
-    var bgIdentifier: UIBackgroundTaskIdentifier?
+    var lastPublishedLocation:CLLocation?
+    let threshold:CLLocationDistance = 10.0
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
@@ -58,10 +59,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                                                object: nil)
         
         FIRAuth.auth()?.addStateDidChangeListener({ auth, user in
-            if let owner = Model.shared.currentUser(), let token = FIRInstanceID.instanceID().token() {
-                owner.token = token
-                Model.shared.updateUser(owner)
-                self.connectToFcm()
+            if let token = FIRInstanceID.instanceID().token(), let currentUser = auth.currentUser {
+                Model.shared.publishToken(currentUser, token:token)
             }
         })
         
@@ -91,7 +90,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Location manager
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
             } else {
@@ -104,13 +104,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     // MARK: - Receive_message
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
-        print("didReceiveRemoteNotification: Message ID: \(userInfo["gcm.message_id"]!)")
         print(userInfo)
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("Message ID: \(userInfo["gcm.message_id"]!)")
         print(userInfo)
     }
     
@@ -119,11 +117,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func tokenRefreshNotification(_ notification: Notification) {
         if let refreshedToken = FIRInstanceID.instanceID().token() {
             print("InstanceID token: \(refreshedToken)")
-            if let owner = Model.shared.currentUser() {
-                owner.token = FIRInstanceID.instanceID().token()
-                Model.shared.updateUser(owner)
-            }
             connectToFcm()
+            if let user = FIRAuth.auth()?.currentUser {
+                Model.shared.publishToken(user, token: refreshedToken)
+            }
         }
     }
     
@@ -246,12 +243,13 @@ extension AppDelegate : CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last, let user = Model.shared.currentUser() {
-            print("update location")
-            user.latitude = location.coordinate.latitude
-            user.longitude = location.coordinate.longitude
-            user.lastDate = NSDate()
-            Model.shared.updateUser(user)
+        if let location = locations.last {
+            if lastPublishedLocation == nil || lastPublishedLocation!.distance(from: location) > threshold {
+                if Model.shared.publishCoordinate(location.coordinate) {
+                    print("updated location")
+                    lastPublishedLocation = location
+                }
+            }
         }
     }
 }

@@ -15,8 +15,11 @@
 		2C1EB4EB1DFEC1E200DBB257 /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1EB4EA1DFEC1E200DBB257 /* MapController.swift */; };
 		2C1EB4EF1DFF539100DBB257 /* RouteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1EB4EE1DFF539100DBB257 /* RouteController.swift */; };
 		2C45C51F1DFEA0A1003ADB52 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45C51E1DFEA0A1003ADB52 /* WatchManager.swift */; };
+		2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */; };
+		2C53BB441E028C4000307C63 /* Contact+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */; };
 		2C5B6B001DE2FE4E00F992C5 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */; };
 		2C7DF6B11DE038CD0046FF94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2C7DF6AF1DE030E50046FF94 /* GoogleService-Info.plist */; };
+		2C85AA111E01FE350050D9D8 /* UIFontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C85AA101E01FE350050D9D8 /* UIFontExtensions.swift */; };
 		2C87D3171DDEE4D200F05528 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D3161DDEE4D200F05528 /* Utilities.swift */; };
 		2C87D31A1DDEF37900F05528 /* TextFieldContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D3191DDEF37900F05528 /* TextFieldContainer.swift */; };
 		2C87D31C1DDEF3C200F05528 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D31B1DDEF3C200F05528 /* UIColorExtensions.swift */; };
@@ -113,8 +116,11 @@
 		2C1EB4EA1DFEC1E200DBB257 /* MapController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
 		2C1EB4EE1DFF539100DBB257 /* RouteController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RouteController.swift; sourceTree = "<group>"; };
 		2C45C51E1DFEA0A1003ADB52 /* WatchManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
+		2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Contact+CoreDataClass.swift"; path = "Model/Contact+CoreDataClass.swift"; sourceTree = "<group>"; };
+		2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Contact+CoreDataProperties.swift"; path = "Model/Contact+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileController.swift; sourceTree = "<group>"; };
 		2C7DF6AF1DE030E50046FF94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "iNear/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2C85AA101E01FE350050D9D8 /* UIFontExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIFontExtensions.swift; path = Extensions/UIFontExtensions.swift; sourceTree = "<group>"; };
 		2C87D3131DDEE1E500F05528 /* iNear.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = iNear.entitlements; path = iNear/iNear.entitlements; sourceTree = "<group>"; };
 		2C87D3161DDEE4D200F05528 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utilities.swift; path = Extensions/Utilities.swift; sourceTree = "<group>"; };
 		2C87D3191DDEF37900F05528 /* TextFieldContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextFieldContainer.swift; path = CustomViews/TextFieldContainer.swift; sourceTree = "<group>"; };
@@ -236,9 +242,8 @@
 			isa = PBXGroup;
 			children = (
 				2C8B18A61DFB1E8A00769A12 /* Model */,
-				2C17476F1DDB93660018AEAB /* Resources */,
-				2C87D3181DDEF36800F05528 /* CustomViews */,
 				2C87D3151DDEE4A800F05528 /* Extensions */,
+				2C87D3181DDEF36800F05528 /* CustomViews */,
 				2C1747701DDB94670018AEAB /* ContactsController.swift */,
 				2CD714441DF0A3D10077249E /* ChatController.swift */,
 				2C1EB4EE1DFF539100DBB257 /* RouteController.swift */,
@@ -247,6 +252,7 @@
 				2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */,
 				2C17475B1DDB872A0018AEAB /* AppDelegate.swift */,
 				2C45C51E1DFEA0A1003ADB52 /* WatchManager.swift */,
+				2C17476F1DDB93660018AEAB /* Resources */,
 			);
 			path = iNear;
 			sourceTree = "<group>";
@@ -273,6 +279,7 @@
 				2C87D31D1DDEF3F000F05528 /* UIViewExtensions.swift */,
 				2C87D31B1DDEF3C200F05528 /* UIColorExtensions.swift */,
 				2C9423B21DFC6708003C4075 /* UIImageExtensions.swift */,
+				2C85AA101E01FE350050D9D8 /* UIFontExtensions.swift */,
 				2C87D3161DDEE4D200F05528 /* Utilities.swift */,
 			);
 			name = Extensions;
@@ -319,6 +326,8 @@
 			isa = PBXGroup;
 			children = (
 				2C8B18A71DFB1EC600769A12 /* iNear.xcdatamodeld */,
+				2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */,
+				2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */,
 				2C9423AE1DFC6456003C4075 /* Message+CoreDataClass.swift */,
 				2C9423AF1DFC6456003C4075 /* Message+CoreDataProperties.swift */,
 				2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */,
@@ -583,6 +592,7 @@
 			files = (
 				2CD714431DF0984C0077249E /* ContactCell.swift in Sources */,
 				2C9423B51DFC67A1003C4075 /* PhotoController.swift in Sources */,
+				2C85AA111E01FE350050D9D8 /* UIFontExtensions.swift in Sources */,
 				2C9423B31DFC6708003C4075 /* UIImageExtensions.swift in Sources */,
 				2CD714451DF0A3D10077249E /* ChatController.swift in Sources */,
 				2C87D31C1DDEF3C200F05528 /* UIColorExtensions.swift in Sources */,
@@ -593,8 +603,10 @@
 				2C87D3201DDF026300F05528 /* UIViewControllerExtensions.swift in Sources */,
 				2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */,
 				2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */,
+				2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */,
 				2C87D3331DDF1A5C00F05528 /* LGProgressView.m in Sources */,
 				2C9423B11DFC6456003C4075 /* Message+CoreDataProperties.swift in Sources */,
+				2C53BB441E028C4000307C63 /* Contact+CoreDataProperties.swift in Sources */,
 				2C8B18A91DFB1EC600769A12 /* iNear.xcdatamodeld in Sources */,
 				2C87D32F1DDF1A5C00F05528 /* LGAlertView.m in Sources */,
 				2C1747711DDB94670018AEAB /* ContactsController.swift in Sources */,

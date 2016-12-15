@@ -42,8 +42,14 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         super.viewDidLoad()
         
         if user != nil {
-            self.senderId = Model.shared.currentUser()!.uid!
-            self.senderDisplayName = Model.shared.currentUser()!.name!
+            if user!.token == nil {
+                SVProgressHUD.show()
+                user!.uploadToken {
+                    SVProgressHUD.dismiss()
+                }
+            }
+            self.senderId = currentUser()!.uid!
+            self.senderDisplayName = currentUser()!.name!
             
             setupTitle(user!.name!)
             
@@ -179,7 +185,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         let message = messages[indexPath.item]
         if message.senderId == senderId {
-            return Avatar(Model.shared.currentUser()!)
+            return Avatar(currentUser()!)
         } else {
             return Avatar(self.user!)
         }
@@ -240,6 +246,22 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     
     // MARK: - Navigation
     
+    @IBAction func showMap(_ sender: Any) {
+        if user?.location() == nil {
+            SVProgressHUD.show()
+            user?.uploadPosition({ success in
+                SVProgressHUD.dismiss()
+                if success {
+                    self.performSegue(withIdentifier: "showMap", sender: nil)
+                } else {
+                    self.showMessage("\(self.user!.shortName) not published location yet.", messageType: .information)
+                }
+            })
+        } else {
+            self.performSegue(withIdentifier: "showMap", sender: nil)
+        }
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showPhoto" {
             let message = sender as! JSQMessage

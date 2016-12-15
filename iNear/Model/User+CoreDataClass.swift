@@ -10,10 +10,17 @@ import Foundation
 import CoreData
 import SDWebImage
 import CoreLocation
+import Firebase
+
+enum SocialType:Int16 {
+    case unknown = 0
+    case facebook = 1
+    case google = 2
+}
 
 public class User: NSManagedObject {
     lazy var socialType: SocialType = {
-        if let val = SocialType(rawValue: Int(self.type)) {
+        if let val = SocialType(rawValue: self.type) {
             return val
         } else {
             return .unknown
@@ -38,12 +45,48 @@ public class User: NSManagedObject {
         }
     }()
     
-    func location() -> CLLocationCoordinate2D {
-        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    func location() -> CLLocationCoordinate2D? {
+        if latitude == 0 && longitude == 0 {
+            return nil
+        } else {
+            return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
     }
     
+    func uploadToken(_ completion: @escaping() -> ()) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("tokens").child(uid!).observeSingleEvent(of: .value, with: { snapshot in
+            if let token = snapshot.value as? String {
+                self.token = token
+                Model.shared.saveContext()
+            }
+            completion()
+        })
+    }
+    
+    func uploadPosition(_ completion: @escaping(Bool) -> ()) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("positions").child(uid!).observeSingleEvent(of: .value, with: { snaphot in
+            if let data = snaphot.value as? [String:Any] {
+                if let lat = data["latitude"] as? Double {
+                    self.latitude = lat
+                }
+                if let lon = data["longitude"] as? Double {
+                    self.longitude = lon
+                }
+                if let dateStr = data["lastDate"] as? String {
+                    self.lastDate = Model.shared.dateFormatter.date(from: dateStr) as NSDate?
+                }
+                Model.shared.saveContext()
+                completion(self.lastDate != nil)
+            } else {
+                completion(false)
+            }
+        })
+    }
+
     func userData() -> [String:Any] {
-        var profile:[String : Any] = ["socialType" : Int(type), "latitude" : latitude, "longitude" : longitude]
+        var profile:[String : Any] = ["socialType" : Int(type)]
         if email != nil {
             profile["email"] = email!
         }
@@ -59,12 +102,6 @@ public class User: NSManagedObject {
         if image != nil {
             profile["imageURL"] = image!
         }
-        if token != nil {
-            profile["token"] = token!
-        }
-        if lastDate != nil {
-            profile["lastDate"] = Model.shared.dateFormatter.string(from: lastDate as! Date)
-        }
 
         return profile
     }
@@ -79,20 +116,6 @@ public class User: NSManagedObject {
         name = profile["name"] as? String
         givenName = profile["givenName"] as? String
         familyName = profile["familyName"] as? String
-        token = profile["token"] as? String
-        if let lat = profile["latitude"] as? Double {
-            latitude = lat
-        } else {
-            latitude = 0
-        }
-        if let lon = profile["longitude"] as? Double {
-            longitude = lon
-        } else {
-            longitude = 0
-        }
-        if let dateVal = profile["lastDate"] as? String {
-            lastDate = Model.shared.dateFormatter.date(from: dateVal) as NSDate?
-        }
 
         image = profile["imageURL"] as? String
         if image != nil, let url = URL(string: image!) {
@@ -119,5 +142,4 @@ public class User: NSManagedObject {
             return UIImage(named:"logo")!
         }
     }
-
 }

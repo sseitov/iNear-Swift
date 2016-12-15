@@ -13,47 +13,53 @@ import AFNetworking
 
 class RouteController: UIViewController {
 
+    @IBOutlet weak var map: GMSMapView!
     var user:User?
-    var mapView:GMSMapView?
+    var userMarker:GMSMarker?
+    var promptText:String = ""
+    var titleText:String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBackButton()
         navigationController?.navigationBar.tintColor = UIColor.white
-        navigationItem.prompt = ""
-        setupTitle("Get route to \(user!.shortName)...", prompt: user!.name!)
+        promptText = "\(self.user!.shortName) was \(Model.shared.textDateFormatter.string(from: self.user!.lastDate as! Date))"
+        titleText = "Get route to \(user!.shortName)..."
+        setupTitle(titleText, promptText: promptText)
         
-        let camera = GMSCameraPosition.camera(withTarget: user!.location(), zoom: 6)
-        mapView = GMSMapView.map(withFrame: CGRect(), camera: camera)
-        mapView!.isMyLocationEnabled = false
-        self.view = mapView!
+        map.camera = GMSCameraPosition.camera(withTarget: user!.location()!, zoom: 6)
+        map.isMyLocationEnabled = false
+        userMarker = marker(forUser: user!)
     }
 
     func marker(forUser:User) -> GMSMarker {
-        let marker = GMSMarker(position: forUser.location())
+        let marker = GMSMarker(position: forUser.location()!)
         marker.icon = forUser.getImage().withSize(CGSize(width: 60, height: 60)).inCircle()
-        if forUser.uid! != Model.shared.currentUser()!.uid! {
-//            marker.position = CLLocationCoordinate2D(latitude: 55.819349, longitude: 37.510184)
+        if forUser.uid! != currentUser()!.uid! {
             marker.title = forUser.shortName
             marker.snippet = Model.shared.textDateFormatter.string(from: forUser.lastDate as! Date)
-            return marker
         }
+        marker.map = map
         return marker
     }
-    
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if userMarker != nil {
+            setupTitle(titleText, promptText: promptText)
+        }
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        let myMarker = marker(forUser: Model.shared.currentUser()!)
-        myMarker.map = mapView
-        let peer = marker(forUser: user!)
-        peer.map = mapView
+        let myMarker = marker(forUser: currentUser()!)
         
-        let bounds = GMSCoordinateBounds(coordinate: myMarker.position, coordinate: peer.position)
+        let bounds = GMSCoordinateBounds(coordinate: myMarker.position, coordinate: userMarker!.position)
         let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
-        mapView?.moveCamera(update)
+        map.moveCamera(update)
         
         SVProgressHUD.show(withStatus: "Refresh...")
-        GMSGeocoder().reverseGeocodeCoordinate(peer.position, completionHandler: { response, error in
+        GMSGeocoder().reverseGeocodeCoordinate(userMarker!.position, completionHandler: { response, error in
             if response != nil {
                 if let address = response!.firstResult() {
                     var addressText = ""
@@ -61,15 +67,20 @@ class RouteController: UIViewController {
                         addressText += address.locality!
                     }
                     if address.thoroughfare != nil {
-                        addressText += ", \(address.thoroughfare!)"
+                        if addressText.isEmpty {
+                            addressText += address.thoroughfare!
+                        } else {
+                            addressText += ", \(address.thoroughfare!)"
+                        }
                     }
                     if addressText.isEmpty {
-                        addressText = "unknown place"
+                        addressText = "Unknown place"
                     }
-                    self.setupTitle(addressText, prompt: "\(self.user!.shortName) was \(Model.shared.textDateFormatter.string(from: self.user!.lastDate as! Date))")
+                    self.titleText = addressText
+                    self.setupTitle(self.titleText, promptText: self.promptText)
                 }
             }
-            self.createDirection(from: myMarker.position, to: peer.position, completion: { result in
+            self.createDirection(from: myMarker.position, to: self.userMarker!.position, completion: { result in
                 SVProgressHUD.dismiss()
                 if result == -1 {
                     self.showMessage("Can not create route to \(self.user!.shortName)", messageType: .error)
@@ -96,7 +107,7 @@ class RouteController: UIViewController {
                                         let polyline = GMSPolyline(path: path)
                                         polyline.strokeColor = UIColor.color(28, 79, 130, 0.7)
                                         polyline.strokeWidth = 7
-                                        polyline.map = self.mapView
+                                        polyline.map = self.map
                                         completion(1)
                                     } else {
                                         completion(0)

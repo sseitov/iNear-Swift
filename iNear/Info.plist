@@ -36,13 +36,15 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>FacebookAppID</key>
 	<string>823694161012947</string>
 	<key>FacebookDisplayName</key>
 	<string>iNear</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbauth2</string>
@@ -57,7 +59,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>iNear needs your camera for take pictures and share it.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>iNear wants to track your location.</string>
+	<string>iNear wants to track your location..</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>iNear needs your photo library for share photos.</string>
 	<key>UIBackgroundModes</key>

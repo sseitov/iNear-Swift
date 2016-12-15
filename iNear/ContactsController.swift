@@ -12,32 +12,45 @@ import SVProgressHUD
 
 class ContactsController: UITableViewController {
     
-    var contacts:[User] = []
+    var contacts:[Contact] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitle("Contacts")
         tableView.allowsSelectionDuringEditing = false
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(ContactsController.refresh),
+                                               name: contactNotification,
+                                               object: nil)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if Model.shared.currentUser() == nil {
+        if currentUser() == nil {
             performSegue(withIdentifier: "showProfile", sender: self)
         } else {
             Model.shared.startObservers()
             refresh()
-            if IS_PAD() {
-                if contacts.count > 0 {
-                    let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
-                    performSegue(withIdentifier: "showDetail", sender: cell)
-                }
-            }
         }
     }
     
     func refresh() {
-        contacts = Model.shared.allUsers()
+        if let allContacts = currentUser()!.contacts?.allObjects as? [Contact] {
+            contacts.removeAll()
+            contacts = allContacts
+        }
         tableView.reloadData()
+        if IS_PAD() {
+            if contacts.count > 0 {
+                performSegue(withIdentifier: "showDetail", sender: contacts[0])
+            } else {
+                performSegue(withIdentifier: "showDetail", sender: nil)
+            }
+        }
     }
     
     // MARK: - Table view data source
@@ -47,12 +60,12 @@ class ContactsController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Model.shared.currentUser() != nil ? contacts.count : 0
+        return currentUser() != nil ? contacts.count : 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Contact", for: indexPath) as! ContactCell
-        cell.user = contacts[indexPath.row]
+        cell.contact = contacts[indexPath.row]
         return cell
     }
     
@@ -62,24 +75,40 @@ class ContactsController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let user = contacts[indexPath.row]
-            if let index = contacts.index(of: user) {
+            let contact = contacts[indexPath.row]
+            if let index = contacts.index(of: contact) {
                 tableView.beginUpdates()
                 contacts.remove(at: index)
-                Model.shared.deleteUser(user)
+                Model.shared.deleteContact(contact)
                 tableView.deleteRows(at: [indexPath], with: .top)
                 tableView.endUpdates()
+                if contacts.count == 0 {
+                    performSegue(withIdentifier: "showDetail", sender: nil)
+                }
             }
         }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let user = contacts[indexPath.row]
-        SVProgressHUD.show(withStatus: "Refresh..")
-        Model.shared.refreshUser(user, completion: {
-            SVProgressHUD.dismiss()
-            self.performSegue(withIdentifier: "showDetail", sender: user)
-        })
+        let contact = contacts[indexPath.row]
+        switch contact.getContactStatus() {
+        case .requested:
+            if contact.initiator != currentUser()!.uid, let user = Model.shared.getUser(contact.initiator!) {
+                let question = createQuestion("\(user.shortName) want to add you in chat. Are you agree?",
+                    acceptTitle: "Yes", cancelTitle: "No",
+                    acceptHandler: {
+                        Model.shared.approveContact(contact)
+                }, cancelHandler: {
+                        Model.shared.rejectContact(contact)
+                        self.refresh()
+                })
+                question?.show()
+            }
+        case .approved:
+            self.performSegue(withIdentifier: "showDetail", sender: contact)
+        default:
+            break
+        }
     }
     
     @IBAction func addContact(_ sender: Any) {
@@ -90,16 +119,20 @@ class ContactsController: UITableViewController {
             ref.child("users").queryOrdered(byChild: "email").queryEqual(toValue: email).observeSingleEvent(of: .value, with: { snapshot in
                 if let values = snapshot.value as? [String:Any] {
                     for uid in values.keys {
-                        if uid == Model.shared.currentUser()!.uid! {
-                            continue
-                        }
-                        if let profile = values[uid] as? [String:Any] {
-                            let user = Model.shared.createUser(uid)
-                            user.setUserData(profile, completion:{
+                        if uid != currentUser()!.uid! {
+                            if Model.shared.contactWithUser(uid) != nil {
                                 SVProgressHUD.dismiss()
-                                self.refresh()
-                            })
-                            return
+                                self.showMessage("This user is in list already.", messageType: .information)
+                                return
+                            } else if let profile = values[uid] as? [String:Any] {
+                                let user = Model.shared.createUser(uid)
+                                user.setUserData(profile, completion:{
+                                    Model.shared.addContact(with: uid)
+                                    SVProgressHUD.dismiss()
+                                    self.refresh()
+                                })
+                                return
+                            }
                         }
                     }
                     SVProgressHUD.dismiss()
@@ -118,7 +151,15 @@ class ContactsController: UITableViewController {
         if segue.identifier == "showDetail" {
             let nav = segue.destination as! UINavigationController
             if let controller = nav.topViewController as? ChatController {
-                controller.user = sender as? User
+                if let contact = sender as? Contact {
+                    if contact.getContactStatus() == .approved {
+                        if contact.initiator! == currentUser()!.uid! {
+                            controller.user = Model.shared.getUser(contact.requester!)
+                        } else {
+                            controller.user = Model.shared.getUser(contact.initiator!)
+                        }
+                    }
+                }
             }
         }
     }

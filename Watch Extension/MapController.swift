@@ -17,10 +17,12 @@ class MapController: WKInterfaceController {
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
+        zoomSlider.setValue(10)
         if let position = context as? [String:Any] {
             if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
+//                location = CLLocationCoordinate2D(latitude: 55.819349, longitude: 37.510184)
                 location = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-                let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+                let span = MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)
                 let region = MKCoordinateRegion(center: location!, span: span)
                 map.setRegion(region)
                 map.addAnnotation(location!, with: .red)
