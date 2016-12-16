@@ -103,9 +103,7 @@ class Model : NSObject {
         }
     }
     
-    lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: "gs://v-channel-a693c.appspot.com")
-    
-    static let serverKey = "AAAA7y6lzqU:APA91bF0ISTVkscUz81T0fYnLvEQzqGPOIerVudF7_CIj4eJsSs1P1FIw4KYzx8MNo11kF7WgZ6SGT3DZuyCNtuIQMi7JxInttd6vf3JmAkxvqPrVzd_6PyXWxW9IoRYQP5aRkZvzwrelpkVa4xUCkGFOkxDdKNVlQ"
+    lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: firStorage)
     
     private var newMessageRefHandle: FIRDatabaseHandle?
     
@@ -125,7 +123,7 @@ class Model : NSObject {
         let manager = AFHTTPSessionManager(baseURL: URL(string: "https://fcm.googleapis.com/fcm/"))
         manager.requestSerializer = AFJSONRequestSerializer()
         manager.requestSerializer.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        manager.requestSerializer.setValue("key=\(serverKey)", forHTTPHeaderField: "Authorization")
+        manager.requestSerializer.setValue("key=\(pushServerKey)", forHTTPHeaderField: "Authorization")
         manager.responseSerializer = AFHTTPResponseSerializer()
         return manager
     }()

@@ -22,9 +22,6 @@ func IS_PAD() -> Bool {
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-    
-    let FACEBOOK_SCHEME = "fb823694161012947"
-    let GoolgleMapAPIKey = "AIzaSyASkBVjFprQb3Mhalnl_rnGe14ewUlrrGA"
 
     let locationManager = CLLocationManager()
     var lastPublishedLocation:CLLocation?
