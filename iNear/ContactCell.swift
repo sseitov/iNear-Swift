@@ -15,6 +15,7 @@ class ContactCell: UITableViewCell {
     @IBOutlet weak var background: UIView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var contactLabel: UILabel!
+    @IBOutlet weak var statusView: UIImageView!
 
     fileprivate var user:User?
     var contact:Contact? {
@@ -32,6 +33,9 @@ class ContactCell: UITableViewCell {
             } else {
                 nameLabel.text = user!.email
             }
+            let unread = Model.shared.unreadCountInChat(user!.uid!)
+            statusView.isHidden = unread == 0
+            
             contactView.image = user!.getImage()
             contactLabel.font = UIFont.condensedFont()
             switch contact!.getContactStatus() {

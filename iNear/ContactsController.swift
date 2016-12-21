@@ -23,6 +23,15 @@ class ContactsController: UITableViewController {
                                                selector: #selector(ContactsController.refresh),
                                                name: contactNotification,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(ContactsController.refreshStatus),
+                                               name: newMessageNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(ContactsController.refreshStatus),
+                                               name: readMessageNotification,
+                                               object: nil)
+
     }
 
     deinit {
@@ -53,6 +62,10 @@ class ContactsController: UITableViewController {
         }
     }
     
+    func refreshStatus() {
+        tableView.reloadData()
+    }
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {

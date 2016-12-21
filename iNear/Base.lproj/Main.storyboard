@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
     <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -116,6 +116,13 @@
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="alert" translatesAutoresizingMaskIntoConstraints="NO" id="Gss-V3-8ui">
+                                            <rect key="frame" x="250" y="20" width="30" height="30"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="30" id="LJa-HR-1Ot"/>
+                                                <constraint firstAttribute="width" constant="30" id="tQC-r9-b3x"/>
+                                            </constraints>
+                                        </imageView>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     <constraints>
@@ -129,7 +136,9 @@
                                         <constraint firstItem="lMm-CS-uV5" firstAttribute="leading" secondItem="37f-cq-3Eg" secondAttribute="leading" constant="5" id="gIj-YB-mPj"/>
                                         <constraint firstAttribute="bottom" secondItem="Vm6-J0-UfC" secondAttribute="bottom" constant="10" id="i1E-Bm-hn0"/>
                                         <constraint firstItem="Vm6-J0-UfC" firstAttribute="leading" secondItem="jed-tM-akX" secondAttribute="trailing" constant="15" id="jdB-C0-Irv"/>
+                                        <constraint firstAttribute="trailing" secondItem="Gss-V3-8ui" secondAttribute="trailing" constant="7" id="kI0-g4-ph5"/>
                                         <constraint firstItem="jed-tM-akX" firstAttribute="centerY" secondItem="37f-cq-3Eg" secondAttribute="centerY" id="kw9-yh-thP"/>
+                                        <constraint firstItem="Gss-V3-8ui" firstAttribute="top" secondItem="37f-cq-3Eg" secondAttribute="top" constant="20" id="pfN-CK-3o2"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="yzx-Kc-Fjk" secondAttribute="trailing" constant="29" id="vEb-gE-AtK"/>
                                         <constraint firstItem="lMm-CS-uV5" firstAttribute="top" secondItem="37f-cq-3Eg" secondAttribute="top" id="zSM-KG-cib"/>
                                     </constraints>
@@ -140,6 +149,7 @@
                                     <outlet property="contactLabel" destination="Vm6-J0-UfC" id="KiB-xO-sLI"/>
                                     <outlet property="contactView" destination="jed-tM-akX" id="Rqm-Vb-tVH"/>
                                     <outlet property="nameLabel" destination="yzx-Kc-Fjk" id="RtD-Kn-pH7"/>
+                                    <outlet property="statusView" destination="Gss-V3-8ui" id="Esh-J5-3WM"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -416,6 +426,7 @@
     </scenes>
     <resources>
         <image name="account" width="26" height="26"/>
+        <image name="alert" width="40" height="40"/>
         <image name="backButton" width="22" height="22"/>
         <image name="button-Facebook" width="260" height="40"/>
         <image name="button-Google" width="260" height="40"/>
