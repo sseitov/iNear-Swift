@@ -1,9 +1,9 @@
 //
 //  UIColorExtensions.swift
-//  cryptoBox (MilCryptor Secure Platform)
+//  iNear
 //
-//  Created by Denys Borysiuk on 19.07.16.
-//  Copyright © 2016 ArchiSec Solutions, Ltd. All rights reserved.//
+//  Created by Сергей Сейтов on 28.11.16.
+//  Copyright © 2016 Сергей Сейтов. All rights reserved.
 //
 
 
