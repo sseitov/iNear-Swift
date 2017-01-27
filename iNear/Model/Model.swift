@@ -77,13 +77,14 @@ class Model : NSObject {
         }
         try? FIRAuth.auth()?.signOut()
         newMessageRefHandle = nil
-        updateCoordinateRefHandle = nil
-        newCoordinateRefHandle = nil
         updateTokenRefHandle = nil
         newTokenRefHandle = nil
         updateContactRefHandle = nil
         newContactRefHandle = nil
         deleteContactRefHandle = nil
+        updateTrackRefHandle = nil
+        newTrackRefHandle = nil
+        removeTrackRefHandle = nil
     }
     
     // MARK: - Cloud observers
@@ -92,8 +93,8 @@ class Model : NSObject {
         if newMessageRefHandle == nil {
             observeMessages()
         }
-        if updateCoordinateRefHandle == nil {
-            observeCoordinate()
+        if updateTrackRefHandle == nil {
+            observeTrack()
         }
         if updateTokenRefHandle == nil {
             observeTokens()
@@ -107,15 +108,16 @@ class Model : NSObject {
     
     private var newMessageRefHandle: FIRDatabaseHandle?
     
-    private var updateCoordinateRefHandle: FIRDatabaseHandle?
-    private var newCoordinateRefHandle: FIRDatabaseHandle?
-    
     private var updateTokenRefHandle: FIRDatabaseHandle?
     private var newTokenRefHandle: FIRDatabaseHandle?
     
     private var updateContactRefHandle: FIRDatabaseHandle?
     private var newContactRefHandle: FIRDatabaseHandle?
     private var deleteContactRefHandle: FIRDatabaseHandle?
+    
+    private var updateTrackRefHandle: FIRDatabaseHandle?
+    private var newTrackRefHandle: FIRDatabaseHandle?
+    private var removeTrackRefHandle: FIRDatabaseHandle?
     
     // MARK: - Push notifications
     
@@ -236,57 +238,9 @@ class Model : NSObject {
         ref.child("users").child(user.uid!).setValue(user.userData())
     }
     
-    func publishCoordinate(_ pos:CLLocationCoordinate2D) -> Bool {
-        if let user = currentUser() {
-            user.latitude = pos.latitude
-            user.longitude = pos.longitude
-            user.lastDate = NSDate()
-            saveContext()
-            let ref = FIRDatabase.database().reference()
-            let data:[String:Any] = ["latitude" : pos.latitude,
-                                     "longitude" : pos.longitude,
-                                     "lastDate" : Model.shared.dateFormatter.string(from: Date())]
-            ref.child("positions").child(currentUser()!.uid!).setValue(data)
-            return true
-        } else {
-            return false
-        }
-    }
-    
     func publishToken(_ user:FIRUser,  token:String) {
         let ref = FIRDatabase.database().reference()
         ref.child("tokens").child(user.uid).setValue(token)
-    }
-    
-    fileprivate func observeCoordinate() {
-        let ref = FIRDatabase.database().reference()
-        let coordQuery = ref.child("positions").queryLimited(toLast:25)
-
-        newCoordinateRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let position = snapshot.value as? [String:Any] {
-                    if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double, let date = position["lastDate"] as? String {
-                        user.latitude = lat
-                        user.longitude = lon
-                        user.lastDate = self.dateFormatter.date(from: date) as NSDate?
-                        self.saveContext()
-                    }
-                }
-            }
-        })
-        
-        updateCoordinateRefHandle = coordQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let position = snapshot.value as? [String:Any] {
-                    if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double, let date = position["lastDate"] as? String {
-                        user.latitude = lat
-                        user.longitude = lon
-                        user.lastDate = self.dateFormatter.date(from: date) as NSDate?
-                        self.saveContext()
-                    }
-                }
-            }
-        })
     }
     
     fileprivate func observeTokens() {
@@ -681,5 +635,151 @@ class Model : NSObject {
             }
         })
     }
+    
+    // MARK: - Track table
 
+    func getTrackPoint(forUser:User, at:String) -> TrackPoint? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackPoint")
+        fetchRequest.predicate = NSPredicate(format: "date == %@ AND ANY user.uid == %@", at, forUser.uid!)
+        if let point = try? managedObjectContext.fetch(fetchRequest).first as? TrackPoint {
+            return point
+        } else {
+            return nil
+        }
+    }
+    
+    func addTrackPoint(user:User, date:String, latitude:Double, longitude:Double) {
+        var point = getTrackPoint(forUser: user, at: date)
+        if point == nil {
+            point = NSEntityDescription.insertNewObject(forEntityName: "TrackPoint", into: managedObjectContext) as? TrackPoint
+            point?.date = date
+            point?.latitude = latitude
+            point?.longitude = longitude
+            point?.user = user
+            user.addToTrack(point!)
+            saveContext()
+        }
+    }
+    
+    func publishCoordinate(_ pos:CLLocationCoordinate2D) -> Bool {
+        if let user = currentUser() {
+            let date = Model.shared.dateFormatter.string(from: Date())
+            addTrackPoint(user: user, date: date, latitude: pos.latitude, longitude: pos.longitude)
+            
+            let ref = FIRDatabase.database().reference()
+            let data:[String:Any] = ["latitude" : pos.latitude,
+                                     "longitude" : pos.longitude]
+            ref.child("tracks").child(currentUser()!.uid!).child(date).setValue(data)
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func clearTrack(_ completion: @escaping() -> ()) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("tracks").child(currentUser()!.uid!).removeValue(completionBlock: { error, _ in
+            for pt in currentUser()?.track?.allObjects as! [TrackPoint] {
+                self.managedObjectContext.delete(pt)
+            }
+            currentUser()!.track = NSSet()
+            completion()
+        })
+    }
+    
+    func removePoint(_ point:TrackPoint) {
+        point.user!.removeFromTrack(point)
+        managedObjectContext.delete(point)
+        saveContext()
+    }
+    
+    func lastUserLocation(user:User) -> TrackPoint? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackPoint")
+        fetchRequest.predicate = NSPredicate(format: "user.uid == %@", user.uid!)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.fetchLimit = 1
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [TrackPoint] {
+            return all.first
+        } else {
+            return nil
+        }
+    }
+ 
+    func userTrack(_ user:User) -> [TrackPoint]? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackPoint")
+        fetchRequest.predicate = NSPredicate(format: "user.uid == %@", user.uid!)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        return try? managedObjectContext.fetch(fetchRequest) as! [TrackPoint]
+    }
+ 
+    func uploadTrack(_ forUser:User, completion: @escaping() -> ()) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("tracks").child(forUser.uid!).observeSingleEvent(of: .value, with: { snapshot in
+            if let user = self.getUser(snapshot.key) {
+                if let points = self.userTrack(user) {
+                    for pt in points {
+                        self.removePoint(pt)
+                    }
+                    self.saveContext()
+                }
+                if let track = snapshot.value as? [String:Any] {
+                    for (date, value) in track {
+                        if let point = value as? [String:Any] {
+                            if let latitude = point["latitude"] as? Double, let longitude = point["longitude"] as? Double {
+                                self.addTrackPoint(user: user, date: date, latitude: latitude, longitude: longitude)
+                            }
+                        }
+                    }
+                }
+            }
+            completion()
+        })
+    }
+    
+    fileprivate func observeTrack() {
+        let ref = FIRDatabase.database().reference()
+        let coordQuery = ref.child("tracks").queryLimited(toLast:25)
+        
+        newTrackRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let track = snapshot.value as? [String:Any] {
+                    for (date, value) in track {
+                        if let point = value as? [String:Any] {
+                            if let latitude = point["latitude"] as? Double, let longitude = point["longitude"] as? Double {
+                                self.addTrackPoint(user: user, date: date, latitude: latitude, longitude: longitude)
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        
+        updateTrackRefHandle = coordQuery.observe(.childChanged, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let track = snapshot.value as? [String:Any] {
+                    for (date, value) in track {
+                        if let point = value as? [String:Any] {
+                            if let latitude = point["latitude"] as? Double, let longitude = point["longitude"] as? Double {
+                                self.addTrackPoint(user: user, date: date, latitude: latitude, longitude: longitude)
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        
+        removeTrackRefHandle = coordQuery.observe(.childRemoved, with: { (snapshot) -> Void in
+            if let user = self.getUser(snapshot.key) {
+                if let track = snapshot.value as? [String:Any] {
+                    for date in track.keys {
+                        if let trackPoint = self.getTrackPoint(forUser: user, at: date) {
+                            self.removePoint(trackPoint)
+                        }
+                    }
+                }
+            }
+        })
+    }
 }

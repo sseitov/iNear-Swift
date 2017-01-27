@@ -42,12 +42,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         super.viewDidLoad()
         
         if user != nil {
-            if user!.token == nil {
-                SVProgressHUD.show()
-                user!.uploadToken {
-                    SVProgressHUD.dismiss()
-                }
-            }
             self.senderId = currentUser()!.uid!
             self.senderDisplayName = currentUser()!.name!
             
@@ -247,16 +241,8 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     // MARK: - Navigation
     
     @IBAction func showMap(_ sender: Any) {
-        if user?.location() == nil {
-            SVProgressHUD.show()
-            user?.uploadPosition({ success in
-                SVProgressHUD.dismiss()
-                if success {
-                    self.performSegue(withIdentifier: "showMap", sender: nil)
-                } else {
-                    self.showMessage("\(self.user!.shortName) not published location yet.", messageType: .information)
-                }
-            })
+        if Model.shared.lastUserLocation(user: user!) == nil {
+            self.showMessage("\(self.user!.shortName) does not published self location yet.", messageType: .information)
         } else {
             self.performSegue(withIdentifier: "showMap", sender: nil)
         }

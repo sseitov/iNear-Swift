@@ -13,6 +13,7 @@ import IQKeyboardManager
 import Firebase
 import CoreLocation
 import GoogleMaps
+import SVProgressHUD
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -22,11 +23,11 @@ func IS_PAD() -> Bool {
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-
+    
     let locationManager = CLLocationManager()
     var lastPublishedLocation:CLLocation?
     let threshold:CLLocationDistance = 10.0
-    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         // Register_for_notifications
@@ -72,9 +73,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
         splitViewController.delegate = self
         
+        SVProgressHUD.setDefaultStyle(.custom)
+        SVProgressHUD.setBackgroundColor(UIColor.mainColor())
+        SVProgressHUD.setForegroundColor(UIColor.white)
+
         UIApplication.shared.statusBarStyle = .lightContent
         if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 17) {
             UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName : font], for: .normal)
+            SVProgressHUD.setFont(font)
         }
         IQKeyboardManager.shared().isEnableAutoToolbar = false
         
@@ -87,11 +93,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Location manager
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
             locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
             } else {
+                locationManager.allowsBackgroundLocationUpdates = true
                 locationManager.startUpdatingLocation()
             }
         }
@@ -235,6 +242,7 @@ extension AppDelegate : CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if CLLocationManager.authorizationStatus() == .authorizedAlways {
+            locationManager.allowsBackgroundLocationUpdates = true
             locationManager.startUpdatingLocation()
         }
     }

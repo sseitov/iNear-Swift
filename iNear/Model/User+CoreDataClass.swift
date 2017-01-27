@@ -44,47 +44,15 @@ public class User: NSManagedObject {
             return "anonym"
         }
     }()
-    
-    func location() -> CLLocationCoordinate2D? {
-        if latitude == 0 && longitude == 0 {
-            return nil
+/*
+    func location() -> TrackPoint? {
+        if let point = Model.shared.lastUserLocation(user: self) {
+            return CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
         } else {
-            return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            return nil
         }
     }
-    
-    func uploadToken(_ completion: @escaping() -> ()) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("tokens").child(uid!).observeSingleEvent(of: .value, with: { snapshot in
-            if let token = snapshot.value as? String {
-                self.token = token
-                Model.shared.saveContext()
-            }
-            completion()
-        })
-    }
-    
-    func uploadPosition(_ completion: @escaping(Bool) -> ()) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("positions").child(uid!).observeSingleEvent(of: .value, with: { snaphot in
-            if let data = snaphot.value as? [String:Any] {
-                if let lat = data["latitude"] as? Double {
-                    self.latitude = lat
-                }
-                if let lon = data["longitude"] as? Double {
-                    self.longitude = lon
-                }
-                if let dateStr = data["lastDate"] as? String {
-                    self.lastDate = Model.shared.dateFormatter.date(from: dateStr) as NSDate?
-                }
-                Model.shared.saveContext()
-                completion(self.lastDate != nil)
-            } else {
-                completion(false)
-            }
-        })
-    }
-
+*/    
     func userData() -> [String:Any] {
         var profile:[String : Any] = ["socialType" : Int(type)]
         if email != nil {

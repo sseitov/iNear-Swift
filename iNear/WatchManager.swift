@@ -79,8 +79,10 @@ extension WatchManager {
                 replyHandler(["contacts" : contacts])
                 return
             } else if task == "userPosition" {
-                if let uid = message["user"] as? String, let user = Model.shared.getUser(uid) {
-                    replyHandler(["latitude" : user.latitude, "longitude" : user.longitude])
+                if let uid = message["user"] as? String,
+                    let user = Model.shared.getUser(uid),
+                    let point = Model.shared.lastUserLocation(user: user) {
+                    replyHandler(["latitude" : point.latitude, "longitude" : point.longitude])
                 } else {
                     replyHandler([:])
                 }

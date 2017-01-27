@@ -158,7 +158,21 @@ class ContactsController: UITableViewController {
         })
         alert?.show()
     }
-
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if identifier == "showDetail" {
+            if let contact = sender as? Contact {
+                if let user = Model.shared.getUser(contact.uid!) {
+                    if user.token == nil {
+                        self.showMessage("\(user.shortName) does not available for chat now.", messageType: .information)
+                        return false
+                    }
+                }
+            }
+        }
+        return true
+    }
+    
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {

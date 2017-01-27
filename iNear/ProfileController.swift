@@ -33,14 +33,9 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
         GIDSignIn.sharedInstance().uiDelegate = self
 
         owner = currentUser()
-        if owner == nil {
-            navigationItem.leftBarButtonItem = nil
-            navigationItem.hidesBackButton = true
-        } else {
-            setupBackButton()
-        }
         
         if owner != nil {
+            setupBackButton()
             authView.alpha = 0
             userView.alpha = 1
             setupTitle("My Account")
@@ -56,12 +51,33 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
             }
             photoView.image = owner!.getImage()
         } else {
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.hidesBackButton = true
             authView.alpha = 1
             userView.alpha = 0
             setupTitle("Authentication")
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        if owner != nil {
+            if Model.shared.lastUserLocation(user: owner!) != nil {
+                let btn = UIBarButtonItem(title: "Track", style: .plain, target: self, action: #selector(ProfileController.showTrack))
+                btn.tintColor = UIColor.white
+                navigationItem.setRightBarButton(btn, animated: true)
+            } else {
+                navigationItem.setRightBarButton(nil, animated: true)
+            }
+        } else {
+            navigationItem.setRightBarButton(nil, animated: true)
+        }
+    }
+    
+    func showTrack() {
+        performSegue(withIdentifier: "showTrack", sender: nil)
+    }
+    
     override func goBack() {
         dismiss(animated: true, completion: nil)
     }
