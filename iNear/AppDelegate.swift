@@ -93,7 +93,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Location manager
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
