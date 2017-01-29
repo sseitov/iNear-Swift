@@ -12,81 +12,35 @@ import SVProgressHUD
 import AFNetworking
 
 class RouteController: UIViewController {
-
+    
     @IBOutlet weak var map: GMSMapView!
+    
     var user:User?
     
     private var userMarker:GMSMarker?
     private var promptText:String = ""
     private var titleText:String = ""
     
-    private var userLocation:CLLocationCoordinate2D?
-    private var myLocation:CLLocationCoordinate2D?
-    private var locationDate:Date?
-    private var userTrack:GMSPolyline?
-    private var startMarker:GMSMarker?
-    private var finishMarker:GMSMarker?
-    private var update:GMSCameraUpdate?
-
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBackButton()
         navigationController?.navigationBar.tintColor = UIColor.white
         
-        let myPoint = Model.shared.lastUserLocation(user: currentUser()!)
-        myLocation = CLLocationCoordinate2D(latitude: myPoint!.latitude, longitude: myPoint!.longitude)
+        let date = Date(timeIntervalSince1970: user!.location!.date)
+        promptText = "\(self.user!.shortName) was \(Model.shared.textDateFormatter.string(from: date))"
+        titleText = "Get route to \(user!.shortName)..."
+        setupTitle(titleText, promptText: promptText)
         
-        let point = Model.shared.lastUserLocation(user: self.user!)
-        locationDate = Model.shared.dateFormatter.date(from: point!.date!)
-        userLocation = CLLocationCoordinate2D(latitude: point!.latitude, longitude: point!.longitude)
-        
-        promptText = "\(self.user!.shortName) was \(Model.shared.textDateFormatter.string(from: locationDate!))"
-        titleText = "Get route to \(self.user!.shortName)..."
-        setupTitle(self.titleText, promptText: self.promptText)
-        
-        map.camera = GMSCameraPosition.camera(withTarget: self.userLocation!, zoom: 6)
+        let userLocation = CLLocationCoordinate2D(latitude: user!.location!.latitude, longitude: user!.location!.longitude)
+        map.camera = GMSCameraPosition.camera(withTarget: userLocation, zoom: 6)
         map.isMyLocationEnabled = true
-        userMarker = self.marker(forUser: self.user!)
-        
-        let points = Model.shared.userTrack(self.user!)
-        if points != nil && points!.count > 1 {
-            let path = GMSMutablePath()
-            var bounds = GMSCoordinateBounds()
-            for pt in points! {
-                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-                bounds = bounds.includingCoordinate(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-            }
-            self.userTrack = GMSPolyline(path: path)
-            self.userTrack?.strokeColor = UIColor.traceColor()
-            self.userTrack?.strokeWidth = 4
-            let start = points!.first!
-            self.startMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude))
-            self.startMarker?.icon = UIImage(named: "startPoint")
-            let finish = points!.last!
-            self.finishMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: finish.latitude, longitude: finish.longitude))
-            self.finishMarker?.icon = UIImage(named: "finishPoint")
-            
-            let showTrackButton = UIBarButtonItem(title: "Show track", style: .plain, target: self, action: #selector(RouteController.showTrack))
-            showTrackButton.tintColor = UIColor.white
-            self.navigationItem.rightBarButtonItem = showTrackButton
-            self.update = GMSCameraUpdate.fit(bounds, withPadding: 100)
-        } else {
-            self.update = GMSCameraUpdate.setTarget(CLLocationCoordinate2D(latitude: myLocation!.latitude, longitude: myLocation!.longitude), zoom: 12)
-        }
-        self.map.moveCamera(self.update!)
+        userMarker = GMSMarker(position: userLocation)
+        userMarker!.icon = user!.getImage().withSize(CGSize(width: 60, height: 60)).inCircle()
+        userMarker!.title = user!.shortName
+        userMarker!.snippet = Model.shared.textDateFormatter.string(from: date)
+        userMarker!.map = map
     }
-
-    func marker(forUser:User) -> GMSMarker {
-        let marker = GMSMarker(position: userLocation!)
-        marker.icon = forUser.getImage().withSize(CGSize(width: 60, height: 60)).inCircle()
-        if forUser.uid! != currentUser()!.uid! {
-            marker.title = forUser.shortName
-            marker.snippet = Model.shared.textDateFormatter.string(from: locationDate!)
-        }
-        marker.map = map
-        return marker
-    }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if userMarker != nil {
@@ -94,11 +48,30 @@ class RouteController: UIViewController {
         }
     }
     
+    func showTrack() {
+        performSegue(withIdentifier: "showTrack", sender: nil)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if user!.lastTrack != nil {
+            let btn = UIBarButtonItem(title: "Track", style: .plain, target: self, action: #selector(RouteController.showTrack))
+            btn.tintColor = UIColor.white
+            navigationItem.setRightBarButton(btn, animated: true)
+        } else {
+            navigationItem.setRightBarButton(nil, animated: true)
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        let bounds = GMSCoordinateBounds(coordinate: Model.shared.myLocation()!, coordinate: userMarker!.position)
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
+        map.moveCamera(update)
+        
         SVProgressHUD.show(withStatus: "Refresh...")
-        GMSGeocoder().reverseGeocodeCoordinate(self.userMarker!.position, completionHandler: { response, error in
+        GMSGeocoder().reverseGeocodeCoordinate(userMarker!.position, completionHandler: { response, error in
             if response != nil {
                 if let address = response!.firstResult() {
                     var addressText = ""
@@ -119,7 +92,7 @@ class RouteController: UIViewController {
                     self.setupTitle(self.titleText, promptText: self.promptText)
                 }
             }
-            self.createDirection(from: self.myLocation!, to: self.userLocation!, completion: { result in
+            self.createDirection(from: Model.shared.myLocation()!, to: self.userMarker!.position, completion: { result in
                 SVProgressHUD.dismiss()
                 if result == -1 {
                     self.showMessage("Can not create route to \(self.user!.shortName)", messageType: .error)
@@ -129,8 +102,8 @@ class RouteController: UIViewController {
             })
         })
     }
-
-    private func createDirection(from:CLLocationCoordinate2D, to:CLLocationCoordinate2D, completion: @escaping(Int) -> ()) {
+    
+    func createDirection(from:CLLocationCoordinate2D, to:CLLocationCoordinate2D, completion: @escaping(Int) -> ()) {
         let urlStr = String(format: "https://maps.googleapis.com/maps/api/directions/json?origin=%f,%f&destination=%f,%f&sensor=true", from.latitude, from.longitude, to.latitude, to.longitude)
         let manager = AFHTTPSessionManager()
         manager.requestSerializer = AFHTTPRequestSerializer()
@@ -165,27 +138,16 @@ class RouteController: UIViewController {
             print("SEND PUSH ERROR: \(error)")
             completion(-1)
         })
-
+        
     }
     
-    func showTrack() {
-        userTrack!.map = self.map
-        startMarker!.map = self.map
-        finishMarker!.map = self.map
-        let hideTrackButton = UIBarButtonItem(title: "Hide track", style: .plain, target: self, action: #selector(RouteController.hideTrack))
-        hideTrackButton.tintColor = UIColor.white
-        navigationItem.setRightBarButton(hideTrackButton, animated: true)
-        map.moveCamera(update!)
-    }
+    // MARK: - Navigation
     
-    func hideTrack() {
-        userTrack!.map = nil
-        startMarker!.map = nil
-        finishMarker!.map = nil
-        let showTrackButton = UIBarButtonItem(title: "Show track", style: .plain, target: self, action: #selector(RouteController.showTrack))
-        showTrackButton.tintColor = UIColor.white
-        navigationItem.setRightBarButton(showTrackButton, animated: true)
-        map.moveCamera(update!)
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showTrack" {
+            let controller = segue.destination as! TrackController
+            controller.user = user
+        }
     }
-    
 }

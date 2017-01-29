@@ -344,6 +344,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="map" destination="azv-yT-Cew" id="tml-mn-izM"/>
+                        <segue destination="qdm-x4-YZq" kind="show" identifier="showTrack" id="h1L-8H-5mz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1SG-Bh-uaI" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -453,12 +454,6 @@
                         <barButtonItem key="leftBarButtonItem" image="backButton" id="FBe-x8-djg">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Clear" id="vvA-Hd-yl4">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="clearTrack:" destination="qdm-x4-YZq" id="ttL-cP-kWM"/>
-                            </connections>
-                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="map" destination="Pdq-vS-SvK" id="3SE-Hc-fTt"/>
@@ -466,7 +461,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KMX-on-5bA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3191" y="-631"/>
+            <point key="canvasLocation" x="2342" y="113"/>
         </scene>
     </scenes>
     <resources>
@@ -481,5 +476,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="be2-C3-Y8g"/>
+        <segue reference="h1L-8H-5mz"/>
     </inferredMetricsTieBreakers>
 </document>

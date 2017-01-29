@@ -12,6 +12,7 @@ import Firebase
 import AFNetworking
 import SDWebImage
 import CoreLocation
+import GoogleMaps
 
 enum PushType:Int {
     case none = 0
@@ -82,9 +83,6 @@ class Model : NSObject {
         updateContactRefHandle = nil
         newContactRefHandle = nil
         deleteContactRefHandle = nil
-        updateTrackRefHandle = nil
-        newTrackRefHandle = nil
-        removeTrackRefHandle = nil
     }
     
     // MARK: - Cloud observers
@@ -92,9 +90,6 @@ class Model : NSObject {
     func startObservers() {
         if newMessageRefHandle == nil {
             observeMessages()
-        }
-        if updateTrackRefHandle == nil {
-            observeTrack()
         }
         if updateTokenRefHandle == nil {
             observeTokens()
@@ -114,10 +109,6 @@ class Model : NSObject {
     private var updateContactRefHandle: FIRDatabaseHandle?
     private var newContactRefHandle: FIRDatabaseHandle?
     private var deleteContactRefHandle: FIRDatabaseHandle?
-    
-    private var updateTrackRefHandle: FIRDatabaseHandle?
-    private var newTrackRefHandle: FIRDatabaseHandle?
-    private var removeTrackRefHandle: FIRDatabaseHandle?
     
     // MARK: - Push notifications
     
@@ -554,18 +545,29 @@ class Model : NSObject {
         NotificationCenter.default.post(name: readMessageNotification, object: message)
     }
     
-    func sendTextMessage(_ text:String, from:String, to:String) {
+    func sendTextMessage(_ text:String, to:String) {
         let ref = FIRDatabase.database().reference()
         let dateStr = dateFormatter.string(from: Date())
-        let messageItem = ["from" : from, "to" : to, "text" : text, "date" : dateStr]
+        var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "text" : text, "date" : dateStr]
+        if let track = self.myTrackForLastDay() {
+            messageItem["track"] = track;
+        }
+        if let coordinate = self.myLocation() {
+            messageItem["latitude"] = coordinate.latitude
+            messageItem["longitude"] = coordinate.longitude
+        }
         ref.child("messages").childByAutoId().setValue(messageItem)
         
-        if let fromUser = getUser(from), let toUser = getUser(to) {
-            self.messagePush(text, to: toUser, from: fromUser)
+        if let toUser = getUser(to) {
+            self.messagePush(text, to: toUser, from: currentUser()!)
         }
     }
     
-    func sendImageMessage(_ image:UIImage, from:String, to:String, result:@escaping (NSError?) -> ()) {
+    func sendImageMessage(_ image:UIImage, to:String, result:@escaping (NSError?) -> ()) {
+        let toUser = getUser(to)
+        if toUser == nil || currentUser() == nil {
+            return
+        }
         if let imageData = UIImageJPEGRepresentation(image, 0.5) {
             let meta = FIRStorageMetadata()
             meta.contentType = "image/jpeg"
@@ -575,12 +577,17 @@ class Model : NSObject {
                 } else {
                     let ref = FIRDatabase.database().reference()
                     let dateStr = self.dateFormatter.string(from: Date())
-                    let messageItem = ["from" : from, "to" : to, "image" : metadata?.path!, "date" : dateStr]
+                    var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "image" : metadata!.path!, "date" : dateStr]
+                    if let track = self.myTrackForLastDay() {
+                        messageItem["track"] = track;
+                    }
+                    if let coordinate = self.myLocation() {
+                        messageItem["latitude"] = coordinate.latitude
+                        messageItem["longitude"] = coordinate.longitude
+                    }
                     ref.child("messages").childByAutoId().setValue(messageItem)
                     
-                    if let fromUser = self.getUser(from), let toUser = self.getUser(to) {
-                        self.messagePush(nil, to: toUser, from: fromUser)
-                    }
+                    self.messagePush(nil, to: toUser!, from: currentUser()!)
                     
                     result(nil)
                 }
@@ -601,6 +608,9 @@ class Model : NSObject {
                     if received || sended {
                         let message = self.createMessage(snapshot.key)
                         message.setData(messageData, new: received, completion: {
+                            if received {
+                                message.setLocationData(messageData)
+                            }
                             NotificationCenter.default.post(name: newMessageNotification, object: message)
                         })
                     }
@@ -624,6 +634,9 @@ class Model : NSObject {
                             if received || sended {
                                 let message = self.createMessage(key)
                                 message.setData(messageData, new: false, completion: {
+                                    if received {
+                                        message.setLocationData(messageData)
+                                    }
                                     NotificationCenter.default.post(name: newMessageNotification, object: message)
                                 })
                             }
@@ -636,150 +649,94 @@ class Model : NSObject {
         })
     }
     
-    // MARK: - Track table
-
-    func getTrackPoint(forUser:User, at:String) -> TrackPoint? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackPoint")
-        fetchRequest.predicate = NSPredicate(format: "date == %@ AND ANY user.uid == %@", at, forUser.uid!)
-        if let point = try? managedObjectContext.fetch(fetchRequest).first as? TrackPoint {
-            return point
-        } else {
-            return nil
-        }
+    // MARK: - Coordinate table
+    
+    func addCoordinate(_ coordinate:CLLocationCoordinate2D, at:Double) {
+        let point = NSEntityDescription.insertNewObject(forEntityName: "Coordinate", into: managedObjectContext) as! Coordinate
+        point.date = at
+        point.latitude = coordinate.latitude
+        point.longitude = coordinate.longitude
+        point.user = nil
+        saveContext()
     }
     
-    func addTrackPoint(user:User, date:String, latitude:Double, longitude:Double) {
-        var point = getTrackPoint(forUser: user, at: date)
-        if point == nil {
-            point = NSEntityDescription.insertNewObject(forEntityName: "TrackPoint", into: managedObjectContext) as? TrackPoint
-            point?.date = date
-            point?.latitude = latitude
-            point?.longitude = longitude
-            point?.user = user
-            user.addToTrack(point!)
+    func addCoordinateForUser(_ coordinate:CLLocationCoordinate2D, at:Double, userID:String) {
+        if let user = getUser(userID) {
+            if user.location != nil {
+                managedObjectContext.delete(user.location!)
+            }
+            let point = NSEntityDescription.insertNewObject(forEntityName: "Coordinate", into: managedObjectContext) as! Coordinate
+            point.date = at
+            point.latitude = coordinate.latitude
+            point.longitude = coordinate.longitude
+            point.user = user
+            user.location = point
             saveContext()
         }
     }
     
-    func publishCoordinate(_ pos:CLLocationCoordinate2D) -> Bool {
-        if let user = currentUser() {
-            let date = Model.shared.dateFormatter.string(from: Date())
-            addTrackPoint(user: user, date: date, latitude: pos.latitude, longitude: pos.longitude)
-            
-            let ref = FIRDatabase.database().reference()
-            let data:[String:Any] = ["latitude" : pos.latitude,
-                                     "longitude" : pos.longitude]
-            ref.child("tracks").child(currentUser()!.uid!).child(date).setValue(data)
-            return true
-        } else {
-            return false
+    func clearTrack() {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
+        fetchRequest.predicate = NSPredicate(format: "user == nil")
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        if var all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate] {
+            while all.count > 1 {
+                let point = all.last!
+                managedObjectContext.delete(point)
+                all.removeLast()
+            }
         }
     }
     
-    func clearTrack(_ completion: @escaping() -> ()) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("tracks").child(currentUser()!.uid!).removeValue(completionBlock: { error, _ in
-            for pt in currentUser()?.track?.allObjects as! [TrackPoint] {
-                self.managedObjectContext.delete(pt)
-            }
-            currentUser()!.track = NSSet()
-            completion()
-        })
-    }
-    
-    func removePoint(_ point:TrackPoint) {
-        point.user!.removeFromTrack(point)
-        managedObjectContext.delete(point)
-        saveContext()
-    }
-    
-    func lastUserLocation(user:User) -> TrackPoint? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackPoint")
-        fetchRequest.predicate = NSPredicate(format: "user.uid == %@", user.uid!)
+    func myLocation() -> CLLocationCoordinate2D? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
+        fetchRequest.predicate = NSPredicate(format: "user == nil")
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         fetchRequest.fetchLimit = 1
-        if let all = try? managedObjectContext.fetch(fetchRequest) as! [TrackPoint] {
-            return all.first
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate], let location = all.first {
+            return CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
         } else {
             return nil
         }
     }
- 
-    func userTrack(_ user:User) -> [TrackPoint]? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackPoint")
-        fetchRequest.predicate = NSPredicate(format: "user.uid == %@", user.uid!)
+  
+    func myTrack() -> GMSMutablePath? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
+        fetchRequest.predicate = NSPredicate(format: "user == nil")
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        return try? managedObjectContext.fetch(fetchRequest) as! [TrackPoint]
-    }
- 
-    func uploadTrack(_ forUser:User, completion: @escaping() -> ()) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("tracks").child(forUser.uid!).observeSingleEvent(of: .value, with: { snapshot in
-            if let user = self.getUser(snapshot.key) {
-                if let points = self.userTrack(user) {
-                    for pt in points {
-                        self.removePoint(pt)
-                    }
-                    self.saveContext()
-                }
-                if let track = snapshot.value as? [String:Any] {
-                    for (date, value) in track {
-                        if let point = value as? [String:Any] {
-                            if let latitude = point["latitude"] as? Double, let longitude = point["longitude"] as? Double {
-                                self.addTrackPoint(user: user, date: date, latitude: latitude, longitude: longitude)
-                            }
-                        }
-                    }
-                }
+        let all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate]
+        if all != nil && all!.count > 1 {
+            let path = GMSMutablePath()
+            for pt in all! {
+                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
             }
-            completion()
-        })
+            return path
+        } else {
+            return nil
+        }
     }
     
-    fileprivate func observeTrack() {
-        let ref = FIRDatabase.database().reference()
-        let coordQuery = ref.child("tracks").queryLimited(toLast:25)
-        
-        newTrackRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let track = snapshot.value as? [String:Any] {
-                    for (date, value) in track {
-                        if let point = value as? [String:Any] {
-                            if let latitude = point["latitude"] as? Double, let longitude = point["longitude"] as? Double {
-                                self.addTrackPoint(user: user, date: date, latitude: latitude, longitude: longitude)
-                            }
-                        }
-                    }
-                }
+    func myTrackForLastDay() -> String? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
+        let predicate1 = NSPredicate(format: "user == nil")
+        let calendar = Calendar.current
+        let startDate = calendar.date(byAdding: .day, value: -1, to: Date())
+        let predicate2 = NSPredicate(format: "date >= %f", startDate!.timeIntervalSince1970)
+        fetchRequest.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [predicate1, predicate2])
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        let all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate]
+        if all != nil && all!.count > 1 {
+            let path = GMSMutablePath()
+            for pt in all! {
+                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
             }
-        })
-        
-        updateTrackRefHandle = coordQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let track = snapshot.value as? [String:Any] {
-                    for (date, value) in track {
-                        if let point = value as? [String:Any] {
-                            if let latitude = point["latitude"] as? Double, let longitude = point["longitude"] as? Double {
-                                self.addTrackPoint(user: user, date: date, latitude: latitude, longitude: longitude)
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        
-        removeTrackRefHandle = coordQuery.observe(.childRemoved, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let track = snapshot.value as? [String:Any] {
-                    for date in track.keys {
-                        if let trackPoint = self.getTrackPoint(forUser: user, at: date) {
-                            self.removePoint(trackPoint)
-                        }
-                    }
-                }
-            }
-        })
+            return path.encodedPath()
+        } else {
+            return nil
+        }
     }
 }

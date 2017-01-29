@@ -2,7 +2,7 @@
 //  User+CoreDataProperties.swift
 //  iNear
 //
-//  Created by Сергей Сейтов on 27.01.17.
+//  Created by Сергей Сейтов on 29.01.17.
 //  Copyright © 2017 Сергей Сейтов. All rights reserved.
 //
 
@@ -26,9 +26,10 @@ extension User {
     @NSManaged public var type: Int16
     @NSManaged public var uid: String?
     @NSManaged public var uploadedOnWatch: Bool
+    @NSManaged public var lastTrack: String?
     @NSManaged public var contacts: NSSet?
     @NSManaged public var messages: Message?
-    @NSManaged public var track: NSSet?
+    @NSManaged public var location: Coordinate?
 
 }
 
@@ -46,22 +47,5 @@ extension User {
 
     @objc(removeContacts:)
     @NSManaged public func removeFromContacts(_ values: NSSet)
-
-}
-
-// MARK: Generated accessors for track
-extension User {
-
-    @objc(addTrackObject:)
-    @NSManaged public func addToTrack(_ value: TrackPoint)
-
-    @objc(removeTrackObject:)
-    @NSManaged public func removeFromTrack(_ value: TrackPoint)
-
-    @objc(addTrack:)
-    @NSManaged public func addToTrack(_ values: NSSet)
-
-    @objc(removeTrack:)
-    @NSManaged public func removeFromTrack(_ values: NSSet)
 
 }

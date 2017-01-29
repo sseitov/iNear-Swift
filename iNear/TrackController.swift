@@ -14,53 +14,50 @@ class TrackController: UIViewController {
 
     @IBOutlet weak var map: GMSMapView!
     
-    private var userTrack:GMSPolyline?
-    private var startMarker:GMSMarker?
-    private var finishMarker:GMSMarker?
-
+    var user:User?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTitle("My Track")
+        if user == currentUser() {
+            setupTitle("My Track")
+            let btn = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(TrackController.clearTrack))
+            btn.tintColor = UIColor.white
+            navigationItem.rightBarButtonItem = btn
+        } else {
+            setupTitle("\(user!.shortName) track for last day")
+        }
         setupBackButton()
         
-        let points = Model.shared.userTrack(currentUser()!)
-        if points!.count > 1 {
-            var bounds = GMSCoordinateBounds()
-            let path = GMSMutablePath()
-            for pt in points! {
+        let path = (user == currentUser()) ? Model.shared.myTrack() : GMSPath(fromEncodedPath: user!.lastTrack!)
+        
+        let userTrack = GMSPolyline(path: path)
+        userTrack.strokeColor = UIColor.traceColor()
+        userTrack.strokeWidth = 4
+        userTrack.map = map
+        if let start = path?.coordinate(at: 0) {
+            let startMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude))
+            startMarker.icon = UIImage(named: "startPoint")
+            startMarker.map = map
+        }
+        if let finish = path?.coordinate(at: path!.count() - 1) {
+            let finishMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: finish.latitude, longitude: finish.longitude))
+            finishMarker.icon = UIImage(named: "finishPoint")
+            finishMarker.map = map
+        }
+        
+        var bounds = GMSCoordinateBounds()
+        for i in 0..<path!.count() {
+            if let pt = path?.coordinate(at: i) {
                 bounds = bounds.includingCoordinate(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-            }
-            userTrack = GMSPolyline(path: path)
-            userTrack?.strokeColor = UIColor.traceColor()
-            userTrack?.strokeWidth = 4
-            userTrack?.map = map
-            let start = points!.first!
-            startMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude))
-            startMarker?.icon = UIImage(named: "startPoint")
-            startMarker?.map = map
-            let finish = points!.last!
-            finishMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: finish.latitude, longitude: finish.longitude))
-            finishMarker?.icon = UIImage(named: "finishPoint")
-            finishMarker?.map = map
-
-            let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
-            map.moveCamera(update)
-        } else {
-            if let pt = Model.shared.lastUserLocation(user: currentUser()!) {
-                let update = GMSCameraUpdate.setTarget(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude), zoom: 12)
-                map.moveCamera(update)
             }
         }
-
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
+        map.moveCamera(update)
     }
     
-    @IBAction func clearTrack(_ sender: Any) {
-        SVProgressHUD.show(withStatus: "Clear...")
-        Model.shared.clearTrack {
-            SVProgressHUD.dismiss()
-            _ = self.navigationController?.popViewController(animated: true)
-        }
+    func clearTrack() {
+        Model.shared.clearTrack()
+        goBack()
     }
 
 }

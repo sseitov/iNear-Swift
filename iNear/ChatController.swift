@@ -113,7 +113,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     }
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        Model.shared.sendTextMessage(text, from: senderId, to: user!.uid!)
+        Model.shared.sendTextMessage(text, to: user!.uid!)
         JSQSystemSoundPlayer.jsq_playMessageSentSound()
         finishSendingMessage()
     }
@@ -221,7 +221,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         picker.dismiss(animated: true, completion: {
             if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
                 SVProgressHUD.show(withStatus: "Send...")
-                Model.shared.sendImageMessage(pickedImage, from: self.senderId, to: self.user!.uid!, result: { error in
+                Model.shared.sendImageMessage(pickedImage, to: self.user!.uid!, result: { error in
                     SVProgressHUD.dismiss()
                     if error != nil {
                         self.showMessage(error!.localizedDescription, messageType: .error)
@@ -241,7 +241,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     // MARK: - Navigation
     
     @IBAction func showMap(_ sender: Any) {
-        if Model.shared.lastUserLocation(user: user!) == nil {
+        if user!.location == nil {
             self.showMessage("\(self.user!.shortName) does not published self location yet.", messageType: .information)
         } else {
             self.performSegue(withIdentifier: "showMap", sender: nil)

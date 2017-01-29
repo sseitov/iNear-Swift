@@ -8,17 +8,10 @@
 
 import Foundation
 import CoreData
-
+import CoreLocation
 
 public class Message: NSManagedObject {
 
-    
-    func getData() -> [String:Any] {
-        var data:[String:Any] = ["to" : to!, "from" : from!, "text" : text!]
-        data["date"] = Model.shared.dateFormatter.string(from: date as! Date)
-        return data
-    }
-    
     func setData(_ data:[String:Any], new:Bool, completion:@escaping () -> ()) {
         from = data["from"] as? String
         to = data["to"] as? String
@@ -27,7 +20,10 @@ public class Message: NSManagedObject {
         isNew = new
         if let dateVal = data["date"] as? String {
             date = Model.shared.dateFormatter.date(from: dateVal) as NSDate?
+        } else {
+            date = nil
         }
+        
         if imageURL != nil {
             let ref = Model.shared.storageRef.child(imageURL!)
             ref.data(withMaxSize: INT64_MAX, completion: { data, error in
@@ -38,6 +34,18 @@ public class Message: NSManagedObject {
         } else {
             Model.shared.saveContext()
             completion()
+        }
+    }
+    
+    func setLocationData(_ data:[String:Any]) {
+        if from != nil && date != nil {
+            if let lat = data["latitude"] as? Double, let lon = data["longitude"] as? Double {
+                let coordinate = CLLocationCoordinate2D(latitude:lat, longitude:lon)
+                Model.shared.addCoordinateForUser(coordinate, at: date!.timeIntervalSince1970, userID: from!)
+            }
+            if let user = Model.shared.getUser(from!) {
+                user.lastTrack = data["track"] as? String
+            }
         }
     }
 }

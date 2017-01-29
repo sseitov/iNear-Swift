@@ -62,7 +62,7 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         if owner != nil {
-            if Model.shared.lastUserLocation(user: owner!) != nil {
+            if Model.shared.myTrack() != nil {
                 let btn = UIBarButtonItem(title: "Track", style: .plain, target: self, action: #selector(ProfileController.showTrack))
                 btn.tintColor = UIColor.white
                 navigationItem.setRightBarButton(btn, animated: true)
@@ -167,14 +167,14 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
         try? FIRAuth.auth()?.signOut()
     }
     
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "showTrack" {
+            let controller = segue.destination as! TrackController
+            controller.user = currentUser()
+        }
     }
-    */
 
 }

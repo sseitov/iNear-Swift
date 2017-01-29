@@ -25,8 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     var window: UIWindow?
     
     let locationManager = CLLocationManager()
-    var lastPublishedLocation:CLLocation?
-    let threshold:CLLocationDistance = 10.0
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
@@ -94,6 +92,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.distanceFilter = 10.0
+            locationManager.headingFilter = 5.0
             locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
@@ -249,11 +249,8 @@ extension AppDelegate : CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            if lastPublishedLocation == nil || lastPublishedLocation!.distance(from: location) > threshold {
-                if Model.shared.publishCoordinate(location.coordinate) {
-                    print("updated location")
-                    lastPublishedLocation = location
-                }
+            if location.horizontalAccuracy <= 10.0 {
+                Model.shared.addCoordinate(location.coordinate, at:NSDate().timeIntervalSince1970)
             }
         }
     }
