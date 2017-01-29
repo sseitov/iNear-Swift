@@ -21,15 +21,15 @@ extension User {
     @NSManaged public var givenName: String?
     @NSManaged public var image: String?
     @NSManaged public var imageData: NSData?
+    @NSManaged public var lastTrack: String?
     @NSManaged public var name: String?
     @NSManaged public var token: String?
     @NSManaged public var type: Int16
     @NSManaged public var uid: String?
     @NSManaged public var uploadedOnWatch: Bool
-    @NSManaged public var lastTrack: String?
     @NSManaged public var contacts: NSSet?
-    @NSManaged public var messages: Message?
     @NSManaged public var location: Coordinate?
+    @NSManaged public var messages: NSSet?
 
 }
 
@@ -47,5 +47,22 @@ extension User {
 
     @objc(removeContacts:)
     @NSManaged public func removeFromContacts(_ values: NSSet)
+
+}
+
+// MARK: Generated accessors for messages
+extension User {
+
+    @objc(addMessagesObject:)
+    @NSManaged public func addToMessages(_ value: Message)
+
+    @objc(removeMessagesObject:)
+    @NSManaged public func removeFromMessages(_ value: Message)
+
+    @objc(addMessages:)
+    @NSManaged public func addToMessages(_ values: NSSet)
+
+    @objc(removeMessages:)
+    @NSManaged public func removeFromMessages(_ values: NSSet)
 
 }

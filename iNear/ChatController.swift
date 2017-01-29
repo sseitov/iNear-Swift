@@ -59,9 +59,14 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                 }
                 self.finishReceivingMessage()
             }
+            
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(ChatController.newMessage(_:)),
                                                    name: newMessageNotification,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(ChatController.deleteMessage(_:)),
+                                                   name: deleteMessageNotification,
                                                    object: nil)
         } else {
             self.senderId = ""
@@ -80,6 +85,29 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             if let jsqMessage = addMessage(message) {
                 messages.append(jsqMessage)
                 self.finishReceivingMessage()
+            }
+        }
+    }
+
+    private func getMsg(sender:String, date:Date) -> JSQMessage? {
+        for msg in messages {
+            if msg.senderId == sender && msg.date.timeIntervalSince1970 == date.timeIntervalSince1970 {
+                return msg
+            }
+        }
+        return nil
+    }
+    
+    func deleteMessage(_ notify:Notification) {
+        if let message = notify.object as? Message {
+            if let msg = getMsg(sender:message.from!, date:message.date as! Date) {
+                if let index = messages.index(of: msg) {
+                    self.collectionView.performBatchUpdates({
+                        self.messages.remove(at: index)
+                        self.collectionView.deleteItems(at: [IndexPath(row:index, section:0)])
+                    }, completion: { _ in
+                    })
+                }
             }
         }
     }
@@ -208,10 +236,35 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
         let message = messages[indexPath.item]
-        if message.isMediaMessage {
+        if message.isMediaMessage || message.senderId == currentUser()!.uid! {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             if (message.media as? JSQPhotoMediaItem) != nil {
-                performSegue(withIdentifier: "showPhoto", sender: message)
+                alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
+                    self.performSegue(withIdentifier: "showPhoto", sender: message)
+                }))
             }
+            if message.senderId == currentUser()!.uid! {
+                alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
+                    if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
+                        SVProgressHUD.show(withStatus: "Delete...")
+                        Model.shared.deleteMessage(msg, completion: {
+                            SVProgressHUD.dismiss()
+                        })
+                    }
+                }))
+            }
+            alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
+            if IS_PAD() {
+                alert.popoverPresentationController?.permittedArrowDirections = .any
+                alert.popoverPresentationController?.sourceView = self.view
+                var rc = collectionView.layoutAttributesForItem(at: indexPath)!.frame
+                let sz = collectionView.collectionViewLayout.messageBubbleSizeForItem(at: indexPath)
+                rc.origin.x = collectionView.frame.size.width - sz.width - collectionView.collectionViewLayout.outgoingAvatarViewSize.width
+                rc.origin.y += 44
+                rc.size.height = sz.height
+                alert.popoverPresentationController?.sourceRect = rc
+            }
+            present(alert, animated: true, completion: nil)
         }
     }
     

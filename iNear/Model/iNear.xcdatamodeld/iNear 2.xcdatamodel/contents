@@ -38,7 +38,7 @@
         <attribute name="uploadedOnWatch" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="contacts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Contact" inverseName="owner" inverseEntity="Contact" syncable="YES"/>
         <relationship name="location" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Coordinate" inverseName="user" inverseEntity="Coordinate" syncable="YES"/>
-        <relationship name="messages" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Message" inverseName="owner" inverseEntity="Message" syncable="YES"/>
+        <relationship name="messages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Message" inverseName="owner" inverseEntity="Message" syncable="YES"/>
     </entity>
     <elements>
         <element name="Contact" positionX="-2864" positionY="-1198" width="128" height="118"/>

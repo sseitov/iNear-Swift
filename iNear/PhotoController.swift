@@ -19,7 +19,7 @@ class PhotoController: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         if date != nil {
-            setupTitle(Model.shared.textDateFormatter.string(from: date!))
+            setupTitle("Picture was sent \(Model.shared.textDateFormatter.string(from: date!))")
         }
         if image != nil {
             photoView.image = image

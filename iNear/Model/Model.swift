@@ -21,6 +21,7 @@ enum PushType:Int {
 }
 
 let newMessageNotification = Notification.Name("NEW_MESSAGE")
+let deleteMessageNotification = Notification.Name("DELETE_MESSAGE")
 let readMessageNotification = Notification.Name("READ_MESSAGE")
 let contactNotification = Notification.Name("CONTACT")
 
@@ -78,6 +79,7 @@ class Model : NSObject {
         }
         try? FIRAuth.auth()?.signOut()
         newMessageRefHandle = nil
+        deleteMessageRefHandle = nil
         updateTokenRefHandle = nil
         newTokenRefHandle = nil
         updateContactRefHandle = nil
@@ -102,6 +104,7 @@ class Model : NSObject {
     lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: firStorage)
     
     private var newMessageRefHandle: FIRDatabaseHandle?
+    private var deleteMessageRefHandle: FIRDatabaseHandle?
     
     private var updateTokenRefHandle: FIRDatabaseHandle?
     private var newTokenRefHandle: FIRDatabaseHandle?
@@ -472,6 +475,33 @@ class Model : NSObject {
         }
     }
     
+    func getMessage(from:User, date:Date) -> Message? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        let predicate1 = NSPredicate(format: "from = %@", from.uid!)
+        let predicate2 = NSPredicate(format: "date = %@", date as NSDate)
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
+        if let message = try? managedObjectContext.fetch(fetchRequest).first as? Message {
+            return message
+        } else {
+            return nil
+        }
+    }
+    
+    func deleteMessage(_ message:Message, completion: @escaping() -> ()) {
+        let ref = FIRDatabase.database().reference()
+        if let image = message.imageURL {
+            self.storageRef.child(image).delete(completion: { _ in
+                ref.child("messages").child(message.uid!).removeValue(completionBlock: { _, _ in
+                    completion()
+                })
+            })
+        } else {
+            ref.child("messages").child(message.uid!).removeValue(completionBlock: { _, _ in
+                completion()
+            })
+        }
+    }
+    
     private func chatPredicate(with:String) -> NSPredicate {
         let predicate1  = NSPredicate(format: "from == %@", with)
         let predicate2 = NSPredicate(format: "to == %@", currentUser()!.uid!)
@@ -617,6 +647,16 @@ class Model : NSObject {
                 }
             } else {
                 print("Error! Could not decode message data \(messageData)")
+            }
+        })
+        
+        deleteMessageRefHandle = messageQuery.observe(.childRemoved, with: { (snapshot) -> Void in
+            if let message = self.getMessage(snapshot.key) {
+                if message.owner != nil {
+                    message.owner!.removeFromMessages(message)
+                }
+                NotificationCenter.default.post(name: deleteMessageNotification, object: message)
+                self.managedObjectContext.delete(message)
             }
         })
     }
