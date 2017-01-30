@@ -359,16 +359,19 @@ class Model : NSObject {
         }
     }
 
-    func addContact(with:String) {
+    func addContact(with:User) {
         let contact = createContact(generateUDID())
         contact.initiator = currentUser()!.uid
-        contact.requester = with
+        contact.requester = with.uid!
         contact.status = ContactStatus.requested.rawValue
         contact.owner = currentUser()
         currentUser()?.addToContacts(contact)
         
         let ref = FIRDatabase.database().reference()
         ref.child("contacts").child(contact.uid!).setValue(contact.getData())
+        let text = "\(currentUser()!.shortName) (\(currentUser()!.email!)) ask you to add him into contact list."
+        messagePush(text, to: with, from: currentUser()!)
+
         NotificationCenter.default.post(name: contactNotification, object: nil)
     }
     

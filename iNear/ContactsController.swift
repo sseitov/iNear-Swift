@@ -107,7 +107,7 @@ class ContactsController: UITableViewController {
         switch contact.getContactStatus() {
         case .requested:
             if contact.initiator != currentUser()!.uid, let user = Model.shared.getUser(contact.initiator!) {
-                let question = createQuestion("\(user.shortName) want to add you in chat. Are you agree?",
+                let question = createQuestion("\(user.shortName) ask you to add him into contact list. Are you agree?",
                     acceptTitle: "Yes", cancelTitle: "No",
                     acceptHandler: {
                         Model.shared.approveContact(contact)
@@ -140,7 +140,7 @@ class ContactsController: UITableViewController {
                             } else if let profile = values[uid] as? [String:Any] {
                                 let user = Model.shared.createUser(uid)
                                 user.setUserData(profile, completion:{
-                                    Model.shared.addContact(with: uid)
+                                    Model.shared.addContact(with: user)
                                     SVProgressHUD.dismiss()
                                     self.refresh()
                                 })
