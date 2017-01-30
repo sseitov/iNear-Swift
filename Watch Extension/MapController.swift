@@ -11,31 +11,59 @@ import WatchKit
 class MapController: WKInterfaceController {
 
     @IBOutlet var map: WKInterfaceMap!
-    @IBOutlet var zoomSlider: WKInterfaceSlider!
-    
-    var location:CLLocationCoordinate2D?
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-        zoomSlider.setValue(10)
-        if let position = context as? [String:Any] {
-            if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
-//                location = CLLocationCoordinate2D(latitude: 55.819349, longitude: 37.510184)
-                location = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-                let span = MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)
-                let region = MKCoordinateRegion(center: location!, span: span)
+        if let params = context as? [String:Any], let user = params["user"] as? String, let positions = params["position"] as? [String:Any] {
+            if let myPoint = positions["myPoint"] as? [String:Any], let userPoint = positions["userPoint"] as? [String:Any] {
+                let lat1 = myPoint["latitude"] as! Double
+                let lon1 = myPoint["longitude"] as! Double
+                let coord1 = CLLocationCoordinate2D(latitude: lat1, longitude: lon1)
+                let lat2 = userPoint["latitude"] as! Double
+                let lon2 = userPoint["longitude"] as! Double
+                let coord2 = CLLocationCoordinate2D(latitude: lat2, longitude: lon2)
+                var region =  MKCoordinateRegionForMapRect(MKMapRect(coordinates: [coord1, coord2]))
+                var latDelta = abs(lat1 - lat2)
+                if latDelta > 1 {
+                    latDelta = 1
+                }
+                if latDelta < 0.1 {
+                    latDelta = 0.1
+                }
+                var lonDelta = abs(lon1 - lon2)
+                if lonDelta > 1 {
+                    lonDelta = 1
+                }
+                if lonDelta < 0.1 {
+                    lonDelta = 0.1
+                }
+                let delta = latDelta > lonDelta ? latDelta : lonDelta
+                region.span = MKCoordinateSpan(latitudeDelta: delta, longitudeDelta: delta)
                 map.setRegion(region)
-                map.addAnnotation(location!, with: .red)
+                map.addAnnotation(coord1, with: .red)
+                if let image = contactImage(uid: user) {
+                    map.addAnnotation(coord2, with: image.withSize(CGSize(width: 20, height: 20)), centerOffset: CGPoint(x: 0, y: 0))
+                } else {
+                    map.addAnnotation(coord2, with: UIImage(named: "position"), centerOffset: CGPoint(x: 0, y: -13))
+                }
             }
         }
     }
-    
-    @IBAction func zoom(_ value: Float) {
-        if location != nil {
-            let span = MKCoordinateSpan(latitudeDelta: Double(value/10.0), longitudeDelta: Double(value/10.0))
-            let region = MKCoordinateRegion(center: location!, span: span)
-            map.setRegion(region)
-            map.addAnnotation(location!, with: .red)
+
+    func contactImage(uid:String) -> UIImage? {
+        if let list = UserDefaults.standard.object(forKey: "contacts") as? [String:Any] {
+            if let user = list[uid] as? [String:Any] {
+                if let imageData = user["image"] as? Data {
+                    return UIImage(data: imageData)
+                }
+            }
         }
+        return nil
+    }
+}
+
+extension MKMapRect {
+    init(coordinates: [CLLocationCoordinate2D]) {
+        self = coordinates.map({ MKMapPointForCoordinate($0) }).map({ MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }).reduce(MKMapRectNull, MKMapRectUnion)
     }
 }

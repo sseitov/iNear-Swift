@@ -8,12 +8,12 @@
 
 import UIKit
 import UserNotifications
-
 import IQKeyboardManager
 import Firebase
 import CoreLocation
 import GoogleMaps
 import SVProgressHUD
+import WatchConnectivity
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -23,7 +23,8 @@ func IS_PAD() -> Bool {
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-    
+    var watchSession:WCSession?
+
     let locationManager = CLLocationManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -83,7 +84,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         IQKeyboardManager.shared().isEnableAutoToolbar = false
         
         // connect iWatch
-        _ = WatchManager.shared.activate()
+        if WCSession.isSupported() {
+            watchSession = WCSession.default()
+            watchSession!.delegate = self
+            watchSession!.activate()
+        }
 
         // Initialize Google Maps
         GMSServices.provideAPIKey(GoolgleMapAPIKey)
@@ -94,7 +99,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.distanceFilter = 10.0
             locationManager.headingFilter = 5.0
-            locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
             } else {
@@ -106,7 +110,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         return true
     }
     
+    // MARK: - iWatch messages
+
+    func sendContactList() {
+        if watchSession != nil, watchSession!.isReachable {
+            DispatchQueue.main.async {
+                let contacts = Model.shared.allContacts()
+                var friends:[Any] = []
+                for contact in contacts {
+                    let data = UIImagePNGRepresentation(contact.getImage().withSize(CGSize(width: 30, height: 30)).inCircle())
+                    let friend:[String:Any] = ["uid" : contact.uid!, "name" : contact.name!, "image" : data!]
+                    friends.append(friend)
+                }
+                self.watchSession?.sendMessage(["contactList" : friends], replyHandler: { response in
+                    
+                }, errorHandler: { error in
+                })
+            }
+        }
+    }
+    
     // MARK: - Receive_message
+    
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
         print(userInfo)
     }
@@ -166,6 +191,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
+        sendContactList()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -253,5 +279,57 @@ extension AppDelegate : CLLocationManagerDelegate {
                 Model.shared.addCoordinate(location.coordinate, at:NSDate().timeIntervalSince1970)
             }
         }
+    }
+}
+
+extension AppDelegate : WCSessionDelegate {
+    
+    func sessionDidDeactivate(_ session: WCSession) {
+        print("sessionDidDeactivate")
+    }
+    
+    func sessionDidBecomeInactive(_ session: WCSession) {
+        print("sessionDidBecomeInactive")
+    }
+    
+    @available(iOS 9.3, *)
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print("activationDidCompleteWith \(activationState)")
+        sendContactList()
+    }
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        print("didReceiveMessage")
+    }
+
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+        print("didReceiveApplicationContext \(applicationContext)")
+    }
+  
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+        if let uid = message["userPosition"] as? String {
+            DispatchQueue.main.async {
+                if let user = Model.shared.getUser(uid), user.location != nil {
+                    var reply:[String:Any] = [:]
+                    if let myLocation = Model.shared.myLocation() {
+                        let location = ["latitude" : myLocation.latitude, "longitude" : myLocation.longitude]
+                        reply["myPoint"] = location
+                    }
+                    let date = Date.init(timeIntervalSince1970: user.location!.date)
+                    let dateTxt = Model.shared.textDateFormatter.string(from: date)
+                    let location:[String:Any] = ["latitude" : user.location!.latitude, "longitude" : user.location!.longitude, "date" : dateTxt]
+                    reply["userPoint"] = location
+                    replyHandler(reply)
+                } else {
+                    replyHandler([:])
+                }
+            }
+        } else {
+            replyHandler([:])
+        }
+    }
+    
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        print("sessionReachabilityDidChange")
     }
 }

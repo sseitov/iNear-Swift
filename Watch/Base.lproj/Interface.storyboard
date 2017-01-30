@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
     <device id="watch38" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -49,20 +49,10 @@
             <objects>
                 <controller identifier="Map" id="jCr-qW-fJv" customClass="MapController" customModule="Watch_Extension">
                     <items>
-                        <group width="1" alignment="left" id="HOU-UT-s8o">
-                            <items>
-                                <map height="100" alignment="left" id="ptI-3L-O7s"/>
-                            </items>
-                        </group>
-                        <slider width="1" alignment="left" continuous="YES" value="1" minimum="1" maximum="10" steps="1" id="6ta-ne-adb">
-                            <connections>
-                                <action selector="zoom:" destination="jCr-qW-fJv" id="qnF-qL-tnj"/>
-                            </connections>
-                        </slider>
+                        <map alignment="left" id="ptI-3L-O7s"/>
                     </items>
                     <connections>
                         <outlet property="map" destination="ptI-3L-O7s" id="7gG-h9-fcH"/>
-                        <outlet property="zoomSlider" destination="6ta-ne-adb" id="Utp-2N-8QC"/>
                     </connections>
                 </controller>
             </objects>

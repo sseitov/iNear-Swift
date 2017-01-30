@@ -38,12 +38,15 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
 
     @IBOutlet var contactsTable: WKInterfaceTable!
   
-    private let session: WCSession = WCSession.default()
+    private var session:WCSession?
 
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-        session.delegate = self
-        session.activate()
+        if WCSession.isSupported() {
+            session = WCSession.default()
+            session!.delegate = self
+            session!.activate()
+        }
         refreshTable()
     }
     
@@ -56,19 +59,32 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     }
 
     override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
-        let row = contactsTable.rowController(at: rowIndex) as! ContactController
-        session.sendMessage(["task" : "userPosition", "user" : row.uid!], replyHandler: { position in
-            DispatchQueue.main.async {
-                self.pushController(withName: "Map", context: position)
-            }
-        }, errorHandler: { error in
-            print(error)
-            self.presentAlert(withTitle: "", message: "User not published his location.", preferredStyle: .alert, actions: [])
-        })
+        if session != nil {
+            let row = contactsTable.rowController(at: rowIndex) as! ContactController
+            session!.sendMessage(["userPosition" : row.uid!], replyHandler: { position in
+                DispatchQueue.main.async {
+                    if (position["userPoint"] as? [String:Any]) != nil {
+                        let context:[String:Any] = ["user" : row.uid!, "position" : position]
+                        self.pushController(withName: "Map", context: context)
+                    } else {
+                        self.presentAlert(withTitle: "Error",
+                                          message: "User not published his location.",
+                                          preferredStyle: .alert,
+                                          actions: [
+                                            WKAlertAction(title: "Ok", style: .default, handler: {})
+                            ])
+                    }
+                }
+            }, errorHandler: { error in
+                DispatchQueue.main.async {
+                    self.presentAlert(withTitle: "", message: "User not published his location.", preferredStyle: .alert, actions: [])
+                }
+            })
+        }
     }
-    
+
     func refreshTable() {
-        let contacts = allContacts()
+        let contacts = loadContacts()
         contactsTable.setNumberOfRows(contacts.count, withRowType: "contact")
         for index in 0..<contacts.count {
             let row = contactsTable.rowController(at:index) as! ContactController
@@ -78,7 +94,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         }
     }
     
-    private func allContacts() -> [Contact] {
+    private func loadContacts() -> [Contact] {
         var contacts:[Contact] = []
         if let list = UserDefaults.standard.object(forKey: "contacts") as? [String:Any] {
             for (key, value) in list {
@@ -99,25 +115,6 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         })
     }
     
-    func addContact(_ contact:[String:Any]?) {
-        if contact != nil, let uid = contact!["uid"] as? String {
-            var list = UserDefaults.standard.object(forKey: "contacts") as? [String:Any]
-            var user:[String:Any] = [:]
-            if let name = contact!["name"] as? String {
-                user["name"] = name
-            }
-            if let imageData = contact!["image"] as? Data {
-                user["image"] = imageData
-            }
-            if list == nil {
-                list = [uid:user]
-            } else {
-                list![uid] = user
-            }
-            UserDefaults.standard.set(list, forKey: "contacts")
-            UserDefaults.standard.synchronize()
-        }
-    }
 }
 
 extension InterfaceController {
@@ -125,20 +122,6 @@ extension InterfaceController {
     @available(iOS 9.3, *)
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         print("activationDidCompleteWith")
-        if session.isReachable {
-            session.sendMessage(["task" : "contactList"], replyHandler: { list in
-                if let contacts = list["contacts"] as? [Any]{
-                    for contact in contacts {
-                        self.addContact(contact as? [String:Any])
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.refreshTable()
-                }
-            }, errorHandler: { error in
-                print(error)
-            })
-        }
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -156,15 +139,6 @@ extension InterfaceController {
     // Receiver
     func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
         print("didReceiveApplicationContext")
-        if let list = applicationContext["contactList"] as? [Any] {
-            DispatchQueue.main.async {
-                UserDefaults.standard.removeObject(forKey: "contacts")
-                for contact in list {
-                    self.addContact(contact as? [String:Any])
-                }
-                self.refreshTable()
-            }
-        }
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -173,6 +147,41 @@ extension InterfaceController {
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         print("didReceiveMessage replyHandler")
+        if let list = message["contactList"] as? [Any] {
+            var contacts:[Contact] = []
+            for item in list {
+                if let contact = item as? [String:Any] {
+                    if let uid = contact["uid"] as? String {
+                        let name = contact["name"] as? String
+                        let imageData = contact["image"] as? Data
+                        contacts.append(Contact(uid, name: name, imageData: imageData))
+                    }
+                }
+            }
+            replyHandler(["contactList":contacts.count])
+            DispatchQueue.main.async {
+                self.saveContacts(contacts)
+                self.refreshTable()
+            }
+        } else {
+            replyHandler(["contactList":false])
+        }
+    }
+    
+    private func saveContacts(_ contacts:[Contact]) {
+        var list:[String:Any] = [:]
+        for contact in contacts {
+            var user:[String:Any] = [:]
+            if contact.name != nil {
+                user["name"] = contact.name!
+            }
+            if contact.image != nil {
+                user["image"] = UIImagePNGRepresentation(contact.image!)
+            }
+            list[contact.uid] = user
+        }
+        UserDefaults.standard.set(list, forKey: "contacts")
+        UserDefaults.standard.synchronize()
     }
 
 }
