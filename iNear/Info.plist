@@ -36,7 +36,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>FacebookAppID</key>
 	<string>823694161012947</string>
 	<key>FacebookDisplayName</key>
@@ -59,7 +59,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>iNear needs your camera for take pictures and share it.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>iNear wants to track your location..</string>
+	<string>iNear will be collect your location point into track and then share this track with contacts from your contact list.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>iNear needs your photo library for share photos.</string>
 	<key>UIBackgroundModes</key>
