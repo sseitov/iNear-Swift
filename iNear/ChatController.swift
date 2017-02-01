@@ -72,6 +72,8 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             self.senderId = ""
             self.senderDisplayName = ""
             inputToolbar.isHidden = true
+            navigationItem.rightBarButtonItem = nil
+            setupTitle("Contact list is empty")
         }
         if IS_PAD() {
             navigationItem.leftBarButtonItem = nil
