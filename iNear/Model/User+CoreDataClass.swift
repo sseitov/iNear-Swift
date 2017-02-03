@@ -16,6 +16,7 @@ enum SocialType:Int16 {
     case unknown = 0
     case facebook = 1
     case google = 2
+    case email = 3
 }
 
 public class User: NSManagedObject {
@@ -41,18 +42,10 @@ public class User: NSManagedObject {
         } else if self.name != nil {
             return self.name!
         } else {
-            return "anonym"
+            return self.email!
         }
     }()
-/*
-    func location() -> TrackPoint? {
-        if let point = Model.shared.lastUserLocation(user: self) {
-            return CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
-        } else {
-            return nil
-        }
-    }
-*/    
+    
     func userData() -> [String:Any] {
         var profile:[String : Any] = ["socialType" : Int(type)]
         if email != nil {
@@ -107,7 +100,9 @@ public class User: NSManagedObject {
         if imageData != nil {
             return UIImage(data: imageData! as Data)!
         } else {
-            return UIImage(named:"logo")!
+            return UIImage.imageWithColor(
+                ColorUtility.md5color(email!),
+                size: CGSize(width: 100, height: 100)).addImage(UIImage(named: "question")!)
         }
     }
 }

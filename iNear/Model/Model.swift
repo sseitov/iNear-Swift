@@ -260,6 +260,13 @@ class Model : NSObject {
         })
     }
     
+    func setEmailUser(_ user:FIRUser, email:String) {
+        let cashedUser = createUser(user.uid)
+        cashedUser.type = Int16(SocialType.email.rawValue)
+        cashedUser.email = email
+        updateUser(cashedUser)
+    }
+    
     func setFacebookUser(_ user:FIRUser, profile:[String:Any], completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.facebook.rawValue)

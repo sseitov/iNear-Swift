@@ -75,6 +75,7 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
     }
     
     func activate(_ active:Bool) {
+        backgroundColor = text().isEmpty ? nonActiveColor : activeColor
         if active {
             textField.becomeFirstResponder()
         } else {
@@ -115,5 +116,4 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
             }
         }
     }
-    
 }

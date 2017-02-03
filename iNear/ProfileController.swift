@@ -11,7 +11,7 @@ import Firebase
 import SVProgressHUD
 import SDWebImage
 
-class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
+class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate, TextFieldContainerDelegate {
     
     @IBOutlet weak var photoView: UIImageView!
     
@@ -21,6 +21,8 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
     @IBOutlet weak var socialType: UILabel!
     
     @IBOutlet weak var authView: UIView!
+    @IBOutlet weak var usrField: TextFieldContainer!
+    @IBOutlet weak var pwdField: TextFieldContainer!
     
     var owner:User?
     
@@ -33,6 +35,16 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
         GIDSignIn.sharedInstance().uiDelegate = self
 
         owner = currentUser()
+        
+        usrField.textType = .emailAddress
+        usrField.placeholder = "email address"
+        usrField.returnType = .next
+        usrField.delegate = self
+        
+        pwdField.placeholder = "password"
+        pwdField.returnType = .go
+        pwdField.secure = true
+        pwdField.delegate = self
         
         if owner != nil {
             setupBackButton()
@@ -57,6 +69,32 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
             userView.alpha = 0
             setupTitle("Authentication")
         }
+    }
+    
+    func textDone(_ sender:TextFieldContainer, text:String?) {
+        if sender == usrField {
+            if usrField.text().isEmail() {
+                pwdField.activate(true)
+            } else {
+                showMessage("Email should have xxxx@domain.prefix format.", messageType: .error, messageHandler: {
+                    self.usrField.activate(true)
+                })
+            }
+        } else {
+            if pwdField.text().isEmpty {
+                showMessage("Password field required.", messageType: .error, messageHandler: {
+                    self.pwdField.activate(true)
+                })
+            } else if usrField.text().isEmpty {
+                usrField.activate(true)
+            } else {
+                emailAuth(user: usrField.text(), password: pwdField.text())
+            }
+        }
+    }
+    
+    func textChange(_ sender:TextFieldContainer, text:String?) -> Bool {
+        return true
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -93,6 +131,47 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
             UIView.animate(withDuration: 0.3, animations: {
                 self.authView.alpha = 1
             })
+        })
+    }
+    
+    // MARK: - Email Auth
+    
+    func emailSignUp(user:String, password:String) {
+        SVProgressHUD.show(withStatus: "SignUp...")
+        FIRAuth.auth()?.createUser(withEmail: user, password: password, completion: { firUser, error in
+            SVProgressHUD.dismiss()
+            if error != nil {
+                self.showMessage((error as! NSError).localizedDescription, messageType: .error)
+            } else {
+                Model.shared.setEmailUser(firUser!, email: user)
+                self.goBack()
+            }
+        })
+    }
+    
+    func emailAuth(user:String, password:String) {
+        SVProgressHUD.show(withStatus: "Login...")
+        FIRAuth.auth()?.signIn(withEmail: user, password: password, completion: { firUser, error in
+            let err = error as? NSError
+            if err != nil {
+                SVProgressHUD.dismiss()
+                if let reason = err!.userInfo["error_name"] as? String  {
+                    if reason == "ERROR_USER_NOT_FOUND" {
+                        let alert = self.createQuestion("User \(user) not found. Do you want to sign up?", acceptTitle: "SignUp", cancelTitle: "Cancel", acceptHandler: {
+                            self.emailSignUp(user: user, password: password)
+                        })
+                        alert?.show()
+                    } else {
+                        self.showMessage(err!.localizedDescription, messageType: .error)
+                    }
+                } else {
+                    self.showMessage(err!.localizedDescription, messageType: .error)
+                }
+            } else {
+                SVProgressHUD.dismiss()
+                Model.shared.setEmailUser(firUser!, email: user)
+                self.goBack()
+            }
         })
     }
     

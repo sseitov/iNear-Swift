@@ -43,9 +43,9 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         
         if user != nil {
             self.senderId = currentUser()!.uid!
-            self.senderDisplayName = currentUser()!.name!
+            self.senderDisplayName = currentUser()!.shortName
             
-            setupTitle(user!.name!)
+            setupTitle(user!.shortName)
             
             collectionView!.collectionViewLayout.incomingAvatarViewSize = CGSize(width: 36, height: 36)
             collectionView!.collectionViewLayout.outgoingAvatarViewSize = CGSize(width: 36, height: 36)
