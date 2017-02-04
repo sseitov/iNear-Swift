@@ -40,6 +40,7 @@ class ContactsController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if currentUser() == nil {
+            try? FIRAuth.auth()?.signOut()
             performSegue(withIdentifier: "showProfile", sender: self)
         } else {
             Model.shared.startObservers()
