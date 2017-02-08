@@ -80,15 +80,12 @@ public class User: NSManagedObject {
 
         image = profile["imageURL"] as? String
         if image != nil, let url = URL(string: image!) {
-            SDWebImageManager.shared().downloadImage(with: url,
-                                                     options: [],
-                                                     progress: { _ in },
-                                                     completed: { image, error, _, _, _ in
-                                                        if image != nil {
-                                                            self.imageData = UIImagePNGRepresentation(image!) as NSData?
-                                                        }
-                                                        Model.shared.saveContext()
-                                                        completion()
+            SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: { _ in}, completed: { _, data, error, _ in
+                if data != nil {
+                    self.imageData = data as NSData?
+                }
+                Model.shared.saveContext()
+                completion()
             })
         } else {
             imageData = nil

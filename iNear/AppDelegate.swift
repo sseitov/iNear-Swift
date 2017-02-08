@@ -57,9 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         FIRAuth.auth()?.addStateDidChangeListener({ auth, user in
             if let token = FIRInstanceID.instanceID().token(), let currUser = auth.currentUser {
-                if currentUser() != nil {
-                    Model.shared.publishToken(currUser, token:token)
-                }
+                Model.shared.publishToken(currUser, token:token)
             }
         })
         

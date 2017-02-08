@@ -280,15 +280,12 @@ class Model : NSObject {
             }
         }
         if cashedUser.image != nil, let url = URL(string: cashedUser.image!) {
-            SDWebImageManager.shared().downloadImage(with: url,
-                                                     options: [],
-                                                     progress: { _ in },
-                                                     completed: { image, error, _, _, _ in
-                                                        if image != nil {
-                                                            cashedUser.imageData = UIImagePNGRepresentation(image!) as NSData?
-                                                        }
-                                                        self.updateUser(cashedUser)
-                                                        completion()
+            SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: { _ in}, completed: { _, data, error, _ in
+                if data != nil {
+                    cashedUser.imageData = data as NSData?
+                }
+                self.updateUser(cashedUser)
+                completion()
             })
         } else {
             cashedUser.imageData = nil
@@ -310,15 +307,12 @@ class Model : NSObject {
             }
         }
         if cashedUser.image != nil, let url = URL(string: cashedUser.image!) {
-            SDWebImageManager.shared().downloadImage(with: url,
-                                                     options: [],
-                                                     progress: { _ in },
-                                                     completed: { image, error, _, _, _ in
-                                                        if image != nil {
-                                                            cashedUser.imageData = UIImagePNGRepresentation(image!) as NSData?
-                                                        }
-                                                        self.updateUser(cashedUser)
-                                                        completion()
+            SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: { _ in}, completed: { _, data, error, _ in
+                if data != nil {
+                    cashedUser.imageData = data as NSData?
+                }
+                self.updateUser(cashedUser)
+                completion()
             })
         } else {
             cashedUser.imageData = nil
