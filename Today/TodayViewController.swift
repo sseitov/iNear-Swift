@@ -18,11 +18,9 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        dateView.text = ""
-        observeButton.isHidden = true
-        trashButton.isHidden = true
+        refresh()
     }
-
+    
     func formattedDate() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMM HH:mm:ss"
@@ -34,22 +32,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     }
     
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
-        print("widgetPerformUpdate")
-        if LocationManager.shared.hasLocations() {
-            dateView.text = formattedDate()
-            observeButton.isHidden = false
-            trashButton.isHidden = false
-        } else {
-            dateView.text = ""
-            observeButton.isHidden = true
-            trashButton.isHidden = true
-        }
-        if LocationManager.shared.isRunning {
-            recordButton.setImage(UIImage(named: "stop"), for: .normal)
-        } else {
-            recordButton.setImage(UIImage(named: "location"), for: .normal)
-        }
-        
+        refresh()
         completionHandler(NCUpdateResult.newData)
     }
     
@@ -68,11 +51,31 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         }
     }
     
-    @IBAction func showTrack(_ sender: Any) {
+    @IBAction func openApp(_ sender: Any) {
         extensionContext?.open(URL(string: "iNearby://")!, completionHandler: nil)
+    }
+    
+    @IBAction func refresh() {
+        if LocationManager.shared.hasLocations() {
+            dateView.text = formattedDate()
+            trashButton.isHidden = false
+            observeButton.isHidden = false
+        } else {
+            dateView.text = ""
+            trashButton.isHidden = true
+            observeButton.isHidden = true
+        }
+        if LocationManager.shared.isRunning {
+            recordButton.setImage(UIImage(named: "stop"), for: .normal)
+        } else {
+            recordButton.setImage(UIImage(named: "location"), for: .normal)
+        }
     }
     
     @IBAction func clearTracker(_ sender: Any) {
         LocationManager.shared.clearAll()
+        dateView.text = ""
+        trashButton.isHidden = !LocationManager.shared.hasLocations()
+        observeButton.isHidden = trashButton.isHidden
     }
 }

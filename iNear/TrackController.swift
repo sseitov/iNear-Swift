@@ -15,6 +15,7 @@ class TrackController: UIViewController {
     @IBOutlet weak var map: GMSMapView!
     
     var user:User?
+    var fromRoot = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +54,14 @@ class TrackController: UIViewController {
         }
         let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
         map.moveCamera(update)
+    }
+    
+    override func goBack() {
+        if fromRoot {
+            dismiss(animated: true, completion: nil)
+        } else {
+            super.goBack()
+        }
     }
     
     func clearTrack() {

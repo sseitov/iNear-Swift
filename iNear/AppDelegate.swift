@@ -160,7 +160,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        if url.scheme! == FACEBOOK_SCHEME {
+        if url.scheme! == "iNearby" {
+            let main = UIStoryboard(name: "Main", bundle: nil)
+            if let nav = main.instantiateViewController(withIdentifier: "MyTrack") as? UINavigationController {
+                if let controller = nav.topViewController as? TrackController {
+                    controller.user = currentUser()
+                    controller.fromRoot = true
+                }
+                nav.modalTransitionStyle = .flipHorizontal
+                self.window!.rootViewController?.present(nav, animated: true, completion: nil)
+            }
+            return true
+        } else if url.scheme! == FACEBOOK_SCHEME {
             return FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         } else {
             return GIDSignIn.sharedInstance().handle(url,

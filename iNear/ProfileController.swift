@@ -69,6 +69,13 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
             userView.alpha = 0
             setupTitle("Authentication")
         }
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapScreen))
+        self.view.addGestureRecognizer(tap)
+    }
+
+    func tapScreen() {
+        TextFieldContainer.deactivateAll()
     }
     
     func textDone(_ sender:TextFieldContainer, text:String?) {

@@ -468,11 +468,11 @@
                         <viewControllerLayoutGuide type="bottom" id="Uiv-bh-DqI"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="y3c-d5-MxU">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pdq-vS-SvK" customClass="GMSMapView">
-                                <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
@@ -497,6 +497,23 @@
             </objects>
             <point key="canvasLocation" x="2342" y="113"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="jVu-KH-93A">
+            <objects>
+                <navigationController storyboardIdentifier="MyTrack" useStoryboardIdentifierAsRestorationIdentifier="YES" id="z3c-mr-7oS" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="M9b-tS-aDk">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="barTintColor" red="0.0" green="0.4431372549" blue="0.64705882349999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="qdm-x4-YZq" kind="relationship" relationship="rootViewController" id="Pou-2v-xQV"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pcB-yd-G8M" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3156" y="-632"/>
+        </scene>
     </scenes>
     <resources>
         <image name="account" width="26" height="26"/>
@@ -510,6 +527,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="be2-C3-Y8g"/>
-        <segue reference="omr-Br-Wcx"/>
+        <segue reference="Pou-2v-xQV"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -20,24 +20,23 @@ class LocationManager: NSObject {
     
     private override init() {
         super.init()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = 10.0
+        locationManager.headingFilter = 5.0
     }
 
     func register() {
         if CLLocationManager.locationServicesEnabled() {
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.distanceFilter = 10.0
-            locationManager.headingFilter = 5.0
+            locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
-            } else {
-                locationManager.allowsBackgroundLocationUpdates = true
             }
         }
     }
     
     func start() -> Bool {
-        if !isRunning && CLLocationManager.authorizationStatus() == .authorizedAlways {
+        if CLLocationManager.authorizationStatus() == .authorizedAlways {
             locationManager.startUpdatingLocation()
             isRunning = true
         }
@@ -53,9 +52,8 @@ class LocationManager: NSObject {
     
     // MARK: - CoreData stack
     
-    lazy var applicationDocumentsDirectory: URL = {
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return urls[urls.count-1]
+    lazy var sharedDocumentsDirectory: URL = {
+        return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.vchannel.iNearby")!
     }()
     
     lazy var managedObjectModel: NSManagedObjectModel = {
@@ -65,7 +63,7 @@ class LocationManager: NSObject {
     
     lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
         let coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-        let url = self.applicationDocumentsDirectory.appendingPathComponent("LocationModel.sqlite")
+        let url = self.sharedDocumentsDirectory.appendingPathComponent("LocationModel.sqlite")
         do {
             try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
         } catch {
@@ -104,7 +102,7 @@ class LocationManager: NSObject {
     func hasLocations() -> Bool {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         if let count = try? managedObjectContext.count(for: fetchRequest) {
-            return count > 0
+            return count > 1
         } else {
             return false
         }
@@ -179,6 +177,7 @@ class LocationManager: NSObject {
                 managedObjectContext.delete(point)
                 all.removeLast()
             }
+            saveContext()
         }
     }
     
@@ -192,19 +191,13 @@ class LocationManager: NSObject {
                 managedObjectContext.delete(point)
                 all.removeLast()
             }
+            saveContext()
         }
     }
 
 }
 
 extension LocationManager : CLLocationManagerDelegate {
-    
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if CLLocationManager.authorizationStatus() == .authorizedAlways {
-            locationManager.allowsBackgroundLocationUpdates = true
-            locationManager.startUpdatingLocation()
-        }
-    }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {

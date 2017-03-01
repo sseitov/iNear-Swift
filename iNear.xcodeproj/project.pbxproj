@@ -68,14 +68,16 @@
 		2CE268A91E66E15600FE8219 /* Today.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2CE2689D1E66E15600FE8219 /* Today.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2CE268AF1E67096A00FE8219 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747641DDB872A0018AEAB /* Assets.xcassets */; };
 		2CE268B01E67097D00FE8219 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C1747641DDB872A0018AEAB /* Assets.xcassets */; };
-		2CE268B31E67134E00FE8219 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268B21E67134E00FE8219 /* LocationManager.swift */; };
-		2CE268B41E67134E00FE8219 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268B21E67134E00FE8219 /* LocationManager.swift */; };
 		2CE268B71E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268B51E67156400FE8219 /* LocationModel.xcdatamodeld */; };
 		2CE268B81E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268B51E67156400FE8219 /* LocationModel.xcdatamodeld */; };
 		2CE268BC1E6716BE00FE8219 /* Location+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268BA1E6716BE00FE8219 /* Location+CoreDataClass.swift */; };
 		2CE268BD1E6716BE00FE8219 /* Location+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268BA1E6716BE00FE8219 /* Location+CoreDataClass.swift */; };
 		2CE268BE1E6716BE00FE8219 /* Location+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268BB1E6716BE00FE8219 /* Location+CoreDataProperties.swift */; };
 		2CE268BF1E6716BE00FE8219 /* Location+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268BB1E6716BE00FE8219 /* Location+CoreDataProperties.swift */; };
+		2CE268C21E672F7C00FE8219 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268C11E672F7C00FE8219 /* LocationManager.swift */; };
+		2CE268C31E672F9C00FE8219 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268C11E672F7C00FE8219 /* LocationManager.swift */; };
+		2CE268C41E6758C200FE8219 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D31B1DDEF3C200F05528 /* UIColorExtensions.swift */; };
+		2CE268C51E675A3100FE8219 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C86B96D1E03AB8600739F7C /* Credentials.swift */; };
 		E6E1E80BE0ADC2ADB3CD745B /* Pods_Today.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7FF28415EEA7B109B05A0C4 /* Pods_Today.framework */; };
 		F5904586F049C32CE5C9F26B /* Pods_iNear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4D918BFE1105623C478C208 /* Pods_iNear.framework */; };
 /* End PBXBuildFile section */
@@ -215,12 +217,12 @@
 		2CE268A11E66E15600FE8219 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
 		2CE268A41E66E15600FE8219 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		2CE268A61E66E15600FE8219 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2CE268B21E67134E00FE8219 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2CE268B61E67156400FE8219 /* LocationModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocationModel.xcdatamodel; sourceTree = "<group>"; };
 		2CE268B91E67159A00FE8219 /* iNear 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "iNear 3.xcdatamodel"; sourceTree = "<group>"; };
 		2CE268BA1E6716BE00FE8219 /* Location+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Location+CoreDataClass.swift"; path = "Model/Location+CoreDataClass.swift"; sourceTree = "<group>"; };
 		2CE268BB1E6716BE00FE8219 /* Location+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Location+CoreDataProperties.swift"; path = "Model/Location+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		2CE268C01E672D2B00FE8219 /* Today.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Today.entitlements; sourceTree = "<group>"; };
+		2CE268C11E672F7C00FE8219 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocationManager.swift; path = Model/LocationManager.swift; sourceTree = "<group>"; };
 		4D20CBE7FFA3C4D46C8764D7 /* Pods-iNear.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iNear.release.xcconfig"; path = "Pods/Target Support Files/Pods-iNear/Pods-iNear.release.xcconfig"; sourceTree = "<group>"; };
 		6FFD5C2F78FBED853543D918 /* Pods-Today.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Today.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Today/Pods-Today.debug.xcconfig"; sourceTree = "<group>"; };
 		A7FF28415EEA7B109B05A0C4 /* Pods_Today.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Today.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -407,7 +409,7 @@
 				2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */,
 				2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */,
 				2C8B18AE1DFB1FBC00769A12 /* Model.swift */,
-				2CE268B21E67134E00FE8219 /* LocationManager.swift */,
+				2CE268C11E672F7C00FE8219 /* LocationManager.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -767,9 +769,9 @@
 				2C5B6B001DE2FE4E00F992C5 /* ProfileController.swift in Sources */,
 				2C87D3201DDF026300F05528 /* UIViewControllerExtensions.swift in Sources */,
 				2CE268B71E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */,
-				2CE268B31E67134E00FE8219 /* LocationManager.swift in Sources */,
 				2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */,
 				2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */,
+				2CE268C21E672F7C00FE8219 /* LocationManager.swift in Sources */,
 				2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */,
 				2C87D3331DDF1A5C00F05528 /* LGProgressView.m in Sources */,
 				2C9423B11DFC6456003C4075 /* Message+CoreDataProperties.swift in Sources */,
@@ -805,8 +807,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CE268BD1E6716BE00FE8219 /* Location+CoreDataClass.swift in Sources */,
-				2CE268B41E67134E00FE8219 /* LocationManager.swift in Sources */,
 				2CE268B81E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */,
+				2CE268C31E672F9C00FE8219 /* LocationManager.swift in Sources */,
+				2CE268C51E675A3100FE8219 /* Credentials.swift in Sources */,
+				2CE268C41E6758C200FE8219 /* UIColorExtensions.swift in Sources */,
 				2CE268A21E66E15600FE8219 /* TodayViewController.swift in Sources */,
 				2CE268BF1E6716BE00FE8219 /* Location+CoreDataProperties.swift in Sources */,
 			);
