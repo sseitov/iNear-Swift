@@ -28,7 +28,7 @@ class TrackController: UIViewController {
         }
         setupBackButton()
         
-        let path = (user == currentUser()) ? Model.shared.myTrack() : GMSPath(fromEncodedPath: user!.lastTrack!)
+        let path = (user == currentUser()) ? LocationManager.shared.myTrack() : GMSPath(fromEncodedPath: user!.lastTrack!)
         
         let userTrack = GMSPolyline(path: path)
         userTrack.strokeColor = UIColor.traceColor()
@@ -56,7 +56,7 @@ class TrackController: UIViewController {
     }
     
     func clearTrack() {
-        Model.shared.clearTrack()
+        LocationManager.shared.clearTrack()
         goBack()
     }
 

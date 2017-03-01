@@ -10,7 +10,6 @@ import UIKit
 import UserNotifications
 import IQKeyboardManager
 import Firebase
-import CoreLocation
 import GoogleMaps
 import SVProgressHUD
 import WatchConnectivity
@@ -24,8 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     var window: UIWindow?
     var watchSession:WCSession?
-
-    let locationManager = CLLocationManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
@@ -94,18 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         GMSServices.provideAPIKey(GoolgleMapAPIKey)
         
         // Location manager
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.distanceFilter = 10.0
-            locationManager.headingFilter = 5.0
-            if CLLocationManager.authorizationStatus() != .authorizedAlways {
-                locationManager.requestAlwaysAuthorization()
-            } else {
-                locationManager.allowsBackgroundLocationUpdates = true
-                locationManager.startUpdatingLocation()
-            }
-        }
+        LocationManager.shared.register()
         
         return true
     }
@@ -264,24 +250,6 @@ extension AppDelegate : FIRMessagingDelegate {
     }
 }
 
-extension AppDelegate : CLLocationManagerDelegate {
-    
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if CLLocationManager.authorizationStatus() == .authorizedAlways {
-            locationManager.allowsBackgroundLocationUpdates = true
-            locationManager.startUpdatingLocation()
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            if location.horizontalAccuracy <= 10.0 {
-                Model.shared.addCoordinate(location.coordinate, at:NSDate().timeIntervalSince1970)
-            }
-        }
-    }
-}
-
 extension AppDelegate : WCSessionDelegate {
     
     func sessionDidDeactivate(_ session: WCSession) {
@@ -309,15 +277,15 @@ extension AppDelegate : WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         if let uid = message["userPosition"] as? String {
             DispatchQueue.main.async {
-                if let user = Model.shared.getUser(uid), user.location != nil {
+                if let user = Model.shared.getUser(uid), user.lastDate != 0 {
                     var reply:[String:Any] = [:]
-                    if let myLocation = Model.shared.myLocation() {
+                    if let myLocation = LocationManager.shared.myLocation() {
                         let location = ["latitude" : myLocation.latitude, "longitude" : myLocation.longitude]
                         reply["myPoint"] = location
                     }
-                    let date = Date.init(timeIntervalSince1970: user.location!.date)
+                    let date = Date.init(timeIntervalSince1970: user.lastDate)
                     let dateTxt = Model.shared.textDateFormatter.string(from: date)
-                    let location:[String:Any] = ["latitude" : user.location!.latitude, "longitude" : user.location!.longitude, "date" : dateTxt]
+                    let location:[String:Any] = ["latitude" : user.lastLatitude, "longitude" : user.lastLongitude, "date" : dateTxt]
                     reply["userPoint"] = location
                     replyHandler(reply)
                 } else {

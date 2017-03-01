@@ -100,7 +100,7 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         if owner != nil {
-            if Model.shared.myTrack() != nil {
+            if LocationManager.shared.myTrack() != nil {
                 let btn = UIBarButtonItem(title: "Track", style: .plain, target: self, action: #selector(ProfileController.showTrack))
                 btn.tintColor = UIColor.white
                 navigationItem.setRightBarButton(btn, animated: true)

@@ -26,12 +26,12 @@ class RouteController: UIViewController {
         setupBackButton()
         navigationController?.navigationBar.tintColor = UIColor.white
         
-        let date = Date(timeIntervalSince1970: user!.location!.date)
+        let date = Date(timeIntervalSince1970: user!.lastDate)
         promptText = "\(self.user!.shortName) was \(Model.shared.textDateFormatter.string(from: date))"
         titleText = "Get route to \(user!.shortName)..."
         setupTitle(titleText, promptText: promptText)
         
-        let userLocation = CLLocationCoordinate2D(latitude: user!.location!.latitude, longitude: user!.location!.longitude)
+        let userLocation = CLLocationCoordinate2D(latitude: user!.lastLatitude, longitude: user!.lastLongitude)
         map.camera = GMSCameraPosition.camera(withTarget: userLocation, zoom: 6)
         map.isMyLocationEnabled = true
         userMarker = GMSMarker(position: userLocation)
@@ -66,7 +66,7 @@ class RouteController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let bounds = GMSCoordinateBounds(coordinate: Model.shared.myLocation()!, coordinate: userMarker!.position)
+        let bounds = GMSCoordinateBounds(coordinate: LocationManager.shared.myLocation()!, coordinate: userMarker!.position)
         let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
         map.moveCamera(update)
         
@@ -92,7 +92,7 @@ class RouteController: UIViewController {
                     self.setupTitle(self.titleText, promptText: self.promptText)
                 }
             }
-            self.createDirection(from: Model.shared.myLocation()!, to: self.userMarker!.position, completion: { result in
+            self.createDirection(from: LocationManager.shared.myLocation()!, to: self.userMarker!.position, completion: { result in
                 SVProgressHUD.dismiss()
                 if result == -1 {
                     self.showMessage("Can not create route to \(self.user!.shortName)", messageType: .error)

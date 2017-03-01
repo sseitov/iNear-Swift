@@ -583,10 +583,10 @@ class Model : NSObject {
         let ref = FIRDatabase.database().reference()
         let dateStr = dateFormatter.string(from: Date())
         var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "text" : text, "date" : dateStr]
-        if let track = self.myTrackForLastDay() {
+        if let track = LocationManager.shared.myTrackForLastDay() {
             messageItem["track"] = track;
         }
-        if let coordinate = self.myLocation() {
+        if let coordinate = LocationManager.shared.myLocation() {
             messageItem["latitude"] = coordinate.latitude
             messageItem["longitude"] = coordinate.longitude
         }
@@ -612,10 +612,10 @@ class Model : NSObject {
                     let ref = FIRDatabase.database().reference()
                     let dateStr = self.dateFormatter.string(from: Date())
                     var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "image" : metadata!.path!, "date" : dateStr]
-                    if let track = self.myTrackForLastDay() {
+                    if let track = LocationManager.shared.myTrackForLastDay() {
                         messageItem["track"] = track;
                     }
-                    if let coordinate = self.myLocation() {
+                    if let coordinate = LocationManager.shared.myLocation() {
                         messageItem["latitude"] = coordinate.latitude
                         messageItem["longitude"] = coordinate.longitude
                     }
@@ -695,92 +695,12 @@ class Model : NSObject {
     
     // MARK: - Coordinate table
     
-    func addCoordinate(_ coordinate:CLLocationCoordinate2D, at:Double) {
-        let point = NSEntityDescription.insertNewObject(forEntityName: "Coordinate", into: managedObjectContext) as! Coordinate
-        point.date = at
-        point.latitude = coordinate.latitude
-        point.longitude = coordinate.longitude
-        point.user = nil
-        saveContext()
-    }
-    
     func addCoordinateForUser(_ coordinate:CLLocationCoordinate2D, at:Double, userID:String) {
         if let user = getUser(userID) {
-            if user.location != nil {
-                managedObjectContext.delete(user.location!)
-            }
-            let point = NSEntityDescription.insertNewObject(forEntityName: "Coordinate", into: managedObjectContext) as! Coordinate
-            point.date = at
-            point.latitude = coordinate.latitude
-            point.longitude = coordinate.longitude
-            point.user = user
-            user.location = point
+            user.lastDate = at
+            user.lastLatitude = coordinate.latitude
+            user.lastLongitude = coordinate.longitude
             saveContext()
-        }
-    }
-    
-    func clearTrack() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
-        fetchRequest.predicate = NSPredicate(format: "user == nil")
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        if var all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate] {
-            while all.count > 1 {
-                let point = all.last!
-                managedObjectContext.delete(point)
-                all.removeLast()
-            }
-        }
-    }
-    
-    func myLocation() -> CLLocationCoordinate2D? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
-        fetchRequest.predicate = NSPredicate(format: "user == nil")
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        fetchRequest.fetchLimit = 1
-        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate], let location = all.first {
-            return CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-        } else {
-            return nil
-        }
-    }
-  
-    func myTrack() -> GMSMutablePath? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
-        fetchRequest.predicate = NSPredicate(format: "user == nil")
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        let all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate]
-        if all != nil && all!.count > 1 {
-            let path = GMSMutablePath()
-            for pt in all! {
-                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-            }
-            return path
-        } else {
-            return nil
-        }
-    }
-    
-    func myTrackForLastDay() -> String? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
-        let predicate1 = NSPredicate(format: "user == nil")
-        let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .day, value: -1, to: Date())
-        let predicate2 = NSPredicate(format: "date >= %f", startDate!.timeIntervalSince1970)
-        fetchRequest.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [predicate1, predicate2])
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        let all = try? managedObjectContext.fetch(fetchRequest) as! [Coordinate]
-        if all != nil && all!.count > 1 {
-            let path = GMSMutablePath()
-            for pt in all! {
-                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-            }
-            return path.encodedPath()
-        } else {
-            return nil
         }
     }
 }

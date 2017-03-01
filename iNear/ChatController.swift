@@ -296,7 +296,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     // MARK: - Navigation
     
     @IBAction func showMap(_ sender: Any) {
-        if user!.location == nil {
+        if user!.lastDate == 0 {
             self.showMessage("\(self.user!.shortName) does not published self location yet.", messageType: .information)
         } else {
             self.performSegue(withIdentifier: "showMap", sender: nil)
