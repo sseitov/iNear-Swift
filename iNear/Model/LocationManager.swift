@@ -17,7 +17,7 @@ class LocationManager: NSObject {
     
     let locationManager = CLLocationManager()
     var isRunning:Bool = false
-    
+        
     private override init() {
         super.init()
         locationManager.delegate = self
@@ -99,15 +99,6 @@ class LocationManager: NSObject {
         saveContext()
     }
 
-    func hasLocations() -> Bool {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
-        if let count = try? managedObjectContext.count(for: fetchRequest) {
-            return count > 1
-        } else {
-            return false
-        }
-    }
-    
     func myLocation() -> CLLocationCoordinate2D? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
@@ -181,17 +172,12 @@ class LocationManager: NSObject {
         }
     }
     
-    func clearAll() {
+    func hasTrack() -> Bool {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        if var all = try? managedObjectContext.fetch(fetchRequest) as! [Location] {
-            while all.count > 0 {
-                let point = all.last!
-                managedObjectContext.delete(point)
-                all.removeLast()
-            }
-            saveContext()
+        if let count = try? managedObjectContext.count(for: fetchRequest) {
+            return count > 1
+        } else {
+            return false
         }
     }
 

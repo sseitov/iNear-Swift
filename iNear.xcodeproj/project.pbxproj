@@ -20,6 +20,7 @@
 		2C5CB3621E4464EE0033675B /* ColorUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C5CB3611E4464EE0033675B /* ColorUtility.m */; };
 		2C7D912C1E3F3AAC0023B084 /* TestLocation.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 2C7D912B1E3F3AAC0023B084 /* TestLocation.gpx */; };
 		2C7D912D1E3FB9D90023B084 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9423B21DFC6708003C4075 /* UIImageExtensions.swift */; };
+		2C8060771E689B45001B9409 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D31D1DDEF3F000F05528 /* UIViewExtensions.swift */; };
 		2C85AA111E01FE350050D9D8 /* UIFontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C85AA101E01FE350050D9D8 /* UIFontExtensions.swift */; };
 		2C86B96E1E03AB8600739F7C /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C86B96D1E03AB8600739F7C /* Credentials.swift */; };
 		2C86B9701E03AD0800739F7C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2C86B96F1E03AD0800739F7C /* GoogleService-Info.plist */; };
@@ -322,6 +323,7 @@
 				2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */,
 				2C17475B1DDB872A0018AEAB /* AppDelegate.swift */,
 				2C86B96D1E03AB8600739F7C /* Credentials.swift */,
+				2CE268C11E672F7C00FE8219 /* LocationManager.swift */,
 				2C17476F1DDB93660018AEAB /* Resources */,
 			);
 			path = iNear;
@@ -409,7 +411,6 @@
 				2C8B18AA1DFB1F8500769A12 /* User+CoreDataClass.swift */,
 				2C8B18AB1DFB1F8500769A12 /* User+CoreDataProperties.swift */,
 				2C8B18AE1DFB1FBC00769A12 /* Model.swift */,
-				2CE268C11E672F7C00FE8219 /* LocationManager.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -808,6 +809,7 @@
 			files = (
 				2CE268BD1E6716BE00FE8219 /* Location+CoreDataClass.swift in Sources */,
 				2CE268B81E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */,
+				2C8060771E689B45001B9409 /* UIViewExtensions.swift in Sources */,
 				2CE268C31E672F9C00FE8219 /* LocationManager.swift in Sources */,
 				2CE268C51E675A3100FE8219 /* Credentials.swift in Sources */,
 				2CE268C41E6758C200FE8219 /* UIColorExtensions.swift in Sources */,
