@@ -8,7 +8,6 @@
 
 import UIKit
 import NotificationCenter
-import GoogleMaps
 
 class TodayViewController: UIViewController, NCWidgetProviding {
             

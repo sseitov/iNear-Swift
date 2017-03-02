@@ -79,7 +79,6 @@
 		2CE268C31E672F9C00FE8219 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268C11E672F7C00FE8219 /* LocationManager.swift */; };
 		2CE268C41E6758C200FE8219 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87D31B1DDEF3C200F05528 /* UIColorExtensions.swift */; };
 		2CE268C51E675A3100FE8219 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C86B96D1E03AB8600739F7C /* Credentials.swift */; };
-		E6E1E80BE0ADC2ADB3CD745B /* Pods_Today.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7FF28415EEA7B109B05A0C4 /* Pods_Today.framework */; };
 		F5904586F049C32CE5C9F26B /* Pods_iNear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4D918BFE1105623C478C208 /* Pods_iNear.framework */; };
 /* End PBXBuildFile section */
 
@@ -144,7 +143,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		16BBD1B08B2A200F997A42B1 /* Pods-Today.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Today.release.xcconfig"; path = "Pods/Target Support Files/Pods-Today/Pods-Today.release.xcconfig"; sourceTree = "<group>"; };
 		288240803301CBF785FCC9B0 /* Pods-iNear.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iNear.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iNear/Pods-iNear.debug.xcconfig"; sourceTree = "<group>"; };
 		2C1747581DDB872A0018AEAB /* iNear.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iNear.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C17475B1DDB872A0018AEAB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -225,7 +223,6 @@
 		2CE268C01E672D2B00FE8219 /* Today.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Today.entitlements; sourceTree = "<group>"; };
 		2CE268C11E672F7C00FE8219 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocationManager.swift; path = Model/LocationManager.swift; sourceTree = "<group>"; };
 		4D20CBE7FFA3C4D46C8764D7 /* Pods-iNear.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iNear.release.xcconfig"; path = "Pods/Target Support Files/Pods-iNear/Pods-iNear.release.xcconfig"; sourceTree = "<group>"; };
-		6FFD5C2F78FBED853543D918 /* Pods-Today.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Today.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Today/Pods-Today.debug.xcconfig"; sourceTree = "<group>"; };
 		A7FF28415EEA7B109B05A0C4 /* Pods_Today.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Today.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4D918BFE1105623C478C208 /* Pods_iNear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iNear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -255,7 +252,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CE2689F1E66E15600FE8219 /* NotificationCenter.framework in Frameworks */,
-				E6E1E80BE0ADC2ADB3CD745B /* Pods_Today.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,8 +452,6 @@
 			children = (
 				288240803301CBF785FCC9B0 /* Pods-iNear.debug.xcconfig */,
 				4D20CBE7FFA3C4D46C8764D7 /* Pods-iNear.release.xcconfig */,
-				6FFD5C2F78FBED853543D918 /* Pods-Today.debug.xcconfig */,
-				16BBD1B08B2A200F997A42B1 /* Pods-Today.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -528,11 +522,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2CE268AC1E66E15600FE8219 /* Build configuration list for PBXNativeTarget "Today" */;
 			buildPhases = (
-				EE0C779B83691344A63E524A /* [CP] Check Pods Manifest.lock */,
 				2CE268991E66E15600FE8219 /* Sources */,
 				2CE2689A1E66E15600FE8219 /* Frameworks */,
 				2CE2689B1E66E15600FE8219 /* Resources */,
-				10421539301323BF14F0F446 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -672,21 +664,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		10421539301323BF14F0F446 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Today/Pods-Today-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		3653E38FEED1161F2DBAC656 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -730,21 +707,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-iNear/Pods-iNear-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EE0C779B83691344A63E524A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1105,7 +1067,6 @@
 		};
 		2CE268AA1E66E15600FE8219 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6FFD5C2F78FBED853543D918 /* Pods-Today.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Today/Today.entitlements;
 				DEVELOPMENT_TEAM = 7TSVKXZ79P;
@@ -1123,7 +1084,6 @@
 		};
 		2CE268AB1E66E15600FE8219 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 16BBD1B08B2A200F997A42B1 /* Pods-Today.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Today/Today.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";

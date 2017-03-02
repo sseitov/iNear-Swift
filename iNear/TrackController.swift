@@ -29,7 +29,17 @@ class TrackController: UIViewController {
         }
         setupBackButton()
         
-        let path = (user == currentUser()) ? LocationManager.shared.myTrack() : GMSPath(fromEncodedPath: user!.lastTrack!)
+        var path:GMSPath?
+        if user == currentUser() {
+            let all = LocationManager.shared.myTrack()
+            let mutablePath = GMSMutablePath()
+            for pt in all! {
+                mutablePath.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
+            }
+            path = mutablePath
+        } else {
+            path = GMSPath(fromEncodedPath: user!.lastTrack!)
+        }
         
         let userTrack = GMSPolyline(path: path)
         userTrack.strokeColor = UIColor.traceColor()

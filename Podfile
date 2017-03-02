@@ -23,7 +23,3 @@ target 'iNear' do
     pod 'IQKeyboardManager'
     pod 'GoogleMaps'
 end
-
-target 'Today' do
-    pod 'GoogleMaps'
-end

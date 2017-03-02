@@ -584,7 +584,13 @@ class Model : NSObject {
         let dateStr = dateFormatter.string(from: Date())
         var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "text" : text, "date" : dateStr]
         if let track = LocationManager.shared.myTrackForLastDay() {
-            messageItem["track"] = track;
+            if track.count > 1 {
+                let path = GMSMutablePath()
+                for pt in track {
+                    path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
+                }
+                messageItem["track"] = path.encodedPath();
+            }
         }
         if let coordinate = LocationManager.shared.myLocation() {
             messageItem["latitude"] = coordinate.latitude
@@ -613,7 +619,13 @@ class Model : NSObject {
                     let dateStr = self.dateFormatter.string(from: Date())
                     var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "image" : metadata!.path!, "date" : dateStr]
                     if let track = LocationManager.shared.myTrackForLastDay() {
-                        messageItem["track"] = track;
+                        if track.count > 1 {
+                            let path = GMSMutablePath()
+                            for pt in track {
+                                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
+                            }
+                            messageItem["track"] = path.encodedPath();
+                        }
                     }
                     if let coordinate = LocationManager.shared.myLocation() {
                         messageItem["latitude"] = coordinate.latitude

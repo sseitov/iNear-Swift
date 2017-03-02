@@ -9,7 +9,6 @@
 import UIKit
 import CoreLocation
 import CoreData
-import GoogleMaps
 
 class LocationManager: NSObject {
     
@@ -122,40 +121,22 @@ class LocationManager: NSObject {
             return nil
         }
     }
-    
-    func myTrack() -> GMSMutablePath? {
+
+    func myTrack() -> [Location]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        let all = try? managedObjectContext.fetch(fetchRequest) as! [Location]
-        if all != nil && all!.count > 1 {
-            let path = GMSMutablePath()
-            for pt in all! {
-                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-            }
-            return path
-        } else {
-            return nil
-        }
+        return try? managedObjectContext.fetch(fetchRequest) as! [Location]
     }
     
-    func myTrackForLastDay() -> String? {
+    func myTrackForLastDay() -> [Location]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -1, to: Date())
         fetchRequest.predicate = NSPredicate(format: "date >= %f", startDate!.timeIntervalSince1970)
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        let all = try? managedObjectContext.fetch(fetchRequest) as! [Location]
-        if all != nil && all!.count > 1 {
-            let path = GMSMutablePath()
-            for pt in all! {
-                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-            }
-            return path.encodedPath()
-        } else {
-            return nil
-        }
+        return try? managedObjectContext.fetch(fetchRequest) as! [Location]
     }
     
     func clearTrack() {
