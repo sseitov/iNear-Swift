@@ -14,9 +14,12 @@
 		2C1EB4EB1DFEC1E200DBB257 /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1EB4EA1DFEC1E200DBB257 /* MapController.swift */; };
 		2C1EB4EF1DFF539100DBB257 /* RouteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1EB4EE1DFF539100DBB257 /* RouteController.swift */; };
 		2C2B3FBC1E3BB6AD003FE095 /* TrackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */; };
+		2C311D711E69760100D79D65 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D701E69760100D79D65 /* SettingsController.swift */; };
+		2C311D731E6976B200D79D65 /* TrackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D721E6976B200D79D65 /* TrackerCell.swift */; };
+		2C311D751E69822100D79D65 /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D741E69822100D79D65 /* ProfileCell.swift */; };
 		2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */; };
 		2C53BB441E028C4000307C63 /* Contact+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */; };
-		2C5B6B001DE2FE4E00F992C5 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */; };
+		2C5B6B001DE2FE4E00F992C5 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B6AFF1DE2FE4E00F992C5 /* LoginController.swift */; };
 		2C5CB3621E4464EE0033675B /* ColorUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C5CB3611E4464EE0033675B /* ColorUtility.m */; };
 		2C7D912C1E3F3AAC0023B084 /* TestLocation.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 2C7D912B1E3F3AAC0023B084 /* TestLocation.gpx */; };
 		2C7D912D1E3FB9D90023B084 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9423B21DFC6708003C4075 /* UIImageExtensions.swift */; };
@@ -154,9 +157,12 @@
 		2C1EB4EA1DFEC1E200DBB257 /* MapController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
 		2C1EB4EE1DFF539100DBB257 /* RouteController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RouteController.swift; sourceTree = "<group>"; };
 		2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackController.swift; sourceTree = "<group>"; };
+		2C311D701E69760100D79D65 /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
+		2C311D721E6976B200D79D65 /* TrackerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackerCell.swift; sourceTree = "<group>"; };
+		2C311D741E69822100D79D65 /* ProfileCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
 		2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Contact+CoreDataClass.swift"; path = "Model/Contact+CoreDataClass.swift"; sourceTree = "<group>"; };
 		2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Contact+CoreDataProperties.swift"; path = "Model/Contact+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileController.swift; sourceTree = "<group>"; };
+		2C5B6AFF1DE2FE4E00F992C5 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		2C5CB3601E4464EE0033675B /* ColorUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorUtility.h; path = Extensions/ColorUtility.h; sourceTree = "<group>"; };
 		2C5CB3611E4464EE0033675B /* ColorUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColorUtility.m; path = Extensions/ColorUtility.m; sourceTree = "<group>"; };
 		2C7D912B1E3F3AAC0023B084 /* TestLocation.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = TestLocation.gpx; sourceTree = SOURCE_ROOT; };
@@ -310,13 +316,10 @@
 				2C8B18A61DFB1E8A00769A12 /* Model */,
 				2C87D3151DDEE4A800F05528 /* Extensions */,
 				2C87D3181DDEF36800F05528 /* CustomViews */,
+				2C311D6E1E69705600D79D65 /* Profile */,
+				2C311D6F1E6971C300D79D65 /* Chat */,
 				2C1747701DDB94670018AEAB /* ContactsController.swift */,
 				2CD714421DF0984C0077249E /* ContactCell.swift */,
-				2CD714441DF0A3D10077249E /* ChatController.swift */,
-				2C1EB4EE1DFF539100DBB257 /* RouteController.swift */,
-				2C9423B41DFC67A1003C4075 /* PhotoController.swift */,
-				2C5B6AFF1DE2FE4E00F992C5 /* ProfileController.swift */,
-				2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */,
 				2C17475B1DDB872A0018AEAB /* AppDelegate.swift */,
 				2C86B96D1E03AB8600739F7C /* Credentials.swift */,
 				2CE268C11E672F7C00FE8219 /* LocationManager.swift */,
@@ -338,6 +341,28 @@
 			);
 			name = Resources;
 			path = ..;
+			sourceTree = "<group>";
+		};
+		2C311D6E1E69705600D79D65 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				2C5B6AFF1DE2FE4E00F992C5 /* LoginController.swift */,
+				2C311D701E69760100D79D65 /* SettingsController.swift */,
+				2C311D721E6976B200D79D65 /* TrackerCell.swift */,
+				2C311D741E69822100D79D65 /* ProfileCell.swift */,
+			);
+			name = Profile;
+			sourceTree = "<group>";
+		};
+		2C311D6F1E6971C300D79D65 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				2CD714441DF0A3D10077249E /* ChatController.swift */,
+				2C9423B41DFC67A1003C4075 /* PhotoController.swift */,
+				2C1EB4EE1DFF539100DBB257 /* RouteController.swift */,
+				2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */,
+			);
+			name = Chat;
 			sourceTree = "<group>";
 		};
 		2C87D3151DDEE4A800F05528 /* Extensions */ = {
@@ -726,10 +751,11 @@
 				2C87D31E1DDEF3F000F05528 /* UIViewExtensions.swift in Sources */,
 				2C87D3361DDF1A5C00F05528 /* NSPointerArray+AbstractionHelpers.m in Sources */,
 				2CE268BC1E6716BE00FE8219 /* Location+CoreDataClass.swift in Sources */,
+				2C311D751E69822100D79D65 /* ProfileCell.swift in Sources */,
 				2C2B3FBC1E3BB6AD003FE095 /* TrackController.swift in Sources */,
 				2C87D31A1DDEF37900F05528 /* TextFieldContainer.swift in Sources */,
 				2CE268BE1E6716BE00FE8219 /* Location+CoreDataProperties.swift in Sources */,
-				2C5B6B001DE2FE4E00F992C5 /* ProfileController.swift in Sources */,
+				2C5B6B001DE2FE4E00F992C5 /* LoginController.swift in Sources */,
 				2C87D3201DDF026300F05528 /* UIViewControllerExtensions.swift in Sources */,
 				2CE268B71E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */,
 				2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */,
@@ -744,9 +770,11 @@
 				2C1747711DDB94670018AEAB /* ContactsController.swift in Sources */,
 				2C1EB4EF1DFF539100DBB257 /* RouteController.swift in Sources */,
 				2C87D3171DDEE4D200F05528 /* Utilities.swift in Sources */,
+				2C311D731E6976B200D79D65 /* TrackerCell.swift in Sources */,
 				2C17475C1DDB872A0018AEAB /* AppDelegate.swift in Sources */,
 				2C8B18AF1DFB1FBC00769A12 /* Model.swift in Sources */,
 				2CC50C371DECC8D900D27456 /* CustomAlerts.swift in Sources */,
+				2C311D711E69760100D79D65 /* SettingsController.swift in Sources */,
 				2C5CB3621E4464EE0033675B /* ColorUtility.m in Sources */,
 				2CC50C3A1DECC93400D27456 /* StringExtensions.swift in Sources */,
 				2C9423B01DFC6456003C4075 /* Message+CoreDataClass.swift in Sources */,

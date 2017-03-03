@@ -22,15 +22,11 @@ extension UIColor {
     }
     
     class func mainColor() -> UIColor {
-        return color(28, 79, 130, 1)
+        return color(0, 113, 165, 1)
     }
     
     class func mainColor(_ alpha:Float) -> UIColor {
-        return color(28, 79, 130, alpha)
-    }
-    
-    class func mainColorOpaque() -> UIColor {
-        return color(69, 122, 160, 1)
+        return color(0, 113, 165, alpha)
     }
     
     class func mainBlueColor() -> UIColor {

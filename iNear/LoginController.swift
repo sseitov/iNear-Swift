@@ -1,5 +1,5 @@
 //
-//  ProfileController.swift
+//  LoginController.swift
 //  iNear
 //
 //  Created by Сергей Сейтов on 21.11.16.
@@ -11,30 +11,18 @@ import Firebase
 import SVProgressHUD
 import SDWebImage
 
-class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate, TextFieldContainerDelegate {
-    
-    @IBOutlet weak var photoView: UIImageView!
-    
-    @IBOutlet weak var userView: UIView!
-    @IBOutlet weak var userName: UILabel!
-    @IBOutlet weak var userEmail: UILabel!
-    @IBOutlet weak var socialType: UILabel!
+class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate, TextFieldContainerDelegate {
     
     @IBOutlet weak var authView: UIView!
     @IBOutlet weak var usrField: TextFieldContainer!
     @IBOutlet weak var pwdField: TextFieldContainer!
     
-    var owner:User?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        photoView.setupCircle()
         
         GIDSignIn.sharedInstance().clientID = FIRApp.defaultApp()?.options.clientID
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance().uiDelegate = self
-
-        owner = currentUser()
         
         usrField.textType = .emailAddress
         usrField.placeholder = "email address"
@@ -46,29 +34,9 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
         pwdField.secure = true
         pwdField.delegate = self
         
-        if owner != nil {
-            setupBackButton()
-            authView.alpha = 0
-            userView.alpha = 1
-            setupTitle("My Account")
-            userEmail.text = owner!.email
-            userName.text = owner!.name
-            switch owner!.socialType {
-            case .facebook:
-                socialType.text = "Login over Facebook"
-            case .google:
-                socialType.text = "Signed over Google+"
-            default:
-                socialType.text = ""
-            }
-            photoView.image = owner!.getImage()
-        } else {
-            navigationItem.leftBarButtonItem = nil
-            navigationItem.hidesBackButton = true
-            authView.alpha = 1
-            userView.alpha = 0
-            setupTitle("Authentication")
-        }
+        navigationItem.hidesBackButton = true
+        authView.alpha = 1
+        setupTitle("Authentication")
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapScreen))
         self.view.addGestureRecognizer(tap)
@@ -103,42 +71,9 @@ class ProfileController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegat
     func textChange(_ sender:TextFieldContainer, text:String?) -> Bool {
         return true
     }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-        if owner != nil {
-            if let track = LocationManager.shared.myTrack(), track.count > 1 {
-                let btn = UIBarButtonItem(title: "Track", style: .plain, target: self, action: #selector(ProfileController.showTrack))
-                btn.tintColor = UIColor.white
-                navigationItem.setRightBarButton(btn, animated: true)
-            } else {
-                navigationItem.setRightBarButton(nil, animated: true)
-            }
-        } else {
-            navigationItem.setRightBarButton(nil, animated: true)
-        }
-    }
-    
-    func showTrack() {
-        performSegue(withIdentifier: "showTrack", sender: nil)
-    }
     
     override func goBack() {
         dismiss(animated: true, completion: nil)
-    }
-    
-    @IBAction func signOut(_ sender: Any) {
-        Model.shared.signOut()
-        UIView.animate(withDuration: 0.3, animations: {
-            self.userView.alpha = 0
-        }, completion: { _ in
-            self.setupTitle("Authentication")
-            self.navigationItem.leftBarButtonItem = nil
-            self.navigationItem.hidesBackButton = true
-            UIView.animate(withDuration: 0.3, animations: {
-                self.authView.alpha = 1
-            })
-        })
     }
     
     // MARK: - Email Auth

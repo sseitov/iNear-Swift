@@ -28,6 +28,19 @@ public class User: NSManagedObject {
         }
     }()
     
+    func socialTypeName() -> String {
+        switch socialType {
+        case .email:
+            return "Email"
+        case .facebook:
+            return "Facebook"
+        case .google:
+            return "Google +"
+        default:
+            return "Unknown"
+        }
+    }
+    
     lazy var imageURL: URL? = {
         if self.image != nil {
             return URL(string: self.image!)
