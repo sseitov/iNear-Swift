@@ -13,6 +13,7 @@ import Firebase
 import GoogleMaps
 import SVProgressHUD
 import WatchConnectivity
+import MapKit
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -96,26 +97,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         return true
     }
     
-    // MARK: - iWatch messages
-
-    func sendContactList() {
-        if watchSession != nil, watchSession!.isReachable {
-            DispatchQueue.main.async {
-                let contacts = Model.shared.allContacts()
-                var friends:[Any] = []
-                for contact in contacts {
-                    let data = UIImagePNGRepresentation(contact.getImage().withSize(CGSize(width: 30, height: 30)).inCircle())
-                    let friend:[String:Any] = ["uid" : contact.uid!, "name" : contact.name!, "image" : data!]
-                    friends.append(friend)
-                }
-                self.watchSession?.sendMessage(["contactList" : friends], replyHandler: { response in
-                    
-                }, errorHandler: { error in
-                })
-            }
-        }
-    }
-    
     // MARK: - Receive_message
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
@@ -146,6 +127,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             }
         }
     }
+    
+    // MARK: - Application delegate
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Unable to register for remote notifications: \(error.localizedDescription)")
@@ -188,7 +171,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        sendContactList()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -231,6 +213,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 }
 
+// MARK: - NotificationCenter delegate
+
 @available(iOS 10, *)
 extension AppDelegate : UNUserNotificationCenterDelegate {
     // Receive displayed notifications for iOS 10 devices.
@@ -254,12 +238,16 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     }
 }
 
+// MARK: - FIRMessaging delegate
+
 extension AppDelegate : FIRMessagingDelegate {
     // Receive data message on iOS 10 devices while app is in the foreground.
     func applicationReceivedRemoteMessage(_ remoteMessage: FIRMessagingRemoteMessage) {
         print(remoteMessage.appData)
     }
 }
+
+// MARK: - WCSession delegate
 
 extension AppDelegate : WCSessionDelegate {
     
@@ -274,7 +262,6 @@ extension AppDelegate : WCSessionDelegate {
     @available(iOS 9.3, *)
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         print("activationDidCompleteWith \(activationState)")
-        sendContactList()
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -284,31 +271,88 @@ extension AppDelegate : WCSessionDelegate {
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         print("didReceiveApplicationContext \(applicationContext)")
     }
-  
-    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-        if let uid = message["userPosition"] as? String {
-            DispatchQueue.main.async {
-                if let user = Model.shared.getUser(uid), user.lastDate != 0 {
-                    var reply:[String:Any] = [:]
-                    if let myLocation = LocationManager.shared.myLocation() {
-                        let location = ["latitude" : myLocation.latitude, "longitude" : myLocation.longitude]
-                        reply["myPoint"] = location
-                    }
-                    let date = Date.init(timeIntervalSince1970: user.lastDate)
-                    let dateTxt = Model.shared.textDateFormatter.string(from: date)
-                    let location:[String:Any] = ["latitude" : user.lastLatitude, "longitude" : user.lastLongitude, "date" : dateTxt]
-                    reply["userPoint"] = location
-                    replyHandler(reply)
-                } else {
-                    replyHandler([:])
-                }
+    
+    // MARK: - iWatch messages
+    
+    func mapShapshot(size:CGSize) -> UIImage? {
+        if let track = LocationManager.shared.myTrack(), track.count > 1 {
+            var points:[CLLocationCoordinate2D] = []
+            for i in 0..<track.count {
+                let loc = track[i]
+                points.append(CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude))
             }
-        } else {
-            replyHandler([:])
+            
+            let options = MKMapSnapshotOptions()
+            options.mapRect = MKMapRect(coordinates: points)
+            options.mapType = .standard
+            options.size = size
+            let snapshotter = MKMapSnapshotter(options: options)
+            snapshotter.start(completionHandler: { snap, error in
+                if let image = snap?.image {
+                    UIGraphicsBeginImageContext(image.size)
+                    image.draw(at: CGPoint())
+                    let context = UIGraphicsGetCurrentContext()
+                    context?.setLineWidth(2.0)
+                    context?.beginPath()
+
+                    for i in 0..<points.count {
+                        let drawPt = snap!.point(for: points[i])
+                        if i == 0 {
+                            context?.move(to: drawPt)
+                        } else {
+                            context?.addLine(to: drawPt)
+                        }
+                    }
+                    context?.strokePath()
+                    let result = UIGraphicsGetImageFromCurrentImageContext()
+                    UIGraphicsEndImageContext()
+                }
+            })
+        }
+        return nil
+    }
+    
+    func trackerStatus() -> [String:Any] {
+        var status:[String:Any] = ["isRunning" : LocationManager.shared.isRunning]
+        if let date = LocationManager.shared.myLastLocationDate() {
+            status["lastDate"] = date
+        }
+        
+        if let track = LocationManager.shared.myTrack(), track.count > 1 {
+            var points:[Any] = []
+            for i in 0..<track.count {
+                let loc = track[i]
+                let coord = ["latitude": loc.latitude, "longitude": loc.longitude]
+                points.append(coord)
+            }
+            status["track"] = points
+        }
+        return status
+    }
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+        if let command = message["command"] as? String {
+            if command == "status" {
+                replyHandler(self.trackerStatus())
+            } else if command == "start" {
+                replyHandler(["result": LocationManager.shared.start()])
+            } else if command == "stop" {
+                LocationManager.shared.stop()
+                replyHandler(["result": LocationManager.shared.isRunning])
+            } else if command == "clear" {
+                LocationManager.shared.clearTrack()
+                replyHandler([:])
+            }
         }
     }
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("sessionReachabilityDidChange")
+    }
+}
+
+extension MKMapRect {
+    init(coordinates: [CLLocationCoordinate2D]) {
+        self = coordinates.map({ MKMapPointForCoordinate($0) }).map({ MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }).reduce(MKMapRectNull, MKMapRectUnion)
     }
 }

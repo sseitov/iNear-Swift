@@ -10,118 +10,133 @@ import WatchKit
 import Foundation
 import WatchConnectivity
 
-class ContactController: NSObject {
-    @IBOutlet var imageView: WKInterfaceImage!
-    @IBOutlet var nameLabel: WKInterfaceLabel!
-    
-    var uid:String?
-}
-
-class Contact  {
-    
-    let uid:String
-    var name:String?
-    let image:UIImage?
-    
-    init(_ uid:String, name:String?, imageData:Data?) {
-        self.uid = uid
-        self.name = name
-        if imageData != nil {
-            self.image = UIImage(data: imageData!)
-        } else {
-            self.image = nil
-        }
-    }
-}
-
 class InterfaceController: WKInterfaceController, WCSessionDelegate {
-
-    @IBOutlet var contactsTable: WKInterfaceTable!
   
+    @IBOutlet var refreshButton: WKInterfaceButton!
+    @IBOutlet var trackerButton: WKInterfaceButton!
+    @IBOutlet var clearButton: WKInterfaceButton!
+    @IBOutlet var showButton: WKInterfaceButton!
+    @IBOutlet var counter: WKInterfaceLabel!
+    
     private var session:WCSession?
-
+    private var trackerRunning = false
+    private var trackerPoints:[Any] = []
+    
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         if WCSession.isSupported() {
             session = WCSession.default()
             session!.delegate = self
             session!.activate()
+            enableButtons(false)
         }
-        refreshTable()
     }
     
     override func willActivate() {
         super.willActivate()
+        refreshStatus()
     }
     
     override func didDeactivate() {
         super.didDeactivate()
     }
 
-    override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
-        if session != nil {
-            let row = contactsTable.rowController(at: rowIndex) as! ContactController
-            session!.sendMessage(["userPosition" : row.uid!], replyHandler: { position in
-                DispatchQueue.main.async {
-                    if (position["userPoint"] as? [String:Any]) != nil {
-                        let context:[String:Any] = ["user" : row.uid!, "position" : position]
-                        self.pushController(withName: "Map", context: context)
-                    } else {
-                        self.presentAlert(withTitle: "Error",
-                                          message: "User not published his location.",
-                                          preferredStyle: .alert,
-                                          actions: [
-                                            WKAlertAction(title: "Ok", style: .default, handler: {})
-                            ])
-                    }
-                }
-            }, errorHandler: { error in
-                DispatchQueue.main.async {
-                    self.presentAlert(withTitle: "", message: "User not published his location.", preferredStyle: .alert, actions: [])
-                }
-            })
-        }
+    private func formattedDate(date:Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM HH:mm:ss"
+        return formatter.string(from: date).uppercased()
     }
 
-    func refreshTable() {
-        let contacts = loadContacts()
-        contactsTable.setNumberOfRows(contacts.count, withRowType: "contact")
-        for index in 0..<contacts.count {
-            let row = contactsTable.rowController(at:index) as! ContactController
-            row.nameLabel.setText(contacts[index].name)
-            row.imageView.setImage(contacts[index].image)
-            row.uid = contacts[index].uid
-        }
+    private func enableButtons(_ enable:Bool) {
+        clearButton.setHidden(!enable)
+        showButton.setHidden(!enable)
     }
     
-    private func loadContacts() -> [Contact] {
-        var contacts:[Contact] = []
-        if let list = UserDefaults.standard.object(forKey: "contacts") as? [String:Any] {
-            for (key, value) in list {
-                if let data = value as? [String:Any] {
-                    let user = Contact(key, name:(data["name"] as? String), imageData:(data["image"] as? Data))
-                    contacts.append(user)
+    @IBAction func refreshStatus() {
+        session!.sendMessage(["command" : "status"], replyHandler: { status in
+            DispatchQueue.main.async {
+                if let isRunning = status["isRunning"] as? Bool {
+                    self.trackerRunning = isRunning
+                } else {
+                    self.trackerRunning = false
                 }
+                if self.trackerRunning {
+                    self.trackerButton.setBackgroundImageNamed("stopTrack")
+                } else {
+                    self.trackerButton.setBackgroundImageNamed("startTrack")
+                }
+
+                if let date = status["lastDate"] as? Date {
+                    self.refreshButton.setTitle(self.formattedDate(date: date))
+                } else {
+                    self.refreshButton.setTitle("REFRESH")
+                }
+                
+                if let points = status["track"] as? [Any] {
+                    self.trackerPoints = points
+                    self.counter.setText("\(points.count)")
+                } else {
+                    self.trackerPoints = []
+                    self.counter.setText("")
+                }
+                self.enableButtons(self.trackerPoints.count > 1)
             }
-        }
-        return contacts.sorted(by: { user1, user2 in
-            if user1.name != nil && user2.name != nil {
-                return user1.name! < user2.name!
-            } else if user1.name == nil {
-                return false
-            } else {
-                return true
+        }, errorHandler: { error in
+            DispatchQueue.main.async {
+                self.presentAlert(withTitle: "", message: "User not published his location.", preferredStyle: .alert, actions: [])
             }
         })
     }
     
+    @IBAction func controlTracker() {
+        let command = trackerRunning ? ["command" : "stop"] : ["command" : "start"]
+        session!.sendMessage(command, replyHandler: { result in
+            DispatchQueue.main.async {
+                if let isRunning = result["result"] as? Bool {
+                    self.trackerRunning = isRunning
+                    if isRunning {
+                        self.trackerButton.setBackgroundImageNamed("stopTrack")
+                    } else {
+                        self.trackerButton.setBackgroundImageNamed("startTrack")
+                    }
+                } else {
+                    self.trackerButton.setBackgroundImageNamed("startTrack")
+                }
+            }
+        }, errorHandler: { error in
+            DispatchQueue.main.async {
+                self.presentAlert(withTitle: "", message: "User not published his location.", preferredStyle: .alert, actions: [])
+            }
+        })
+    }
+    
+    @IBAction func clearTrack() {
+        session!.sendMessage(["command": "clear"], replyHandler: { result in
+            DispatchQueue.main.async {
+                self.enableButtons(false)
+                self.counter.setText("")
+            }
+        }, errorHandler: { error in
+            DispatchQueue.main.async {
+                self.presentAlert(withTitle: "", message: "User not published his location.", preferredStyle: .alert, actions: [])
+            }
+        })
+    }
+    
+    override func contextForSegue(withIdentifier segueIdentifier: String) -> Any? {
+        if segueIdentifier == "showTrack" {
+            return trackerPoints
+        } else {
+            return nil
+        }
+    }
 }
 
 extension InterfaceController {
     
     @available(iOS 9.3, *)
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        print("activationDidCompleteWith")
+        refreshStatus()
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -147,41 +162,6 @@ extension InterfaceController {
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         print("didReceiveMessage replyHandler")
-        if let list = message["contactList"] as? [Any] {
-            var contacts:[Contact] = []
-            for item in list {
-                if let contact = item as? [String:Any] {
-                    if let uid = contact["uid"] as? String {
-                        let name = contact["name"] as? String
-                        let imageData = contact["image"] as? Data
-                        contacts.append(Contact(uid, name: name, imageData: imageData))
-                    }
-                }
-            }
-            replyHandler(["contactList":contacts.count])
-            DispatchQueue.main.async {
-                self.saveContacts(contacts)
-                self.refreshTable()
-            }
-        } else {
-            replyHandler(["contactList":false])
-        }
-    }
-    
-    private func saveContacts(_ contacts:[Contact]) {
-        var list:[String:Any] = [:]
-        for contact in contacts {
-            var user:[String:Any] = [:]
-            if contact.name != nil {
-                user["name"] = contact.name!
-            }
-            if contact.image != nil {
-                user["image"] = UIImagePNGRepresentation(contact.image!)
-            }
-            list[contact.uid] = user
-        }
-        UserDefaults.standard.set(list, forKey: "contacts")
-        UserDefaults.standard.synchronize()
     }
 
 }
