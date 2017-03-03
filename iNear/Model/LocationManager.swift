@@ -9,6 +9,7 @@
 import UIKit
 import CoreLocation
 import CoreData
+import MapKit
 
 class LocationManager: NSObject {
     
@@ -161,7 +162,68 @@ class LocationManager: NSObject {
             return false
         }
     }
+    
+    func trackShapshot(size:CGSize, result:@escaping (UIImage?) -> ()) {
+        let track = myTrack()
+        if track == nil {
+            result(nil)
+            return
+        }
+        
+        var points:[CLLocationCoordinate2D] = []
+        for i in 0..<track!.count {
+            let loc = track![i]
+            points.append(CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude))
+        }
+        points.append(CLLocationCoordinate2D(latitude: 56.335, longitude: 36.717))
+        
+        let options = MKMapSnapshotOptions()
+        let rect = MKMapRect(coordinates: points)
+        let inset = -rect.size.width*0.05
+        options.mapRect = MKMapRectInset(rect, inset, inset)
+        options.mapType = .standard
+        options.scale = 0.8
+        options.size = size
+        
+        let snapshotter = MKMapSnapshotter(options: options)
+        snapshotter.start(completionHandler: { snap, error in
+            if error != nil {
+                print(error!)
+                result(nil)
+                return
+            }
+            if let image = snap?.image {
+                UIGraphicsBeginImageContext(image.size)
+                image.draw(at: CGPoint())
+                let context = UIGraphicsGetCurrentContext()
+                context?.setLineWidth(4.0)
+                context?.setStrokeColor(UIColor.traceColor().cgColor)
+                context?.beginPath()
+                
+                for i in 0..<points.count {
+                    let drawPt = snap!.point(for: points[i])
+                    if i == 0 {
+                        context?.move(to: drawPt)
+                    } else {
+                        context?.addLine(to: drawPt)
+                    }
+                }
+                context?.strokePath()
+                let image = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                result(image)
+            } else {
+                result(nil)
+            }
+        })
+    }
 
+}
+
+extension MKMapRect {
+    init(coordinates: [CLLocationCoordinate2D]) {
+        self = coordinates.map({ MKMapPointForCoordinate($0) }).map({ MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }).reduce(MKMapRectNull, MKMapRectUnion)
+    }
 }
 
 extension LocationManager : CLLocationManagerDelegate {

@@ -13,7 +13,6 @@ import Firebase
 import GoogleMaps
 import SVProgressHUD
 import WatchConnectivity
-import MapKit
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -273,45 +272,7 @@ extension AppDelegate : WCSessionDelegate {
     }
     
     // MARK: - iWatch messages
-    
-    func mapShapshot(size:CGSize) -> UIImage? {
-        if let track = LocationManager.shared.myTrack(), track.count > 1 {
-            var points:[CLLocationCoordinate2D] = []
-            for i in 0..<track.count {
-                let loc = track[i]
-                points.append(CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude))
-            }
-            
-            let options = MKMapSnapshotOptions()
-            options.mapRect = MKMapRect(coordinates: points)
-            options.mapType = .standard
-            options.size = size
-            let snapshotter = MKMapSnapshotter(options: options)
-            snapshotter.start(completionHandler: { snap, error in
-                if let image = snap?.image {
-                    UIGraphicsBeginImageContext(image.size)
-                    image.draw(at: CGPoint())
-                    let context = UIGraphicsGetCurrentContext()
-                    context?.setLineWidth(2.0)
-                    context?.beginPath()
-
-                    for i in 0..<points.count {
-                        let drawPt = snap!.point(for: points[i])
-                        if i == 0 {
-                            context?.move(to: drawPt)
-                        } else {
-                            context?.addLine(to: drawPt)
-                        }
-                    }
-                    context?.strokePath()
-                    let result = UIGraphicsGetImageFromCurrentImageContext()
-                    UIGraphicsEndImageContext()
-                }
-            })
-        }
-        return nil
-    }
-    
+ 
     func trackerStatus() -> [String:Any] {
         var status:[String:Any] = ["isRunning" : LocationManager.shared.isRunning]
         if let date = LocationManager.shared.myLastLocationDate() {
@@ -348,11 +309,5 @@ extension AppDelegate : WCSessionDelegate {
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("sessionReachabilityDidChange")
-    }
-}
-
-extension MKMapRect {
-    init(coordinates: [CLLocationCoordinate2D]) {
-        self = coordinates.map({ MKMapPointForCoordinate($0) }).map({ MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }).reduce(MKMapRectNull, MKMapRectUnion)
     }
 }

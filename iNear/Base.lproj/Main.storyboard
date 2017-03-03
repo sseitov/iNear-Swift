@@ -266,7 +266,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xcR-2Z-QEu">
-                                            <rect key="frame" x="251" y="14.5" width="51" height="31"/>
+                                            <rect key="frame" x="251" y="15" width="51" height="31"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="49" id="HxJ-Ip-oaG"/>
                                                 <constraint firstAttribute="height" constant="31" id="hUA-JR-5WC"/>
@@ -300,10 +300,30 @@
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <segue destination="qdm-x4-YZq" kind="show" identifier="showTrack" id="OQ7-O2-Inc"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="npJ-zJ-qjz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2362.5" y="-631.69014084507046"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="cyW-4e-XVY">
+            <objects>
+                <navigationController storyboardIdentifier="MyTrack" useStoryboardIdentifierAsRestorationIdentifier="YES" id="LjC-Lp-xkr" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Xb4-mN-1eb">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="barTintColor" red="0.0" green="0.4431372549" blue="0.64705882349999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="qdm-x4-YZq" kind="relationship" relationship="rootViewController" id="kCb-M4-O5c"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OWp-E5-fWs" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3084" y="-631"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="v4A-rk-2Pp">
@@ -475,7 +495,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1SG-Bh-uaI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1564" y="114"/>
+            <point key="canvasLocation" x="1584" y="146"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="r7l-gg-dq7">
@@ -558,11 +578,11 @@
                         <viewControllerLayoutGuide type="bottom" id="Uiv-bh-DqI"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="y3c-d5-MxU">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pdq-vS-SvK" customClass="GMSMapView">
-                                <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
@@ -585,7 +605,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KMX-on-5bA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2342" y="113"/>
+            <point key="canvasLocation" x="2363" y="146"/>
         </scene>
     </scenes>
     <resources>
@@ -600,5 +620,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="be2-C3-Y8g"/>
+        <segue reference="kCb-M4-O5c"/>
     </inferredMetricsTieBreakers>
 </document>

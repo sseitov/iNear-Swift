@@ -90,7 +90,7 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if LocationManager.shared.hasTrack() {
             if indexPath.row == 1 {
-                
+                performSegue(withIdentifier: "showTrack", sender: nil)
             } else if indexPath.row == 2 {
                 LocationManager.shared.clearTrack()
                 tableView.reloadData()
@@ -98,14 +98,13 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
         }
     }
     
-    /*
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "showTrack" {
+            let next = segue.destination as! TrackController
+            next.user = currentUser()
+        }
     }
-    */
 
 }

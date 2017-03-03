@@ -8,6 +8,7 @@
 
 import UIKit
 import NotificationCenter
+import MapKit
 
 class TodayViewController: UIViewController, NCWidgetProviding {
             
@@ -18,8 +19,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.extensionContext?.widgetLargestAvailableDisplayMode = .expanded
         refresh()
     }
     
@@ -30,14 +29,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
             return formatter.string(from: date).uppercased()
         } else {
             return ""
-        }
-    }
-    
-    func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
-        if activeDisplayMode == .expanded {
-            self.preferredContentSize = CGSize(width: maxSize.width, height: 430)
-        } else {
-            self.preferredContentSize = maxSize
         }
     }
     
@@ -73,6 +64,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
             trashButton.isHidden = true
         }
         observeButton.isHidden = trashButton.isHidden
+        
         if LocationManager.shared.isRunning {
             recordButton.setImage(UIImage(named: "stop"), for: .normal)
         } else {

@@ -21,9 +21,6 @@ class TrackController: UIViewController {
         super.viewDidLoad()
         if user == currentUser() {
             setupTitle("My Track")
-            let btn = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(TrackController.clearTrack))
-            btn.tintColor = UIColor.white
-            navigationItem.rightBarButtonItem = btn
         } else {
             setupTitle("\(user!.shortName) track for last day")
         }
@@ -72,11 +69,6 @@ class TrackController: UIViewController {
         } else {
             super.goBack()
         }
-    }
-    
-    func clearTrack() {
-        LocationManager.shared.clearTrack()
-        goBack()
     }
 
 }
