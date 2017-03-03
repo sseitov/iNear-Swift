@@ -58,7 +58,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     
     @IBAction func refresh() {
         dateView.text = formattedDate()
-        if LocationManager.shared.hasTrack() {
+        if LocationManager.shared.trackSize() > 1 {
             trashButton.isHidden = false
         } else {
             trashButton.isHidden = true
@@ -75,7 +75,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     @IBAction func clearTracker(_ sender: Any) {
         LocationManager.shared.clearTrack()
         dateView.text = ""
-        trashButton.isHidden = !LocationManager.shared.hasTrack()
+        trashButton.isHidden = (LocationManager.shared.trackSize() < 2)
         observeButton.isHidden = trashButton.isHidden
     }
 

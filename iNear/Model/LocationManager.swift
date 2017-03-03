@@ -154,15 +154,15 @@ class LocationManager: NSObject {
         }
     }
     
-    func hasTrack() -> Bool {
+    func trackSize() -> Int {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         if let count = try? managedObjectContext.count(for: fetchRequest) {
-            return count > 1
+            return count
         } else {
-            return false
+            return 0
         }
     }
-    
+/*
     func trackShapshot(size:CGSize, result:@escaping (UIImage?) -> ()) {
         let track = myTrack()
         if track == nil {
@@ -217,7 +217,7 @@ class LocationManager: NSObject {
             }
         })
     }
-
+*/
 }
 
 extension MKMapRect {

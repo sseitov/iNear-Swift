@@ -278,16 +278,12 @@ extension AppDelegate : WCSessionDelegate {
         if let date = LocationManager.shared.myLastLocationDate() {
             status["lastDate"] = date
         }
-        
-        if let track = LocationManager.shared.myTrack(), track.count > 1 {
-            var points:[Any] = []
-            for i in 0..<track.count {
-                let loc = track[i]
-                let coord = ["latitude": loc.latitude, "longitude": loc.longitude]
-                points.append(coord)
-            }
-            status["track"] = points
+        if let point = LocationManager.shared.myLocation() {
+            let coord = ["latitude": point.latitude, "longitude": point.longitude]
+            status["lastLocation"] = coord
         }
+        status["trackSize"] = LocationManager.shared.trackSize()
+        
         return status
     }
     

@@ -59,16 +59,26 @@
                     </connections>
                 </controller>
             </objects>
+            <point key="canvasLocation" x="77" y="162"/>
         </scene>
         <!--Map-->
         <scene sceneID="zLE-hx-MkX">
             <objects>
                 <controller identifier="Map" id="jCr-qW-fJv" customClass="MapController" customModule="Watch_Extension">
                     <items>
-                        <map alignment="left" id="ptI-3L-O7s"/>
+                        <group width="1" alignment="left" id="PBc-RM-l7L">
+                            <items>
+                                <map height="100" alignment="left" id="zwu-4i-c18"/>
+                            </items>
+                        </group>
+                        <slider width="1" alignment="left" continuous="YES" value="1" minimum="1" maximum="5" steps="1" id="XqP-ZA-FXq">
+                            <connections>
+                                <action selector="changeZoom:" destination="jCr-qW-fJv" id="DdF-Un-JH9"/>
+                            </connections>
+                        </slider>
                     </items>
                     <connections>
-                        <outlet property="map" destination="ptI-3L-O7s" id="7gG-h9-fcH"/>
+                        <outlet property="map" destination="zwu-4i-c18" id="RdI-4H-N1L"/>
                     </connections>
                 </controller>
             </objects>

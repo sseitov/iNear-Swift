@@ -72,7 +72,7 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .none
                 cell.textLabel?.font = UIFont.condensedFont()
-                if LocationManager.shared.hasTrack() {
+                if LocationManager.shared.trackSize() > 1 {
                     cell.textLabel?.textColor = UIColor.mainColor()
                 } else {
                     cell.textLabel?.textColor = UIColor.mainColor(0.3)
@@ -88,7 +88,7 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if LocationManager.shared.hasTrack() {
+        if LocationManager.shared.trackSize() > 1 {
             if indexPath.row == 1 {
                 performSegue(withIdentifier: "showTrack", sender: nil)
             } else if indexPath.row == 2 {

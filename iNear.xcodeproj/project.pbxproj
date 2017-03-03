@@ -17,7 +17,6 @@
 		2C311D711E69760100D79D65 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D701E69760100D79D65 /* SettingsController.swift */; };
 		2C311D731E6976B200D79D65 /* TrackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D721E6976B200D79D65 /* TrackerCell.swift */; };
 		2C311D751E69822100D79D65 /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D741E69822100D79D65 /* ProfileCell.swift */; };
-		2C311D771E69925E00D79D65 /* SnapShotController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C311D761E69925E00D79D65 /* SnapShotController.swift */; };
 		2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */; };
 		2C53BB441E028C4000307C63 /* Contact+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */; };
 		2C5B6B001DE2FE4E00F992C5 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B6AFF1DE2FE4E00F992C5 /* LoginController.swift */; };
@@ -161,7 +160,6 @@
 		2C311D701E69760100D79D65 /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		2C311D721E6976B200D79D65 /* TrackerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackerCell.swift; sourceTree = "<group>"; };
 		2C311D741E69822100D79D65 /* ProfileCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
-		2C311D761E69925E00D79D65 /* SnapShotController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapShotController.swift; sourceTree = "<group>"; };
 		2C53BB411E028C4000307C63 /* Contact+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Contact+CoreDataClass.swift"; path = "Model/Contact+CoreDataClass.swift"; sourceTree = "<group>"; };
 		2C53BB421E028C4000307C63 /* Contact+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Contact+CoreDataProperties.swift"; path = "Model/Contact+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		2C5B6AFF1DE2FE4E00F992C5 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
@@ -352,7 +350,6 @@
 				2C311D701E69760100D79D65 /* SettingsController.swift */,
 				2C311D721E6976B200D79D65 /* TrackerCell.swift */,
 				2C311D741E69822100D79D65 /* ProfileCell.swift */,
-				2C311D761E69925E00D79D65 /* SnapShotController.swift */,
 			);
 			name = Profile;
 			sourceTree = "<group>";
@@ -765,7 +762,6 @@
 				2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */,
 				2CE268C21E672F7C00FE8219 /* LocationManager.swift in Sources */,
 				2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */,
-				2C311D771E69925E00D79D65 /* SnapShotController.swift in Sources */,
 				2C87D3331DDF1A5C00F05528 /* LGProgressView.m in Sources */,
 				2C9423B11DFC6456003C4075 /* Message+CoreDataProperties.swift in Sources */,
 				2C53BB441E028C4000307C63 /* Contact+CoreDataProperties.swift in Sources */,

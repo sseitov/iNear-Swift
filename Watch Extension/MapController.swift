@@ -12,33 +12,30 @@ class MapController: WKInterfaceController {
 
     @IBOutlet var map: WKInterfaceMap!
     
+    var myLocation:CLLocationCoordinate2D?
+    
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         
-        if let points = context as? [Any] {
-            var coords:[CLLocationCoordinate2D] = []
-            for i in 0..<points.count {
-                if let pt = points[i] as? [String:Any],
-                    let lat = pt["latitude"] as? Double,
-                    let lon = pt["longitude"] as? Double {
-                    
-                    coords.append(CLLocationCoordinate2D(latitude: lat, longitude: lon))
-                }
-            }
-            map.setVisibleMapRect(MKMapRect(coordinates: coords))
-            for coord in coords {
-                map.addAnnotation(coord, with: .green)
-            }
+//        myLocation = CLLocationCoordinate2D(latitude: 55.764637, longitude:37.604888)
+
+        if let point = context as? [String:Any], let lat = point["latitude"] as? Double, let lon = point["longitude"] as? Double {
+            myLocation = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+            let span = MKCoordinateSpanMake(0.1, 0.1)
+            let region = MKCoordinateRegionMake(myLocation!, span)
+            map.setRegion(region)
+            map.addAnnotation(myLocation!, with: .red)
         }
+
     }
     
-    deinit {
-        map.removeAllAnnotations()
+    @IBAction func changeZoom(_ value: Float) {
+        if myLocation != nil {
+            let degrees:CLLocationDegrees = CLLocationDegrees(value) / 10.0
+            let span = MKCoordinateSpanMake(degrees, degrees)
+            let region = MKCoordinateRegionMake(myLocation!, span)
+            map.setRegion(region)
+        }
     }
-}
 
-extension MKMapRect {
-    init(coordinates: [CLLocationCoordinate2D]) {
-        self = coordinates.map({ MKMapPointForCoordinate($0) }).map({ MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }).reduce(MKMapRectNull, MKMapRectUnion)
-    }
 }

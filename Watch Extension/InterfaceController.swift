@@ -20,7 +20,8 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     
     private var session:WCSession?
     private var trackerRunning = false
-    private var trackerPoints:[Any] = []
+    private var lastLocation:[String:Any]?
+    private var trackSize:Int = 0
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
@@ -72,14 +73,14 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                     self.refreshButton.setTitle("REFRESH")
                 }
                 
-                if let points = status["track"] as? [Any] {
-                    self.trackerPoints = points
-                    self.counter.setText("\(points.count)")
+                self.lastLocation = status["lastLocation"] as? [String:Any]
+                if let size = status["trackSize"] as? Int {
+                    self.trackSize = size
+                    self.counter.setText("\(size)")
                 } else {
-                    self.trackerPoints = []
                     self.counter.setText("")
                 }
-                self.enableButtons(self.trackerPoints.count > 1)
+                self.enableButtons(self.trackSize > 1)
             }
         }, errorHandler: { error in
             DispatchQueue.main.async {
@@ -125,7 +126,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     
     override func contextForSegue(withIdentifier segueIdentifier: String) -> Any? {
         if segueIdentifier == "showTrack" {
-            return trackerPoints
+            return lastLocation
         } else {
             return nil
         }
