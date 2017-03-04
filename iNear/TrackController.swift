@@ -42,15 +42,17 @@ class TrackController: UIViewController {
         userTrack.strokeColor = UIColor.traceColor()
         userTrack.strokeWidth = 4
         userTrack.map = map
-        if let start = path?.coordinate(at: 0) {
-            let startMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude))
-            startMarker.icon = UIImage(named: "startPoint")
-            startMarker.map = map
-        }
-        if let finish = path?.coordinate(at: path!.count() - 1) {
+        if let finish = path?.coordinate(at:0) {
             let finishMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: finish.latitude, longitude: finish.longitude))
             finishMarker.icon = UIImage(named: "finishPoint")
+            finishMarker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
             finishMarker.map = map
+        }
+        if let start = path?.coordinate(at: path!.count() - 1) {
+            let startMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude))
+            startMarker.icon = UIImage(named: "startPoint")
+            startMarker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+            startMarker.map = map
         }
         
         var bounds = GMSCoordinateBounds()

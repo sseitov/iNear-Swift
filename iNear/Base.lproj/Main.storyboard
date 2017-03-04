@@ -203,7 +203,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="HLZ-UJ-iGt"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="21"/>
+                                            <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="17"/>
                                             <color key="textColor" red="0.0" green="0.4431372549" blue="0.64705882349999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -266,7 +266,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xcR-2Z-QEu">
-                                            <rect key="frame" x="251" y="15" width="51" height="31"/>
+                                            <rect key="frame" x="251" y="14" width="51" height="31"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="49" id="HxJ-Ip-oaG"/>
                                                 <constraint firstAttribute="height" constant="31" id="hUA-JR-5WC"/>
@@ -620,6 +620,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="be2-C3-Y8g"/>
-        <segue reference="kCb-M4-O5c"/>
+        <segue reference="OQ7-O2-Inc"/>
     </inferredMetricsTieBreakers>
 </document>

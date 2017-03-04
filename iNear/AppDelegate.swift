@@ -220,20 +220,24 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+/*
         let userInfo = notification.request.content.userInfo
         // Print message ID.
         print("Message ID: \(userInfo["gcm.message_id"]!)")
         // Print full message.
         print(userInfo)
+ */
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+/*
         let userInfo = response.notification.request.content.userInfo
         // Print message ID.
         print("Message ID: \(userInfo["gcm.message_id"]!)")
         // Print full message.
         print(userInfo)
+ */
     }
 }
 
@@ -242,7 +246,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
 extension AppDelegate : FIRMessagingDelegate {
     // Receive data message on iOS 10 devices while app is in the foreground.
     func applicationReceivedRemoteMessage(_ remoteMessage: FIRMessagingRemoteMessage) {
-        print(remoteMessage.appData)
+//        print(remoteMessage.appData)
     }
 }
 

@@ -40,11 +40,11 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 1 : 3
+        return section == 0 ? 3 : 1
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return section == 0 ? "account" : "tracker"
+        return section == 0 ? "tracker" : "account"
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -56,7 +56,7 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.section == 0 {
+        if indexPath.section == 1 {
             let profileCell = tableView.dequeueReusableCell(withIdentifier: "profile", for: indexPath) as! ProfileCell
             profileCell.accountType.text = currentUser()!.socialTypeName()
             profileCell.account.text = currentUser()!.email!

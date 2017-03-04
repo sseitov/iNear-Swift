@@ -18,7 +18,7 @@ class TrackerCell: UITableViewCell {
 
     var delegate:TrackerCellDelegate? {
         didSet {
-            trackerSwitch.isOn = LocationManager.shared.isRunning
+            trackerSwitch.isOn = LocationManager.shared.isRunning()
         }
     }
     

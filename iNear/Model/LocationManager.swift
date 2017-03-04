@@ -16,8 +16,9 @@ class LocationManager: NSObject {
     static let shared = LocationManager()
     
     let locationManager = CLLocationManager()
-    var isRunning:Bool = false
-        
+    let startMarker = UIImage(named: "startPoint")
+    let finishMarker = UIImage(named: "finishPoint")
+   
     private override init() {
         super.init()
         locationManager.delegate = self
@@ -35,22 +36,31 @@ class LocationManager: NSObject {
         }
     }
     
-    func start() -> Bool {
+    func start() {
         if CLLocationManager.authorizationStatus() == .authorizedAlways {
             locationManager.startUpdatingLocation()
-            isRunning = true
+            sharedDefaults.set(true, forKey: "trackerRunning")
+            sharedDefaults.synchronize()
         }
-        return isRunning
     }
     
     func stop() {
-        if isRunning {
+        if isRunning() {
             locationManager.stopUpdatingLocation()
-            isRunning = false
+            sharedDefaults.set(false, forKey: "trackerRunning")
+            sharedDefaults.synchronize()
         }
     }
     
+    func isRunning() -> Bool {
+        return sharedDefaults.bool(forKey: "trackerRunning")
+    }
+    
     // MARK: - CoreData stack
+    
+    lazy var sharedDefaults: UserDefaults = {
+        return UserDefaults(suiteName: "group.com.vchannel.iNearby")!
+    }()
     
     lazy var sharedDocumentsDirectory: URL = {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.vchannel.iNearby")!
@@ -123,10 +133,13 @@ class LocationManager: NSObject {
         }
     }
 
-    func myTrack() -> [Location]? {
+    func myTrack(_ size:Int = 0) -> [Location]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
+        if size > 0 {
+            fetchRequest.fetchLimit = size
+        }
         return try? managedObjectContext.fetch(fetchRequest) as! [Location]
     }
     
@@ -135,7 +148,7 @@ class LocationManager: NSObject {
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -1, to: Date())
         fetchRequest.predicate = NSPredicate(format: "date >= %f", startDate!.timeIntervalSince1970)
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         return try? managedObjectContext.fetch(fetchRequest) as! [Location]
     }
@@ -162,9 +175,9 @@ class LocationManager: NSObject {
             return 0
         }
     }
-/*
-    func trackShapshot(size:CGSize, result:@escaping (UIImage?) -> ()) {
-        let track = myTrack()
+    
+    func trackShapshot(size:CGSize, pointsCoint:Int, result:@escaping (UIImage?) -> ()) {
+        let track = LocationManager.shared.myTrack(pointsCoint)
         if track == nil {
             result(nil)
             return
@@ -175,18 +188,17 @@ class LocationManager: NSObject {
             let loc = track![i]
             points.append(CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude))
         }
-        points.append(CLLocationCoordinate2D(latitude: 56.335, longitude: 36.717))
         
         let options = MKMapSnapshotOptions()
         let rect = MKMapRect(coordinates: points)
-        let inset = -rect.size.width*0.05
+        let inset = -rect.size.width*0.1
         options.mapRect = MKMapRectInset(rect, inset, inset)
         options.mapType = .standard
-        options.scale = 0.8
+        options.scale = 1.0
         options.size = size
         
         let snapshotter = MKMapSnapshotter(options: options)
-        snapshotter.start(completionHandler: { snap, error in
+        snapshotter.start(with: DispatchQueue.main, completionHandler: { snap, error in
             if error != nil {
                 print(error!)
                 result(nil)
@@ -200,15 +212,27 @@ class LocationManager: NSObject {
                 context?.setStrokeColor(UIColor.traceColor().cgColor)
                 context?.beginPath()
                 
+                var startPt:CGPoint = CGPoint()
+                var drawPt:CGPoint = CGPoint()
                 for i in 0..<points.count {
-                    let drawPt = snap!.point(for: points[i])
+                    drawPt = snap!.point(for: points[i])
                     if i == 0 {
+                        startPt = drawPt
                         context?.move(to: drawPt)
                     } else {
                         context?.addLine(to: drawPt)
                     }
                 }
-                context?.strokePath()
+                
+                startPt = CGPoint(x: startPt.x - self.startMarker!.size.width/2.0, y: startPt.y - self.startMarker!.size.height/2.0)
+                self.startMarker!.draw(at: startPt)
+                if points.count > 1 {
+                    context?.strokePath()
+                    drawPt = CGPoint(x: drawPt.x - self.finishMarker!.size.width/2.0, y: drawPt.y - self.finishMarker!.size.height/2.0)
+                    self.finishMarker!.draw(at: startPt)
+                    self.startMarker!.draw(at: drawPt)
+                }
+                                
                 let image = UIGraphicsGetImageFromCurrentImageContext()
                 UIGraphicsEndImageContext()
                 result(image)
@@ -217,13 +241,7 @@ class LocationManager: NSObject {
             }
         })
     }
-*/
-}
 
-extension MKMapRect {
-    init(coordinates: [CLLocationCoordinate2D]) {
-        self = coordinates.map({ MKMapPointForCoordinate($0) }).map({ MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }).reduce(MKMapRectNull, MKMapRectUnion)
-    }
 }
 
 extension LocationManager : CLLocationManagerDelegate {
