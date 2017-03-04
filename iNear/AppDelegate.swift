@@ -99,12 +99,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     // MARK: - Receive_message
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
-        print(userInfo)
+//        print(userInfo)
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print(userInfo)
+//        print(userInfo)
     }
     
     // MARK: - Refresh_token
@@ -281,10 +281,8 @@ extension AppDelegate : WCSessionDelegate {
         if let date = LocationManager.shared.myLastLocationDate() {
             status["lastDate"] = date
         }
-        if let point = LocationManager.shared.myLocation() {
-            let coord = ["latitude": point.latitude, "longitude": point.longitude]
-            status["lastLocation"] = coord
-        }
+        status["lastLocation"] = ["latitude": LocationManager.shared.myLocation().latitude,
+                                  "longitude": LocationManager.shared.myLocation().longitude]
         status["trackSize"] = LocationManager.shared.trackSize()
         
         return status

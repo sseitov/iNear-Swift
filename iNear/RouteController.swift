@@ -51,7 +51,7 @@ class RouteController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let bounds = GMSCoordinateBounds(coordinate: LocationManager.shared.myLocation()!, coordinate: userMarker!.position)
+        let bounds = GMSCoordinateBounds(coordinate: LocationManager.shared.myLocation(), coordinate: userMarker!.position)
         let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
         map.moveCamera(update)
         
@@ -77,7 +77,7 @@ class RouteController: UIViewController {
                     self.setupTitle(self.titleText, promptText: self.promptText)
                 }
             }
-            self.createDirection(from: LocationManager.shared.myLocation()!, to: self.userMarker!.position, completion: { result in
+            self.createDirection(from: LocationManager.shared.myLocation(), to: self.userMarker!.position, completion: { result in
                 SVProgressHUD.dismiss()
                 if result == -1 {
                     self.showMessage("Can not create route to \(self.user!.shortName)", messageType: .error)

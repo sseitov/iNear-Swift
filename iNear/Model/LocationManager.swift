@@ -109,7 +109,7 @@ class LocationManager: NSObject {
         saveContext()
     }
 
-    func myLocation() -> CLLocationCoordinate2D? {
+    func myLocation() -> CLLocationCoordinate2D {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
@@ -117,7 +117,7 @@ class LocationManager: NSObject {
         if let all = try? managedObjectContext.fetch(fetchRequest) as! [Location], let location = all.first {
             return CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
         } else {
-            return nil
+            return CLLocationCoordinate2D()
         }
     }
     
@@ -143,14 +143,18 @@ class LocationManager: NSObject {
         return try? managedObjectContext.fetch(fetchRequest) as! [Location]
     }
     
-    func myTrackForLastDay() -> [Location]? {
+    func myTrackPointsForLastDay() -> [Location]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -1, to: Date())
         fetchRequest.predicate = NSPredicate(format: "date >= %f", startDate!.timeIntervalSince1970)
         let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        return try? managedObjectContext.fetch(fetchRequest) as! [Location]
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Location], all.count > 1 {
+            return all
+        } else {
+            return nil
+        }
     }
     
     func clearTrack() {
@@ -176,19 +180,13 @@ class LocationManager: NSObject {
         }
     }
     
-    func locationShapshot(size:CGSize, result:@escaping (UIImage?) -> ()) {
-        let center = myLocation()
-        if center == nil {
-            result(nil)
-            return
-        }
-        
+    func locationShapshot(size:CGSize, center:CLLocationCoordinate2D, result:@escaping (UIImage?) -> ()) {
         let options = MKMapSnapshotOptions()
         options.mapType = .standard
         options.scale = 1.0
         options.size = size
         let span = MKCoordinateSpanMake(0.1, 0.1)
-        options.region = MKCoordinateRegionMake(center!, span)
+        options.region = MKCoordinateRegionMake(center, span)
 
         let snapshotter = MKMapSnapshotter(options: options)
         snapshotter.start(with: DispatchQueue.main, completionHandler: { snap, error in
@@ -201,7 +199,7 @@ class LocationManager: NSObject {
                 UIGraphicsBeginImageContext(image.size)
                 image.draw(at: CGPoint())
                 
-                var startPt = snap!.point(for: center!)
+                var startPt = snap!.point(for: center)
                 startPt = CGPoint(x: startPt.x - self.startMarker!.size.width/2.0, y: startPt.y - self.startMarker!.size.height/2.0)
                 self.startMarker!.draw(at: startPt)
                 

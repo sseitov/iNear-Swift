@@ -124,11 +124,11 @@ class Model : NSObject {
         return manager
     }()
     
-    fileprivate func messagePush(_ text:String?, to:User, from:User) {
+    fileprivate func messagePush(_ text:String, to:User, from:User) {
         if to.token != nil {
             let data:[String:Int] = ["pushType" : PushType.newMessage.rawValue]
             let notification:[String:Any] = ["title" : "New message from \(from.shortName):",
-                "body": text != nil ? text! : "It is photo",
+                "body": text,
                 "sound":"default",
                 "content_available": true]
             let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
@@ -579,27 +579,45 @@ class Model : NSObject {
         NotificationCenter.default.post(name: readMessageNotification, object: message)
     }
     
+    func myTrackLastDay() -> String? {
+        if let all = LocationManager.shared.myTrackPointsForLastDay() {
+            let path = GMSMutablePath()
+            for pt in all {
+                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
+            }
+            return path.encodedPath();
+        } else {
+            return nil
+        }
+    }
+
     func sendTextMessage(_ text:String, to:String) {
         let ref = FIRDatabase.database().reference()
         let dateStr = dateFormatter.string(from: Date())
-        var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "text" : text, "date" : dateStr]
-        if let track = LocationManager.shared.myTrackForLastDay() {
-            if track.count > 1 {
-                let path = GMSMutablePath()
-                for pt in track {
-                    path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-                }
-                messageItem["track"] = path.encodedPath();
-            }
-        }
-        if let coordinate = LocationManager.shared.myLocation() {
-            messageItem["latitude"] = coordinate.latitude
-            messageItem["longitude"] = coordinate.longitude
-        }
+        let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
+                                        "to" : to,
+                                        "text" : text,
+                                        "date" : dateStr,
+                                        "latitude" : LocationManager.shared.myLocation().latitude,
+                                        "longitude" : LocationManager.shared.myLocation().longitude]
         ref.child("messages").childByAutoId().setValue(messageItem)
-        
         if let toUser = getUser(to) {
             self.messagePush(text, to: toUser, from: currentUser()!)
+        }
+    }
+    
+    func sendTrackMessage(_ track:String, to:String) {
+        let ref = FIRDatabase.database().reference()
+        let dateStr = dateFormatter.string(from: Date())
+        let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
+                                        "to" : to,
+                                        "track" : track,
+                                        "date" : dateStr,
+                                        "latitude" : LocationManager.shared.myLocation().latitude,
+                                        "longitude" : LocationManager.shared.myLocation().longitude]
+        ref.child("messages").childByAutoId().setValue(messageItem)
+        if let toUser = getUser(to) {
+            self.messagePush("\(currentUser()!.name!) sent track.", to: toUser, from: currentUser()!)
         }
     }
     
@@ -617,24 +635,14 @@ class Model : NSObject {
                 } else {
                     let ref = FIRDatabase.database().reference()
                     let dateStr = self.dateFormatter.string(from: Date())
-                    var messageItem:[String:Any] = ["from" : currentUser()!.uid!, "to" : to, "image" : metadata!.path!, "date" : dateStr]
-                    if let track = LocationManager.shared.myTrackForLastDay() {
-                        if track.count > 1 {
-                            let path = GMSMutablePath()
-                            for pt in track {
-                                path.add(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
-                            }
-                            messageItem["track"] = path.encodedPath();
-                        }
-                    }
-                    if let coordinate = LocationManager.shared.myLocation() {
-                        messageItem["latitude"] = coordinate.latitude
-                        messageItem["longitude"] = coordinate.longitude
-                    }
+                    let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
+                                                    "to" : to,
+                                                    "image" : metadata!.path!,
+                                                    "date" : dateStr,
+                                                    "latitude" : LocationManager.shared.myLocation().latitude,
+                                                    "longitude" : LocationManager.shared.myLocation().longitude]
                     ref.child("messages").childByAutoId().setValue(messageItem)
-                    
-                    self.messagePush(nil, to: toUser!, from: currentUser()!)
-                    
+                    self.messagePush("\(currentUser()!.name!) sent photo.", to: toUser!, from: currentUser()!)
                     result(nil)
                 }
             })

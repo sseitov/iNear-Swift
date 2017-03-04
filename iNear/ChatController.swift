@@ -11,6 +11,33 @@ import Firebase
 import JSQMessagesViewController
 import SVProgressHUD
 
+class TrackMediaItem : JSQLocationMediaItem {
+    
+    var track:String?
+    var outgoing:Bool?
+    var cashedImageView:UIImageView?
+    
+    override func setLocation(_ location: CLLocation!, withCompletionHandler completion: JSQLocationMediaItemCompletionBlock!) {
+        if location != nil {
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 200, height: 120))
+            LocationManager.shared.locationShapshot(size: imageView.frame.size, center: location.coordinate, result: { image in
+                imageView.image = image
+                JSQMessagesMediaViewBubbleImageMasker.applyBubbleImageMask(toMediaView: imageView, isOutgoing: self.outgoing!)
+                self.cashedImageView = imageView
+                completion()
+            })
+        }
+    }
+    
+    override func mediaView() -> UIView! {
+        return cashedImageView
+    }
+    
+    override func mediaViewDisplaySize() -> CGSize {
+        return CGSize(width: 200, height: 120)
+    }
+}
+
 class Avatar : NSObject, JSQMessageAvatarImageDataSource {
     
     var userImage:UIImage?
@@ -132,6 +159,14 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             if message.imageData != nil {
                 let photo = JSQPhotoMediaItem(image: UIImage(data: message.imageData as! Data))
                 return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date as! Date, media: photo)
+            } else if message.track != nil {
+                let track = TrackMediaItem(location: nil)
+                track!.track = message.track
+                track!.outgoing = (message.from! == currentUser()!.uid!)
+                track!.setLocation(CLLocation(latitude: message.latitude, longitude: message.longitude), withCompletionHandler: {
+                    self.collectionView.reloadData()
+                })
+                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date as! Date, media: track)
             } else if message.text != nil {
                 return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date as! Date, text: message.text!)
             } else {
@@ -150,9 +185,16 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
+        let track = Model.shared.myTrackLastDay()
+        
+        let trackHandler:CompletionBlock? = (track == nil) ? nil : {
+            Model.shared.sendTrackMessage(track!, to: self.user!.uid!)
+        }
+
         let actionView = ActionSheet.create(
-            title: "Choose Photo",
-            actions: ["From Camera Roll", "Use Camera"],
+            title: "Choose Data",
+            actions: (track == nil) ? ["Photo from Camera Roll", "Create photo use Camera"] :
+                ["Photo from Camera Roll", "Create photo use Camera", "My track for last day"],
             handler1: {
                 let imagePicker = UIImagePickerController()
                 imagePicker.allowsEditing = false
@@ -170,7 +212,8 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             imagePicker.sourceType = .camera
             imagePicker.delegate = self
             self.present(imagePicker, animated: true, completion: nil)
-        })
+        }, handler3: trackHandler)
+        
         actionView?.show()
     }
     
@@ -245,6 +288,11 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                     self.performSegue(withIdentifier: "showPhoto", sender: message)
                 }))
             }
+            if (message.media as? TrackMediaItem) != nil {
+                alert.addAction(UIAlertAction(title: "show track", style: .default, handler: { _ in
+                    self.performSegue(withIdentifier: "showTrack", sender: message)
+                }))
+            }
             if message.senderId == currentUser()!.uid! {
                 alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
                     if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
@@ -313,6 +361,12 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         } else if segue.identifier == "showMap" {
             let controller = segue.destination as! RouteController
             controller.user = self.user
+        } else if segue.identifier == "showTrack" {
+            let message = sender as! JSQMessage
+            let controller = segue.destination as! TrackController
+            controller.user = self.user
+            let track = message.media as! TrackMediaItem
+            controller.track = track.track
         }
 
     }
