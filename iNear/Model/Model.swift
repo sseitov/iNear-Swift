@@ -495,7 +495,7 @@ class Model : NSObject {
         let ref = FIRDatabase.database().reference()
         if let image = message.imageURL {
             self.storageRef.child(image).delete(completion: { _ in
-                ref.child("messages").child(message.uid!).removeValue(completionBlock: { _, _ in
+                ref.child("messages").child(message.uid!).removeValue(completionBlock:{_, _ in
                     completion()
                 })
             })
@@ -591,6 +591,16 @@ class Model : NSObject {
         }
     }
 
+    func trackPoints(_ track:String) -> [CLLocationCoordinate2D] {
+        var points:[CLLocationCoordinate2D] = []
+        if let path = GMSPath(fromEncodedPath: track) {
+            for i in 0..<path.count() {
+                points.append(path.coordinate(at: i))
+            }
+        }
+        return points
+    }
+    
     func sendTextMessage(_ text:String, to:String) {
         let ref = FIRDatabase.database().reference()
         let dateStr = dateFormatter.string(from: Date())
@@ -676,11 +686,9 @@ class Model : NSObject {
         
         deleteMessageRefHandle = messageQuery.observe(.childRemoved, with: { (snapshot) -> Void in
             if let message = self.getMessage(snapshot.key) {
-                if message.owner != nil {
-                    message.owner!.removeFromMessages(message)
-                }
                 NotificationCenter.default.post(name: deleteMessageNotification, object: message)
                 self.managedObjectContext.delete(message)
+                self.saveContext()
             }
         })
     }

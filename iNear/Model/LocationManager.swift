@@ -25,13 +25,16 @@ class LocationManager: NSObject {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10.0
         locationManager.headingFilter = 5.0
+        locationManager.activityType = .automotiveNavigation
+        locationManager.pausesLocationUpdatesAutomatically = false
     }
 
     func register() {
         if CLLocationManager.locationServicesEnabled() {
-            locationManager.allowsBackgroundLocationUpdates = true
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
+            } else {
+                locationManager.allowsBackgroundLocationUpdates = true
             }
         }
     }
@@ -212,18 +215,7 @@ class LocationManager: NSObject {
         })
     }
     
-    func trackShapshot(size:CGSize, pointsCoint:Int, result:@escaping (UIImage?) -> ()) {
-        let track = myTrack(pointsCoint)
-        if track == nil {
-            result(nil)
-            return
-        }
-        
-        var points:[CLLocationCoordinate2D] = []
-        for i in 0..<track!.count {
-            let loc = track![i]
-            points.append(CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude))
-        }
+    func trackShapshot(size:CGSize, points:[CLLocationCoordinate2D], result:@escaping (UIImage?) -> ()) {
         
         let options = MKMapSnapshotOptions()
         let rect = MKMapRect(coordinates: points)

@@ -2,7 +2,7 @@
 //  User+CoreDataProperties.swift
 //  iNear
 //
-//  Created by Сергей Сейтов on 04.03.17.
+//  Created by Сергей Сейтов on 05.03.17.
 //  Copyright © 2017 Сергей Сейтов. All rights reserved.
 //
 
@@ -30,7 +30,6 @@ extension User {
     @NSManaged public var uid: String?
     @NSManaged public var uploadedOnWatch: Bool
     @NSManaged public var contacts: NSSet?
-    @NSManaged public var messages: NSSet?
 
 }
 
@@ -48,22 +47,5 @@ extension User {
 
     @objc(removeContacts:)
     @NSManaged public func removeFromContacts(_ values: NSSet)
-
-}
-
-// MARK: Generated accessors for messages
-extension User {
-
-    @objc(addMessagesObject:)
-    @NSManaged public func addToMessages(_ value: Message)
-
-    @objc(removeMessagesObject:)
-    @NSManaged public func removeFromMessages(_ value: Message)
-
-    @objc(addMessages:)
-    @NSManaged public func addToMessages(_ values: NSSet)
-
-    @objc(removeMessages:)
-    @NSManaged public func removeFromMessages(_ values: NSSet)
 
 }
