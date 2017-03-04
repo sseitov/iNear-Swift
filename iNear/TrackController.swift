@@ -8,18 +8,18 @@
 
 import UIKit
 import GoogleMaps
-import SVProgressHUD
 
 class TrackController: UIViewController {
 
     @IBOutlet weak var map: GMSMapView!
     
     var user:User?
+    var track:String?
     var fromRoot = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if user == currentUser() {
+        if user == nil {
             setupTitle("My Track")
         } else {
             setupTitle("\(user!.shortName) track for last day")
@@ -27,7 +27,7 @@ class TrackController: UIViewController {
         setupBackButton()
         
         var path:GMSPath?
-        if user == currentUser() {
+        if track == nil {
             let all = LocationManager.shared.myTrack()
             let mutablePath = GMSMutablePath()
             for pt in all! {
@@ -35,7 +35,7 @@ class TrackController: UIViewController {
             }
             path = mutablePath
         } else {
-            path = GMSPath(fromEncodedPath: user!.lastTrack!)
+            path = GMSPath(fromEncodedPath: track!)
         }
         
         let userTrack = GMSPolyline(path: path)
@@ -61,7 +61,7 @@ class TrackController: UIViewController {
                 bounds = bounds.includingCoordinate(CLLocationCoordinate2D(latitude: pt.latitude, longitude: pt.longitude))
             }
         }
-        let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 20)
         map.moveCamera(update)
     }
     

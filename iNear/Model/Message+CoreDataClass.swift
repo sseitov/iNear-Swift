@@ -23,6 +23,11 @@ public class Message: NSManagedObject {
         } else {
             date = nil
         }
+        if let lat = data["latitude"] as? Double, let lon = data["longitude"] as? Double {
+            latitude = lat
+            longitude = lon
+        }
+        track = data["track"] as? String
         
         if imageURL != nil {
             let ref = Model.shared.storageRef.child(imageURL!)
@@ -36,16 +41,14 @@ public class Message: NSManagedObject {
             completion()
         }
     }
-    
+
     func setLocationData(_ data:[String:Any]) {
         if from != nil && date != nil {
             if let lat = data["latitude"] as? Double, let lon = data["longitude"] as? Double {
                 let coordinate = CLLocationCoordinate2D(latitude:lat, longitude:lon)
-                Model.shared.addCoordinateForUser(coordinate, at: date!.timeIntervalSince1970, userID: from!)
-            }
-            if let user = Model.shared.getUser(from!) {
-                user.lastTrack = data["track"] as? String
+                Model.shared.setCoordinateForUser(coordinate, at: date!.timeIntervalSince1970, userID: from!)
             }
         }
     }
+
 }

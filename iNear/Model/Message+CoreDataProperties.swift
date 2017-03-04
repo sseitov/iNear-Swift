@@ -2,7 +2,7 @@
 //  Message+CoreDataProperties.swift
 //  iNear
 //
-//  Created by Сергей Сейтов on 29.01.17.
+//  Created by Сергей Сейтов on 04.03.17.
 //  Copyright © 2017 Сергей Сейтов. All rights reserved.
 //
 
@@ -24,6 +24,9 @@ extension Message {
     @NSManaged public var text: String?
     @NSManaged public var to: String?
     @NSManaged public var uid: String?
+    @NSManaged public var latitude: Double
+    @NSManaged public var longitude: Double
+    @NSManaged public var track: String?
     @NSManaged public var owner: User?
 
 }

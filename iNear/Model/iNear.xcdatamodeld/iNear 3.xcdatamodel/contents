@@ -13,8 +13,11 @@
         <attribute name="imageData" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="isNew" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="to" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="track" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="owner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="messages" inverseEntity="User" syncable="YES"/>
     </entity>
@@ -27,7 +30,6 @@
         <attribute name="lastDate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="lastLatitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="lastLongitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="lastTrack" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="token" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -38,7 +40,7 @@
     </entity>
     <elements>
         <element name="Contact" positionX="-2864" positionY="-1198" width="128" height="118"/>
-        <element name="Message" positionX="-2864" positionY="-990" width="128" height="178"/>
-        <element name="User" positionX="-3096" positionY="-1197" width="128" height="283"/>
+        <element name="Message" positionX="-2864" positionY="-990" width="128" height="225"/>
+        <element name="User" positionX="-3096" positionY="-1197" width="128" height="270"/>
     </elements>
 </model>

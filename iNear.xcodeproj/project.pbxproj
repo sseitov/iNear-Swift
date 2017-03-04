@@ -357,6 +357,7 @@
 				2C311D701E69760100D79D65 /* SettingsController.swift */,
 				2C311D721E6976B200D79D65 /* TrackerCell.swift */,
 				2C311D741E69822100D79D65 /* ProfileCell.swift */,
+				2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */,
 			);
 			name = Profile;
 			sourceTree = "<group>";
@@ -367,7 +368,6 @@
 				2CD714441DF0A3D10077249E /* ChatController.swift */,
 				2C9423B41DFC67A1003C4075 /* PhotoController.swift */,
 				2C1EB4EE1DFF539100DBB257 /* RouteController.swift */,
-				2C2B3FBB1E3BB6AD003FE095 /* TrackController.swift */,
 			);
 			name = Chat;
 			sourceTree = "<group>";

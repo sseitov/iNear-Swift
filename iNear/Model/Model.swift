@@ -707,7 +707,7 @@ class Model : NSObject {
     
     // MARK: - Coordinate table
     
-    func addCoordinateForUser(_ coordinate:CLLocationCoordinate2D, at:Double, userID:String) {
+    func setCoordinateForUser(_ coordinate:CLLocationCoordinate2D, at:Double, userID:String) {
         if let user = getUser(userID) {
             user.lastDate = at
             user.lastLatitude = coordinate.latitude

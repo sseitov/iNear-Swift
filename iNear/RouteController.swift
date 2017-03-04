@@ -48,21 +48,6 @@ class RouteController: UIViewController {
         }
     }
     
-    func showTrack() {
-        performSegue(withIdentifier: "showTrack", sender: nil)
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if user!.lastTrack != nil {
-            let btn = UIBarButtonItem(title: "Track", style: .plain, target: self, action: #selector(RouteController.showTrack))
-            btn.tintColor = UIColor.white
-            navigationItem.setRightBarButton(btn, animated: true)
-        } else {
-            navigationItem.setRightBarButton(nil, animated: true)
-        }
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
