@@ -98,13 +98,4 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
         }
     }
     
-    // MARK: - Navigation
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showTrack" {
-            let next = segue.destination as! TrackController
-            next.user = currentUser()
-        }
-    }
-
 }

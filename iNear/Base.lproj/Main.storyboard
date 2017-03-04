@@ -24,7 +24,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8fS-aE-onr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-38" y="-630"/>
+            <point key="canvasLocation" x="-73" y="-331"/>
         </scene>
         <!--Detail-->
         <scene sceneID="yUG-lL-AsK">
@@ -54,11 +54,12 @@
                     <connections>
                         <segue destination="Azb-cL-7ug" kind="show" identifier="showPhoto" id="nJS-yb-X5M"/>
                         <segue destination="7yV-40-yWv" kind="show" identifier="showMap" id="a7U-RW-fKK"/>
+                        <segue destination="qdm-x4-YZq" kind="show" identifier="showTrack" id="sn6-L2-39e"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="759" y="455"/>
+            <point key="canvasLocation" x="49" y="467"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
@@ -180,7 +181,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="708.75" y="-631.69014084507046"/>
+            <point key="canvasLocation" x="752" y="-331"/>
         </scene>
         <!--Settings Controller-->
         <scene sceneID="fRT-PE-bJh">
@@ -306,7 +307,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="npJ-zJ-qjz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2362.5" y="-631.69014084507046"/>
+            <point key="canvasLocation" x="1583" y="467"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="cyW-4e-XVY">
@@ -323,7 +324,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OWp-E5-fWs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3084" y="-631"/>
+            <point key="canvasLocation" x="909" y="467"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="v4A-rk-2Pp">
@@ -340,7 +341,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="H6f-Na-msx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1584" y="-631"/>
+            <point key="canvasLocation" x="1584" y="-332"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="SaU-sD-v7L">
@@ -357,7 +358,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qwu-zO-12C" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1586" y="-1346"/>
+            <point key="canvasLocation" x="1583" y="-1018"/>
         </scene>
         <!--Login Controller-->
         <scene sceneID="wEa-Le-UcM">
@@ -456,7 +457,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vfl-AC-NaZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2364" y="-1345"/>
+            <point key="canvasLocation" x="2372" y="-1018"/>
         </scene>
         <!--Route Controller-->
         <scene sceneID="sP6-cq-iW9">
@@ -490,12 +491,11 @@
                     </navigationItem>
                     <connections>
                         <outlet property="map" destination="azv-yT-Cew" id="tml-mn-izM"/>
-                        <segue destination="qdm-x4-YZq" kind="show" identifier="showTrack" id="h1L-8H-5mz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1SG-Bh-uaI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1584" y="146"/>
+            <point key="canvasLocation" x="49" y="1257"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="r7l-gg-dq7">
@@ -512,7 +512,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SLD-UC-DBI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-39" y="456"/>
+            <point key="canvasLocation" x="-804" y="467"/>
         </scene>
         <!--Photo Controller-->
         <scene sceneID="m1C-gX-nBM">
@@ -567,7 +567,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="n1Y-VR-nJD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1564" y="859"/>
+            <point key="canvasLocation" x="-823" y="1256"/>
         </scene>
         <!--Track Controller-->
         <scene sceneID="luY-VZ-w3A">
@@ -578,11 +578,11 @@
                         <viewControllerLayoutGuide type="bottom" id="Uiv-bh-DqI"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="y3c-d5-MxU">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pdq-vS-SvK" customClass="GMSMapView">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                                <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
@@ -605,7 +605,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KMX-on-5bA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2363" y="146"/>
+            <point key="canvasLocation" x="908" y="1256"/>
         </scene>
     </scenes>
     <resources>
@@ -620,6 +620,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="be2-C3-Y8g"/>
-        <segue reference="OQ7-O2-Inc"/>
+        <segue reference="sn6-L2-39e"/>
     </inferredMetricsTieBreakers>
 </document>

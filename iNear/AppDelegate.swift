@@ -146,7 +146,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             let main = UIStoryboard(name: "Main", bundle: nil)
             if let nav = main.instantiateViewController(withIdentifier: "MyTrack") as? UINavigationController {
                 if let controller = nav.topViewController as? TrackController {
-                    controller.user = currentUser()
                     controller.fromRoot = true
                 }
                 nav.modalTransitionStyle = .flipHorizontal
