@@ -176,8 +176,46 @@ class LocationManager: NSObject {
         }
     }
     
+    func locationShapshot(size:CGSize, result:@escaping (UIImage?) -> ()) {
+        let center = myLocation()
+        if center == nil {
+            result(nil)
+            return
+        }
+        
+        let options = MKMapSnapshotOptions()
+        options.mapType = .standard
+        options.scale = 1.0
+        options.size = size
+        let span = MKCoordinateSpanMake(0.1, 0.1)
+        options.region = MKCoordinateRegionMake(center!, span)
+
+        let snapshotter = MKMapSnapshotter(options: options)
+        snapshotter.start(with: DispatchQueue.main, completionHandler: { snap, error in
+            if error != nil {
+                print(error!)
+                result(nil)
+                return
+            }
+            if let image = snap?.image {
+                UIGraphicsBeginImageContext(image.size)
+                image.draw(at: CGPoint())
+                
+                var startPt = snap!.point(for: center!)
+                startPt = CGPoint(x: startPt.x - self.startMarker!.size.width/2.0, y: startPt.y - self.startMarker!.size.height/2.0)
+                self.startMarker!.draw(at: startPt)
+                
+                let image = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                result(image)
+            } else {
+                result(nil)
+            }
+        })
+    }
+    
     func trackShapshot(size:CGSize, pointsCoint:Int, result:@escaping (UIImage?) -> ()) {
-        let track = LocationManager.shared.myTrack(pointsCoint)
+        let track = myTrack(pointsCoint)
         if track == nil {
             result(nil)
             return
