@@ -164,16 +164,8 @@ class LocationManager: NSObject {
     
     func clearTrack() {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Location")
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        if var all = try? managedObjectContext.fetch(fetchRequest) as! [Location] {
-            while all.count > 1 {
-                let point = all.last!
-                managedObjectContext.delete(point)
-                all.removeLast()
-            }
-            saveContext()
-        }
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        _ = try? persistentStoreCoordinator.execute(deleteRequest, with: managedObjectContext)
     }
     
     func trackSize() -> Int {
