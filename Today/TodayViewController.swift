@@ -8,15 +8,15 @@
 
 import UIKit
 import NotificationCenter
-import MapKit
 
 class TodayViewController: UIViewController, NCWidgetProviding {
             
     @IBOutlet weak var recordButton: UIButton!
-    @IBOutlet weak var trashView: UIView!
-    @IBOutlet weak var observeView: UIView!
+    @IBOutlet weak var trashButton: UIButton!
+    @IBOutlet weak var observeButton: UIButton!
     @IBOutlet weak var dateButton: UIButton!
     @IBOutlet weak var trackCounter: UILabel!
+    @IBOutlet weak var observeLabel: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,15 +24,38 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         self.extensionContext?.widgetLargestAvailableDisplayMode = .compact
     }
     
-    func formattedDate(_ date:Date) -> String {
+    private func formattedDate(_ date:Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMM HH:mm:ss"
         return formatter.string(from: date).uppercased()
     }
 
+    private func enableTrackerButtons(_ count:Int) {
+        trashButton.alpha = count > 1 ? 1 : 0.4
+        trashButton.isEnabled = count > 1
+        observeButton.alpha = count > 1 ? 1 : 0.4
+        observeButton.isEnabled = count > 1
+        trackCounter.text = count > 1 ? "CLEAR \(count)" : ""
+        observeLabel.text = count > 1 ? "SHOW TRACK" : ""
+    }
+    
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
         self.refresh()
         completionHandler(NCUpdateResult.newData)
+    }
+    
+    @IBAction func refresh() {
+        if let date = LocationManager.shared.myLastLocationDate() {
+            dateButton.setTitle("LAST POINT: \(formattedDate(date))", for: .normal)
+        } else {
+            dateButton.setTitle("REFRESH STATUS", for: .normal)
+        }
+        if LocationManager.shared.isRunning() {
+            recordButton.setImage(UIImage(named: "stop"), for: .normal)
+        } else {
+            recordButton.setImage(UIImage(named: "location"), for: .normal)
+        }
+        enableTrackerButtons(LocationManager.shared.trackSize())
     }
     
     @IBAction func startTracker(_ sender: UIButton) {
@@ -45,38 +68,14 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         }
     }
     
-    @IBAction func openApp(_ sender: Any) {
-        extensionContext?.open(URL(string: "iNearby://")!, completionHandler: nil)
-    }
-    
-    @IBAction func refresh() {
-        if let date = LocationManager.shared.myLastLocationDate() {
-            dateButton.setTitle("LAST POINT: \(formattedDate(date))", for: .normal)
-        } else {
-            dateButton.setTitle("REFRESH STATUS", for: .normal)
-        }
-        let trackSize = LocationManager.shared.trackSize()
-        if trackSize > 1 {
-            trashView.isHidden = false
-            trackCounter.text = "CLEAR \(trackSize)"
-        } else {
-            trashView.isHidden = true
-        }
-        observeView.isHidden = trashView.isHidden
-        
-        if LocationManager.shared.isRunning() {
-            recordButton.setImage(UIImage(named: "stop"), for: .normal)
-        } else {
-            recordButton.setImage(UIImage(named: "location"), for: .normal)
-        }
-    }
-    
     @IBAction func clearTracker(_ sender: Any) {
         LocationManager.shared.clearTrack()
         dateButton.setTitle("REFRESH STATUS", for: .normal)
-        trackCounter.text = ""
-        trashView.isHidden = (LocationManager.shared.trackSize() < 2)
-        observeView.isHidden = trashView.isHidden
+        enableTrackerButtons(LocationManager.shared.trackSize())
+    }
+    
+    @IBAction func openApp(_ sender: Any) {
+        extensionContext?.open(URL(string: "iNearby://")!, completionHandler: nil)
     }
 
 }

@@ -66,10 +66,8 @@
 		2CC50C3A1DECC93400D27456 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC50C391DECC93400D27456 /* StringExtensions.swift */; };
 		2CD714431DF0984C0077249E /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD714421DF0984C0077249E /* ContactCell.swift */; };
 		2CD714451DF0A3D10077249E /* ChatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD714441DF0A3D10077249E /* ChatController.swift */; };
-		2CDFA7FA1E6AAC72007D9FF0 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CDFA7F91E6AAC72007D9FF0 /* MapKit.framework */; };
 		2CDFA7FE1E6ACC13007D9FF0 /* MKMapRectExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDFA7FD1E6ACC13007D9FF0 /* MKMapRectExtension.swift */; };
-		2CDFA7FF1E6ACC20007D9FF0 /* MKMapRectExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDFA7FD1E6ACC13007D9FF0 /* MKMapRectExtension.swift */; };
-		2CDFA8011E6B618B007D9FF0 /* MediaItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDFA8001E6B618B007D9FF0 /* MediaItems.swift */; };
+		2CDFA8011E6B618B007D9FF0 /* TrackMediaItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDFA8001E6B618B007D9FF0 /* TrackMediaItem.swift */; };
 		2CE2689F1E66E15600FE8219 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CE2689E1E66E15600FE8219 /* NotificationCenter.framework */; };
 		2CE268A21E66E15600FE8219 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE268A11E66E15600FE8219 /* TodayViewController.swift */; };
 		2CE268A51E66E15600FE8219 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE268A31E66E15600FE8219 /* MainInterface.storyboard */; };
@@ -223,7 +221,7 @@
 		2CD714441DF0A3D10077249E /* ChatController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatController.swift; sourceTree = "<group>"; };
 		2CDFA7F91E6AAC72007D9FF0 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		2CDFA7FD1E6ACC13007D9FF0 /* MKMapRectExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MKMapRectExtension.swift; path = Extensions/MKMapRectExtension.swift; sourceTree = "<group>"; };
-		2CDFA8001E6B618B007D9FF0 /* MediaItems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaItems.swift; sourceTree = "<group>"; };
+		2CDFA8001E6B618B007D9FF0 /* TrackMediaItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackMediaItem.swift; sourceTree = "<group>"; };
 		2CE2689D1E66E15600FE8219 /* Today.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Today.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE2689E1E66E15600FE8219 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		2CE268A11E66E15600FE8219 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
@@ -264,7 +262,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CDFA7FA1E6AAC72007D9FF0 /* MapKit.framework in Frameworks */,
 				2CE2689F1E66E15600FE8219 /* NotificationCenter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -370,7 +367,7 @@
 				2CD714441DF0A3D10077249E /* ChatController.swift */,
 				2C9423B41DFC67A1003C4075 /* PhotoController.swift */,
 				2C1EB4EE1DFF539100DBB257 /* RouteController.swift */,
-				2CDFA8001E6B618B007D9FF0 /* MediaItems.swift */,
+				2CDFA8001E6B618B007D9FF0 /* TrackMediaItem.swift */,
 			);
 			name = Chat;
 			sourceTree = "<group>";
@@ -630,7 +627,7 @@
 								enabled = 1;
 							};
 							com.apple.Maps.iOS = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -779,7 +776,7 @@
 				2C8B18AD1DFB1F8500769A12 /* User+CoreDataProperties.swift in Sources */,
 				2C8B18AC1DFB1F8500769A12 /* User+CoreDataClass.swift in Sources */,
 				2CE268C21E672F7C00FE8219 /* LocationManager.swift in Sources */,
-				2CDFA8011E6B618B007D9FF0 /* MediaItems.swift in Sources */,
+				2CDFA8011E6B618B007D9FF0 /* TrackMediaItem.swift in Sources */,
 				2C53BB431E028C4000307C63 /* Contact+CoreDataClass.swift in Sources */,
 				2C87D3331DDF1A5C00F05528 /* LGProgressView.m in Sources */,
 				2C9423B11DFC6456003C4075 /* Message+CoreDataProperties.swift in Sources */,
@@ -820,7 +817,6 @@
 				2CE268B81E67156400FE8219 /* LocationModel.xcdatamodeld in Sources */,
 				2C8060771E689B45001B9409 /* UIViewExtensions.swift in Sources */,
 				2CE268C31E672F9C00FE8219 /* LocationManager.swift in Sources */,
-				2CDFA7FF1E6ACC20007D9FF0 /* MKMapRectExtension.swift in Sources */,
 				2CE268C51E675A3100FE8219 /* Credentials.swift in Sources */,
 				2CE268C41E6758C200FE8219 /* UIColorExtensions.swift in Sources */,
 				2CE268A21E66E15600FE8219 /* TodayViewController.swift in Sources */,

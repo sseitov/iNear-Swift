@@ -156,10 +156,11 @@
                     <size key="freeformSize" width="320" height="110"/>
                     <connections>
                         <outlet property="dateButton" destination="oeX-iw-t7F" id="NeE-gc-0dx"/>
-                        <outlet property="observeView" destination="LvN-VN-3Mo" id="0Ql-j0-Mc7"/>
+                        <outlet property="observeButton" destination="Mwm-7f-kQW" id="L5J-HW-etL"/>
+                        <outlet property="observeLabel" destination="4g5-zq-fZM" id="daE-eJ-eTR"/>
                         <outlet property="recordButton" destination="JYq-dB-naf" id="BXO-9E-7Sx"/>
                         <outlet property="trackCounter" destination="dlX-dc-yfn" id="x6W-6N-g8f"/>
-                        <outlet property="trashView" destination="lgD-7g-WDR" id="Nzc-oq-mHq"/>
+                        <outlet property="trashButton" destination="HfW-cl-hiB" id="39V-9W-ieY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>

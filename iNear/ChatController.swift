@@ -11,6 +11,28 @@ import Firebase
 import JSQMessagesViewController
 import SVProgressHUD
 
+class Avatar : NSObject, JSQMessageAvatarImageDataSource {
+    
+    var userImage:UIImage?
+    
+    init(_ user:User) {
+        super.init()
+        self.userImage = user.getImage().inCircle()
+    }
+    
+    func avatarImage() -> UIImage! {
+        return userImage
+    }
+    
+    func avatarHighlightedImage() -> UIImage! {
+        return userImage
+    }
+    
+    func avatarPlaceholderImage() -> UIImage! {
+        return UIImage(named: "logo")?.inCircle()
+    }
+}
+
 class ChatController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
     var user:User?
@@ -317,7 +339,9 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         } else if segue.identifier == "showTrack" {
             let message = sender as! JSQMessage
             let controller = segue.destination as! TrackController
-            controller.user = self.user
+            if message.senderId != currentUser()!.uid! {
+                controller.user = self.user
+            }
             let track = message.media as! TrackMediaItem
             controller.track = track.track
         }

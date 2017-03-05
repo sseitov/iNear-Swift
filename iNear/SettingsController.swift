@@ -69,7 +69,6 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
                 return trackerCell
             } else {
                 let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-                cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .none
                 cell.textLabel?.font = UIFont.condensedFont()
                 if LocationManager.shared.trackSize() > 1 {
@@ -79,8 +78,10 @@ class SettingsController: UITableViewController, TrackerCellDelegate, ProfileCel
                 }
                 if indexPath.row == 1 {
                     cell.textLabel?.text = "Show track"
+                    cell.accessoryType = .disclosureIndicator
                 } else {
                     cell.textLabel?.text = "Clear track"
+                    cell.accessoryType = .none
                 }
                 return cell
             }

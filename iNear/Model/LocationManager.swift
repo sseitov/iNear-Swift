@@ -9,15 +9,12 @@
 import UIKit
 import CoreLocation
 import CoreData
-import MapKit
 
 class LocationManager: NSObject {
     
     static let shared = LocationManager()
     
     let locationManager = CLLocationManager()
-    let startMarker = UIImage(named: "startPoint")
-    let finishMarker = UIImage(named: "finishPoint")
    
     private override init() {
         super.init()
@@ -182,94 +179,6 @@ class LocationManager: NSObject {
             return 0
         }
     }
-    
-    func locationShapshot(size:CGSize, center:CLLocationCoordinate2D, result:@escaping (UIImage?) -> ()) {
-        let options = MKMapSnapshotOptions()
-        options.mapType = .standard
-        options.scale = 1.0
-        options.size = size
-        let span = MKCoordinateSpanMake(0.1, 0.1)
-        options.region = MKCoordinateRegionMake(center, span)
-
-        let snapshotter = MKMapSnapshotter(options: options)
-        snapshotter.start(with: DispatchQueue.main, completionHandler: { snap, error in
-            if error != nil {
-                print(error!)
-                result(nil)
-                return
-            }
-            if let image = snap?.image {
-                UIGraphicsBeginImageContext(image.size)
-                image.draw(at: CGPoint())
-                
-                var startPt = snap!.point(for: center)
-                startPt = CGPoint(x: startPt.x - self.startMarker!.size.width/2.0, y: startPt.y - self.startMarker!.size.height/2.0)
-                self.startMarker!.draw(at: startPt)
-                
-                let image = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
-                result(image)
-            } else {
-                result(nil)
-            }
-        })
-    }
-    
-    func trackShapshot(size:CGSize, points:[CLLocationCoordinate2D], result:@escaping (UIImage?) -> ()) {
-        
-        let options = MKMapSnapshotOptions()
-        let rect = MKMapRect(coordinates: points)
-        let inset = -rect.size.width*0.1
-        options.mapRect = MKMapRectInset(rect, inset, inset)
-        options.mapType = .standard
-        options.scale = 1.0
-        options.size = size
-        
-        let snapshotter = MKMapSnapshotter(options: options)
-        snapshotter.start(with: DispatchQueue.main, completionHandler: { snap, error in
-            if error != nil {
-                print(error!)
-                result(nil)
-                return
-            }
-            if let image = snap?.image {
-                UIGraphicsBeginImageContext(image.size)
-                image.draw(at: CGPoint())
-                let context = UIGraphicsGetCurrentContext()
-                context?.setLineWidth(4.0)
-                context?.setStrokeColor(UIColor.traceColor().cgColor)
-                context?.beginPath()
-                
-                var startPt:CGPoint = CGPoint()
-                var drawPt:CGPoint = CGPoint()
-                for i in 0..<points.count {
-                    drawPt = snap!.point(for: points[i])
-                    if i == 0 {
-                        startPt = drawPt
-                        context?.move(to: drawPt)
-                    } else {
-                        context?.addLine(to: drawPt)
-                    }
-                }
-                
-                startPt = CGPoint(x: startPt.x - self.startMarker!.size.width/2.0, y: startPt.y - self.startMarker!.size.height/2.0)
-                self.startMarker!.draw(at: startPt)
-                if points.count > 1 {
-                    context?.strokePath()
-                    drawPt = CGPoint(x: drawPt.x - self.finishMarker!.size.width/2.0, y: drawPt.y - self.finishMarker!.size.height/2.0)
-                    self.finishMarker!.draw(at: startPt)
-                    self.startMarker!.draw(at: drawPt)
-                }
-                                
-                let image = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
-                result(image)
-            } else {
-                result(nil)
-            }
-        })
-    }
-
 }
 
 extension LocationManager : CLLocationManagerDelegate {
