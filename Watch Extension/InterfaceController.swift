@@ -21,7 +21,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     private var session:WCSession?
     private var trackerRunning = false
     private var lastLocation:[String:Any]?
-    private var trackSize:Int = 0
+//    private var trackSize:Int = 0
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
@@ -29,7 +29,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             session = WCSession.default()
             session!.delegate = self
             session!.activate()
-            enableButtons(false)
+            enableButtons(0)
         }
     }
     
@@ -48,9 +48,12 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         return formatter.string(from: date).uppercased()
     }
 
-    private func enableButtons(_ enable:Bool) {
-        clearButton.setHidden(!enable)
-        showButton.setHidden(!enable)
+    private func enableButtons(_ size:Int) {
+        clearButton.setEnabled(size > 1)
+        showButton.setEnabled(size > 1)
+        let text = size > 0 ? "\(size)" : ""
+        self.counter.setText(text)
+
     }
     
     @IBAction func refreshStatus() {
@@ -75,12 +78,10 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 
                 self.lastLocation = status["lastLocation"] as? [String:Any]
                 if let size = status["trackSize"] as? Int {
-                    self.trackSize = size
-                    self.counter.setText("\(size)")
+                    self.enableButtons(size)
                 } else {
-                    self.counter.setText("")
+                    self.enableButtons(0)
                 }
-                self.enableButtons(self.trackSize > 1)
             }
         }, errorHandler: { error in
             DispatchQueue.main.async {
@@ -114,8 +115,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     @IBAction func clearTrack() {
         session!.sendMessage(["command": "clear"], replyHandler: { result in
             DispatchQueue.main.async {
-                self.enableButtons(false)
-                self.counter.setText("")
+                self.enableButtons(0)
             }
         }, errorHandler: { error in
             DispatchQueue.main.async {

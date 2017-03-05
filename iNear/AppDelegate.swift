@@ -277,7 +277,7 @@ extension AppDelegate : WCSessionDelegate {
     // MARK: - iWatch messages
  
     func trackerStatus() -> [String:Any] {
-        var status:[String:Any] = ["isRunning" : LocationManager.shared.isRunning]
+        var status:[String:Any] = ["isRunning" : LocationManager.shared.isRunning()]
         if let date = LocationManager.shared.myLastLocationDate() {
             status["lastDate"] = date
         }
@@ -293,10 +293,11 @@ extension AppDelegate : WCSessionDelegate {
             if command == "status" {
                 replyHandler(self.trackerStatus())
             } else if command == "start" {
-                replyHandler(["result": LocationManager.shared.start()])
+                LocationManager.shared.startInBackground()
+                replyHandler(["result": LocationManager.shared.isRunning()])
             } else if command == "stop" {
                 LocationManager.shared.stop()
-                replyHandler(["result": LocationManager.shared.isRunning])
+                replyHandler(["result": LocationManager.shared.isRunning()])
             } else if command == "clear" {
                 LocationManager.shared.clearTrack()
                 replyHandler([:])

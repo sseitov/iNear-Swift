@@ -112,7 +112,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
             } else {
                 SVProgressHUD.dismiss()
                 Model.shared.setEmailUser(firUser!, email: user)
-                LocationManager.shared.start()
+                LocationManager.shared.startInBackground()
                 self.goBack()
             }
         })
@@ -144,7 +144,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                             if let profile = result as? [String:Any] {
                                 Model.shared.setFacebookUser(firUser!, profile: profile, completion: {
                                     SVProgressHUD.dismiss()
-                                    LocationManager.shared.start()
+                                    LocationManager.shared.startInBackground()
                                     self.goBack()
                                 })
                             } else {
@@ -180,7 +180,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
             } else {
                 Model.shared.setGoogleUser(firUser!, googleProfile: user.profile, completion: {
                     SVProgressHUD.dismiss()
-                    LocationManager.shared.start()
+                    LocationManager.shared.startInBackground()
                     self.goBack()
                 })
             }

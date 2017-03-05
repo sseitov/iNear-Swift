@@ -22,7 +22,7 @@ class LocationManager: NSObject {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10.0
         locationManager.headingFilter = 5.0
-        locationManager.activityType = .automotiveNavigation
+//        locationManager.activityType = .automotiveNavigation
         locationManager.pausesLocationUpdatesAutomatically = false
     }
 
@@ -30,8 +30,6 @@ class LocationManager: NSObject {
         if CLLocationManager.locationServicesEnabled() {
             if CLLocationManager.authorizationStatus() != .authorizedAlways {
                 locationManager.requestAlwaysAuthorization()
-            } else {
-                locationManager.allowsBackgroundLocationUpdates = true
             }
         }
     }
@@ -41,6 +39,13 @@ class LocationManager: NSObject {
             locationManager.startUpdatingLocation()
             sharedDefaults.set(true, forKey: "trackerRunning")
             sharedDefaults.synchronize()
+        }
+    }
+    
+    func startInBackground() {
+        if CLLocationManager.authorizationStatus() == .authorizedAlways {
+            start()
+            locationManager.allowsBackgroundLocationUpdates = true
         }
     }
     

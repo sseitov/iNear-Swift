@@ -24,7 +24,7 @@ class TrackerCell: UITableViewCell {
     
     @IBAction func runTracker(_ sender: UISwitch) {
         if sender.isOn {
-            _ = LocationManager.shared.start()
+            LocationManager.shared.startInBackground()
         } else {
             LocationManager.shared.stop()
         }
